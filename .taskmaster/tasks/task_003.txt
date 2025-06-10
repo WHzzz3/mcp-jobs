@@ -1,0 +1,53 @@
+# Task ID: 3
+# Title: Implement Schema Merger Utility
+# Status: done
+# Dependencies: 2
+# Priority: high
+# Description: Create utility function to merge common schema with chart-specific schemas
+# Details:
+Implemented SchemaMerger class that:
+- Loads and caches common.schema.json
+- Merges with specific chart schemas
+- Handles schema references and inheritance
+- Provides validation and utility methods
+- Supports reference resolution and caching
+
+# Test Strategy:
+Comprehensive unit test suite with 13 passing tests covering:
+- Chart type retrieval
+- Schema merging functionality
+- Reference resolution
+- Caching mechanism
+- Error handling
+
+# Subtasks:
+## 3.1. Create SchemaMerger class [completed]
+### Dependencies: None
+### Description: 
+### Details:
+Implemented core SchemaMerger class with loading and caching of common.schema.json
+
+## 3.2. Implement reference resolution [completed]
+### Dependencies: None
+### Description: 
+### Details:
+Built reference resolution system handling commonChartDefinitions.json#/definitions/xxx format and nested references
+
+## 3.3. Add utility methods [completed]
+### Dependencies: None
+### Description: 
+### Details:
+Implemented getAvailableChartTypes(), mergeSchemas(), and validateMergedSchema() methods
+
+## 3.4. Implement caching mechanism [completed]
+### Dependencies: None
+### Description: 
+### Details:
+Added caching system to improve performance of repeated operations
+
+## 3.5. Write comprehensive tests [completed]
+### Dependencies: None
+### Description: 
+### Details:
+Created and verified 13 unit tests covering all major functionality
+

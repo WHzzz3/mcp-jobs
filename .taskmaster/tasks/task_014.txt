@@ -1,0 +1,13 @@
+# Task ID: 14
+# Title: Create Mixed Charts Schema
+# Status: done
+# Dependencies: 2
+# Priority: medium
+# Description: Implement schemas for mixed chart types
+# Details:
+Create schemas for:
+- mixed-line-stacked-column.schema.json
+- mixed-line-grouped-column.schema.json
+
+# Test Strategy:
+Schema validation and structure verification

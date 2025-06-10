@@ -1,0 +1,15 @@
+# Task ID: 16
+# Title: Develop Test Framework
+# Status: pending
+# Dependencies: 7, 9, 11, 13, 15
+# Priority: high
+# Description: Create automated testing framework for chart generators
+# Details:
+Implement test framework that:
+- Loads sample JSONs
+- Executes generators
+- Compares outputs
+- Reports differences
+
+# Test Strategy:
+Meta-testing of the test framework itself

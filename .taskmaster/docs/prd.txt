@@ -1,0 +1,38 @@
+项目名称：MCP-Server 图表 JSON 配置生成器
+
+项目目标：
+开发一个能够生成多种不同类型图表 JSON 配置的 MCP-Server。该服务支持多种图表类型，能够根据输入参数生成符合 schema 校验的图表配置，并支持自动化测试。
+
+目录结构说明：
+- src/mastra/tools/chart/configs/：存放各类图表的 JSON 配置实例，文件名即为图表类型名称（如 bar-progress.sample.json 代表 bar-progress 图表）。
+- src/mastra/tools/chart/schemas/：存放所有图表的 schema 定义。
+  - common.schema.json：所有图表共用的配置定义。
+  - *.schema.json：每种图表私有的配置定义，文件名与图表类型对应。
+
+核心需求：
+1. 参考 src/mastra/tools/weather-tool.ts 的写法，为每种图表类型编写一个配置生成函数：
+   - 每个函数需有输入输出接口定义（TypeScript interface）。
+   - 输入输出均需用 zod schema 进行校验。
+   - 支持 createTool 工厂方法注册。
+2. 每个图表类型的生成函数需支持：
+   - 读取并合并 common.schema.json 和对应的私有 schema。
+   - 根据输入参数生成符合 schema 的 JSON 配置。
+   - 输出结构需与 configs 目录下的 *.sample.json 一致。
+3. 自动化测试：
+   - 针对每个 configs 目录下的 *.sample.json，编写测试用例，验证生成函数输出与 sample.json 一致。
+   - 测试需覆盖所有图表类型。
+
+开发流程建议：
+1. 先实现通用的 schema 合并与校验工具。
+2. 按照 weather-tool.ts 的风格，为每个图表类型实现 createTool 工厂注册的生成函数。
+3. 为每个生成函数编写输入输出 interface 和 zod schema。
+4. 编写自动化测试，遍历 configs 目录下所有 sample.json，调用对应生成函数并比对输出。
+
+验收标准：
+- 每个图表类型均有独立的生成函数、输入输出 interface、zod schema。
+- 所有生成函数输出均通过自动化测试，结果与 sample.json 完全一致。
+- 代码结构清晰，易于扩展和维护。
+
+补充说明：
+- 图表类型包括但不限于：bar-progress、basic-bar、voronoi、stacked-column、stacked-bar、stacked-area、single-layer-treemap、sankey、rose-pie、river-area、mixed-line-stacked-column、mixed-line-grouped-column、jade-jue、grouped-column、grouped-bar、funnel、donut-progress、difference-arrow-column、difference-arrow-bar、descartes-heatmap、compose-waterfall、check-in-bubble、cascaded-area、butterfly、basic-radar、basic-pie、basic-line、basic-column 等。
+- 未来如有新增图表类型，需按本规范补充生成函数和测试。 

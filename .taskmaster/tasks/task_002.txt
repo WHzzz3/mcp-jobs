@@ -1,0 +1,55 @@
+# Task ID: 2
+# Title: Create Common Schema Definition
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Develop common.schema.json containing shared configuration definitions for all chart types
+# Details:
+Successfully created src/mastra/tools/chart/schemas/common.schema.json with comprehensive shared definitions including color systems, positioning, data structures, and various configurations. The schema is being referenced by individual chart schemas via $ref.
+
+# Test Strategy:
+Schema has been validated for syntax and structure using JSON Schema validator. All components are verified to be working correctly.
+
+# Subtasks:
+## 2.1. Color System Implementation [completed]
+### Dependencies: None
+### Description: Implemented complete color system including simpleColor, gradientColor, colorOption, and borderElementColorOption
+### Details:
+
+
+## 2.2. Position and Layout Configurations [completed]
+### Dependencies: None
+### Description: Implemented positionXY supporting left/center/right and top/center/bottom positioning
+### Details:
+
+
+## 2.3. Data Structure Definition [completed]
+### Dependencies: None
+### Description: Implemented chartDataArray with three-dimensional array structure
+### Details:
+
+
+## 2.4. UI Component Configurations [completed]
+### Dependencies: None
+### Description: Implemented titleConfig, backgroundConfig, legendConfig, and tooltipConfig
+### Details:
+
+
+## 2.5. Formatting and Animation [completed]
+### Dependencies: None
+### Description: Implemented numberFormatConfig and animationConfig with transition effects
+### Details:
+
+
+## 2.6. Layout and Spacing [completed]
+### Dependencies: None
+### Description: Implemented paddingConfig for internal spacing control
+### Details:
+
+
+## 2.7. Schema Integration [completed]
+### Dependencies: None
+### Description: Verified successful $ref integration with individual chart schemas
+### Details:
+
+

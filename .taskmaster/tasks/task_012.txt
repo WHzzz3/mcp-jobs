@@ -1,0 +1,64 @@
+# Task ID: 12
+# Title: Create Complex Charts Schema
+# Status: done
+# Dependencies: 2
+# Priority: medium
+# Description: Implement and validate schemas for complex chart types (voronoi, sankey, treemap)
+# Details:
+Successfully created and validated schemas for:
+
+1. voronoi.schema.json (404 lines)
+- Key-value data pipeline support
+- Three-column data format (category-object-value)
+- Advanced features: multiple shapes, drawing modes, corner radius
+
+2. sankey.schema.json (365 lines)
+- Source-target-value data flow format
+- Node width configuration
+- Gradient links and gap control
+
+3. single-layer-treemap.schema.json (436 lines)
+- Name-value pair data format
+- Border radius and gap configuration
+- Opacity controls
+
+Technical Achievements:
+- Full compatibility with common schema
+- Comprehensive test coverage (64 test cases)
+- Strict value constraints with sensible defaults
+- Integration with SchemaMerger
+- Adherence to project architecture standards
+
+# Test Strategy:
+Comprehensive validation strategy:
+1. Schema structure tests (28 cases)
+2. Schema functionality tests (36 cases)
+3. SchemaMerger integration verification
+4. Common schema reference validation
+5. Sample configuration validation
+
+# Subtasks:
+## 12.1. Schema Development [completed]
+### Dependencies: None
+### Description: 
+### Details:
+Created all three schema files with proper structure and validation rules
+
+## 12.2. Test Suite Implementation [completed]
+### Dependencies: None
+### Description: 
+### Details:
+Developed 64 test cases across structure and functionality validation
+
+## 12.3. Integration Verification [completed]
+### Dependencies: None
+### Description: 
+### Details:
+Verified SchemaMerger compatibility and common schema references
+
+## 12.4. Sample Configuration Validation [completed]
+### Dependencies: None
+### Description: 
+### Details:
+Validated all sample configurations against the new schemas
+

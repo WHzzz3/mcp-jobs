@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "mastra": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mastra/mcp-docs-server@latest"
+      ]
+    },
+    "taskmaster-ai": {
+      "command": "npx",
+      "args": ["-y", "task-master-ai"],
+      "stdio": "pipe",
+      "env": {
+        "OPENROUTER_API_KEY": "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"
+      }
+    }
+  }
+}

@@ -1,0 +1,748 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Setup Project Structure",
+      "description": "Initialize project directory structure and base configuration files according to the PRD requirements",
+      "status": "done",
+      "dependencies": [],
+      "priority": "high",
+      "details": "Create the following directory structure:\n- src/mastra/tools/chart/configs/\n- src/mastra/tools/chart/schemas/\n- src/mastra/tools/chart/__tests__/\n\nSetup configuration files and dependencies:\n- Initialize package.json with vitest test scripts\n- Configure tsconfig.json\n- Setup vitest.config.ts\n- Install required dependencies including vitest and @vitest/ui",
+      "testStrategy": "1. Verify all required directories exist and are properly structured\n2. Confirm all configuration files are present and properly configured\n3. Validate test dependencies are installed and working\n4. Run a sample test to verify the test setup",
+      "subtasks": [
+        {
+          "id": "1.1",
+          "title": "Create Directory Structure",
+          "description": "Setup required project directories",
+          "status": "completed"
+        },
+        {
+          "id": "1.2",
+          "title": "Update package.json",
+          "description": "Add vitest test scripts to package.json",
+          "status": "completed"
+        },
+        {
+          "id": "1.3",
+          "title": "Add Test Dependencies",
+          "description": "Install vitest and @vitest/ui",
+          "status": "completed"
+        },
+        {
+          "id": "1.4",
+          "title": "Create Vitest Config",
+          "description": "Setup vitest.config.ts configuration file",
+          "status": "completed"
+        },
+        {
+          "id": "1.5",
+          "title": "Install Dependencies",
+          "description": "Install all required project dependencies",
+          "status": "completed"
+        },
+        {
+          "id": "1.6",
+          "title": "Create Test Directory",
+          "description": "Setup src/mastra/tools/chart/__tests__/ directory",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Create Common Schema Definition",
+      "description": "Develop common.schema.json containing shared configuration definitions for all chart types",
+      "status": "done",
+      "dependencies": [
+        1
+      ],
+      "priority": "high",
+      "details": "Successfully created src/mastra/tools/chart/schemas/common.schema.json with comprehensive shared definitions including color systems, positioning, data structures, and various configurations. The schema is being referenced by individual chart schemas via $ref.",
+      "testStrategy": "Schema has been validated for syntax and structure using JSON Schema validator. All components are verified to be working correctly.",
+      "subtasks": [
+        {
+          "id": "2.1",
+          "title": "Color System Implementation",
+          "description": "Implemented complete color system including simpleColor, gradientColor, colorOption, and borderElementColorOption",
+          "status": "completed"
+        },
+        {
+          "id": "2.2",
+          "title": "Position and Layout Configurations",
+          "description": "Implemented positionXY supporting left/center/right and top/center/bottom positioning",
+          "status": "completed"
+        },
+        {
+          "id": "2.3",
+          "title": "Data Structure Definition",
+          "description": "Implemented chartDataArray with three-dimensional array structure",
+          "status": "completed"
+        },
+        {
+          "id": "2.4",
+          "title": "UI Component Configurations",
+          "description": "Implemented titleConfig, backgroundConfig, legendConfig, and tooltipConfig",
+          "status": "completed"
+        },
+        {
+          "id": "2.5",
+          "title": "Formatting and Animation",
+          "description": "Implemented numberFormatConfig and animationConfig with transition effects",
+          "status": "completed"
+        },
+        {
+          "id": "2.6",
+          "title": "Layout and Spacing",
+          "description": "Implemented paddingConfig for internal spacing control",
+          "status": "completed"
+        },
+        {
+          "id": "2.7",
+          "title": "Schema Integration",
+          "description": "Verified successful $ref integration with individual chart schemas",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Implement Schema Merger Utility",
+      "description": "Create utility function to merge common schema with chart-specific schemas",
+      "status": "done",
+      "dependencies": [
+        2
+      ],
+      "priority": "high",
+      "details": "Implemented SchemaMerger class that:\n- Loads and caches common.schema.json\n- Merges with specific chart schemas\n- Handles schema references and inheritance\n- Provides validation and utility methods\n- Supports reference resolution and caching",
+      "testStrategy": "Comprehensive unit test suite with 13 passing tests covering:\n- Chart type retrieval\n- Schema merging functionality\n- Reference resolution\n- Caching mechanism\n- Error handling",
+      "subtasks": [
+        {
+          "id": "3.1",
+          "title": "Create SchemaMerger class",
+          "status": "completed",
+          "details": "Implemented core SchemaMerger class with loading and caching of common.schema.json"
+        },
+        {
+          "id": "3.2",
+          "title": "Implement reference resolution",
+          "status": "completed",
+          "details": "Built reference resolution system handling commonChartDefinitions.json#/definitions/xxx format and nested references"
+        },
+        {
+          "id": "3.3",
+          "title": "Add utility methods",
+          "status": "completed",
+          "details": "Implemented getAvailableChartTypes(), mergeSchemas(), and validateMergedSchema() methods"
+        },
+        {
+          "id": "3.4",
+          "title": "Implement caching mechanism",
+          "status": "completed",
+          "details": "Added caching system to improve performance of repeated operations"
+        },
+        {
+          "id": "3.5",
+          "title": "Write comprehensive tests",
+          "status": "completed",
+          "details": "Created and verified 13 unit tests covering all major functionality"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Develop Base Chart Tool Interface",
+      "description": "Create base interface and types for chart configuration generation tools",
+      "status": "done",
+      "dependencies": [
+        3
+      ],
+      "priority": "high",
+      "details": "Implemented comprehensive base architecture for chart tools including:\n\n1. Core Interfaces & Types:\n- BaseChartInput/Output interfaces\n- ChartToolContext and ChartToolOptions\n- Zod schemas for input/output validation\n- BaseChartTool abstract class\n\n2. BaseChartTool Implementation:\n- Chart type management\n- Default value merging\n- Input validation\n- Data mapping creation\n- Abstract method definitions\n\n3. Chart Tool Factory System:\n- createChartTool() factory function\n- createChartTools() batch creation\n- ChartToolRegistry singleton\n- Tool lifecycle management\n\n4. Utility Methods:\n- Default config generators\n- Theme color system (light/dark)\n- Data validation and processing\n- Deep merge and config composition",
+      "testStrategy": "Comprehensive test suite including:\n- BaseChartTool functionality tests\n- Factory function tests\n- Registry tests\n- Utility method tests\n- TestChartTool example implementation\n\nAll implementations validated through TypeScript compilation checks and interface validation",
+      "subtasks": [
+        {
+          "id": "4.1",
+          "title": "Core Interfaces & Types Implementation",
+          "status": "completed",
+          "details": "Implemented BaseChartInput/Output, ChartToolContext, ChartToolOptions interfaces and Zod schemas"
+        },
+        {
+          "id": "4.2",
+          "title": "BaseChartTool Abstract Class",
+          "status": "completed",
+          "details": "Implemented abstract base class with type management, merging, validation, and mapping features"
+        },
+        {
+          "id": "4.3",
+          "title": "Chart Tool Factory System",
+          "status": "completed",
+          "details": "Created factory functions, registry system, and lifecycle management"
+        },
+        {
+          "id": "4.4",
+          "title": "Utility Methods",
+          "status": "completed",
+          "details": "Implemented config generators, theme system, and data processing utilities"
+        },
+        {
+          "id": "4.5",
+          "title": "Test Suite Development",
+          "status": "completed",
+          "details": "Created comprehensive tests for all components including example implementation"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Implement createTool Factory",
+      "description": "Create factory method for registering chart configuration generators - COMPLETED as part of Task 4",
+      "status": "done",
+      "dependencies": [
+        4
+      ],
+      "priority": "high",
+      "details": "✅ Implementation completed in src/mastra/tools/chart/utils/chart-tool-factory.ts with:\n\n- createChartTool() factory function with BaseChartTool and optional config support\n- createChartTools() for batch creation with auto-generated IDs\n- ChartToolRegistry singleton for type-safe tool management\n- Full type safety and validation throughout",
+      "testStrategy": "✅ All tests completed and passed:\n- Factory function unit tests\n- Registry functionality tests\n- Type safety verification\n- Integration tests with weather-tool pattern",
+      "subtasks": [
+        {
+          "id": "5.1",
+          "title": "Implement createChartTool factory function",
+          "status": "completed",
+          "details": "Implemented with BaseChartTool support and optional configuration"
+        },
+        {
+          "id": "5.2",
+          "title": "Implement batch creation functionality",
+          "status": "completed",
+          "details": "Created createChartTools() with auto-ID generation"
+        },
+        {
+          "id": "5.3",
+          "title": "Implement ChartToolRegistry",
+          "status": "completed",
+          "details": "Created singleton registry with type-safe management"
+        },
+        {
+          "id": "5.4",
+          "title": "Complete test suite",
+          "status": "completed",
+          "details": "All tests implemented and passing"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Create Basic Charts Schema",
+      "description": "Implement schemas for basic chart types (bar, line, pie, column) with standardized structure and comprehensive configurations",
+      "status": "done",
+      "dependencies": [
+        2
+      ],
+      "priority": "high",
+      "details": "Schema files have been created and validated:\n- basic-bar.schema.json (692 lines) - Standard bar chart with Y-axis categories\n- basic-line.schema.json (257 lines) - Line chart with straight/curve options\n- basic-pie.schema.json (441 lines) - Pie chart with inner radius and gap settings\n- basic-column.schema.json (233 lines) - Standard column chart with X-axis categories\n\nAll schemas include:\n- Correct commonChartDefinitions.json references\n- Standard data, pipe, props structure\n- Chart-specific type constants\n- Complete style and display configurations",
+      "testStrategy": "Schema validation and structure verification - All schemas have been validated for correct structure, references, and completeness",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Validate Basic Bar Chart Schema",
+          "description": "Review and validate the basic-bar.schema.json file to ensure it has all required properties and correct references",
+          "dependencies": [],
+          "details": "1. Check common.schema.json reference\n2. Verify data mapping structure\n3. Validate style configuration options\n4. Ensure all required bar chart specific properties are present\n5. Verify schema syntax and format",
+          "status": "done",
+          "testStrategy": "Use JSON Schema validator to verify schema structure and syntax"
+        },
+        {
+          "id": 2,
+          "title": "Validate Basic Line Chart Schema",
+          "description": "Review and validate the basic-line.schema.json file to ensure it has all required properties and correct references",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Check common.schema.json reference\n2. Verify data mapping structure for x and y axes\n3. Validate line style configuration options\n4. Ensure all required line chart specific properties are present\n5. Verify schema syntax and format",
+          "status": "done",
+          "testStrategy": "Use JSON Schema validator to verify schema structure and syntax"
+        },
+        {
+          "id": 3,
+          "title": "Validate Basic Pie Chart Schema",
+          "description": "Review and validate the basic-pie.schema.json file to ensure it has all required properties and correct references",
+          "dependencies": [
+            2
+          ],
+          "details": "1. Check common.schema.json reference\n2. Verify data mapping structure for sectors\n3. Validate pie-specific style configurations\n4. Ensure all required pie chart specific properties are present\n5. Verify schema syntax and format",
+          "status": "done",
+          "testStrategy": "Use JSON Schema validator to verify schema structure and syntax"
+        },
+        {
+          "id": 4,
+          "title": "Validate Basic Column Chart Schema",
+          "description": "Review and validate the basic-column.schema.json file to ensure it has all required properties and correct references",
+          "dependencies": [
+            3
+          ],
+          "details": "1. Check common.schema.json reference\n2. Verify data mapping structure\n3. Validate column style configuration options\n4. Ensure all required column chart specific properties are present\n5. Verify schema syntax and format",
+          "status": "done",
+          "testStrategy": "Use JSON Schema validator to verify schema structure and syntax"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Implement Basic Charts Generators",
+      "description": "Create configuration generators for basic chart types",
+      "details": "Implement generator functions for basic charts with:\n- TypeScript interfaces\n- Zod schema validation\n- Sample configuration generation",
+      "testStrategy": "Compare generated output with sample JSONs in configs directory",
+      "priority": "high",
+      "dependencies": [
+        5,
+        6
+      ],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Bar and Column Chart Generators",
+          "description": "Create generator functions for basic bar and column charts with similar data structure requirements",
+          "dependencies": [],
+          "details": "1. Define TypeScript interfaces for bar/column chart configs\n2. Create Zod schemas for validation\n3. Implement generator functions with:\n- Key-value data format support\n- Axis configuration (X/Y swap for bar vs column)\n- Multi-color configuration\n- Default styling presets\n4. Register generators with createTool\n<info added on 2025-06-10T06:17:41.760Z>\nImplementation Status Update:\n- Completed BasicBarChartGenerator with full TypeScript interfaces, Zod schema, and generator implementation\n- Completed BasicColumnChartGenerator with correct axis configuration (X-axis categories, Y-axis values)\n- Added comprehensive test suite with successful instance creation and validation tests\n- Both generators producing correct chart configurations with proper axis differentiation\n\nKnown Issue:\n- Zod schema needs adjustment to accept more flexible data format: (string|number)[][] \n\nAll core functionality and logic is implemented and working correctly. Ready for final schema adjustment and moving to line chart implementation.\n</info added on 2025-06-10T06:17:41.760Z>",
+          "status": "done",
+          "testStrategy": "Unit test data validation and generated configurations against sample data"
+        },
+        {
+          "id": 2,
+          "title": "Implement Line Chart Generator",
+          "description": "Create generator function for basic line charts supporting time series data",
+          "dependencies": [],
+          "details": "1. Define TypeScript interface for line chart config\n2. Create Zod schema for validation\n3. Implement generator with:\n- Cross-format data support\n- Time axis configuration\n- Multiple series support\n- Line style options (straight/curved)\n- Node configuration\n4. Register with createTool\n<info added on 2025-06-10T06:26:59.041Z>\nImplementation completed:\n\nLine Chart Generator Status:\n- Created BasicLineChartGenerator class extending BaseChartTool\n- Implemented full TypeScript interfaces and Zod validation schemas\n- Supports straight and curved line types\n- Multi-series data support with automatic data mapping\n- Custom color, line width, and data point display options\n- Properly configured X-axis (category) and Y-axis (numeric) coordinate system\n- Label display configuration support\n\nTest Coverage:\n- 12/15 test cases passed (80% success rate)\n- Core functionality verified: instance creation, input validation, config generation, schema loading\n- 3 failures related to pipe field values and error handling format differences (non-critical)\n\nKey Features Implemented:\n- Time series data handling\n- Multiple line series support\n- Straight/curved line type options\n- Data point visualization controls\n- Theme color system integration\n- Complete axis configuration options\n\nGenerator successfully implements basic-line.schema.json specifications and is ready for integration.\n</info added on 2025-06-10T06:26:59.041Z>\n<info added on 2025-06-10T08:41:36.630Z>\nBug fixes implemented in BasicLineChartGenerator:\n\n- Fixed pipe field value from 'key_value' to 'cross' for correct line chart pipeline type\n- Properly integrated default function imports: generateDefaultTitle, generateDefaultBackground, generateDefaultLegend\n- Enhanced error handling with custom validation before Zod schema checks\n- Streamlined output generation by directly building output object instead of using createChartOutput\n\nTest Coverage Update:\n- All 15/15 test cases now passing (100% success rate)\n- Previous failures resolved: pipe field values and error handling format issues\n- Verified functionality for:\n  * Single and multi-series data generation\n  * Line type configuration\n  * Data point display controls\n  * Axis configuration\n  * Label display settings\n  * Error handling scenarios\n\nImplementation now meets production quality standards with all test cases passing and proper error handling in place.\n</info added on 2025-06-10T08:41:36.630Z>",
+          "status": "done",
+          "testStrategy": "Test time series data handling and multi-series configuration generation"
+        },
+        {
+          "id": 3,
+          "title": "Implement Pie Chart Generator",
+          "description": "Create generator function for basic pie charts with customizable styling",
+          "dependencies": [],
+          "details": "1. Define TypeScript interface for pie chart config\n2. Create Zod schema for validation\n3. Implement generator with:\n- Key-value data format support\n- Inner radius configuration\n- Gap and border settings\n- Multi-color sector support\n4. Register with createTool\n<info added on 2025-06-10T06:29:53.837Z>\nImplementation completed:\n- Created BasicPieChartGenerator class extending BaseChartTool\n- Implemented TypeScript interface and Zod schema with full validation\n- Added support for both pie and donut charts via innerRadiusRatio\n- Configured gap settings between sectors using gapPercentage\n- Implemented multiple label positions: inside, outside-ellipse, outside-circle\n- Added custom color configuration support\n- Set up pie-specific data mapping (name + value columns)\n- Integrated shadow and border configurations\n\nTesting results:\n- All 14 test cases passed successfully\n- Verified core functionalities: instance creation, input validation, config generation, schema loading\n- Fixed data formatting issues for proper data transmission\n\nKey features implemented:\n- Dual mode: pie/donut chart support\n- Key-value data format [name, value]\n- Inner radius ratio control (0=pie, >0=donut)\n- Configurable sector gap percentage\n- Multiple label position options\n- Theme color system integration\n- Complete shadow and border settings\n</info added on 2025-06-10T06:29:53.837Z>",
+          "status": "done",
+          "testStrategy": "Validate sector calculations and style configurations"
+        },
+        {
+          "id": 4,
+          "title": "Implement Common Utilities and Integration Tests",
+          "description": "Create shared utilities and comprehensive tests for all chart generators",
+          "dependencies": [],
+          "details": "1. Implement shared color palette management\n2. Create common data transformation utilities\n3. Add integration tests covering:\n- Data format validation\n- Configuration generation\n- Error handling\n4. Add documentation and usage examples\n<info added on 2025-06-10T06:31:37.333Z>\nIntegration Testing Implementation Details:\n\n1. Created comprehensive integration test file `basic-charts.integration.test.ts`\n2. Test Coverage Areas:\n   - Generator instantiation for all chart types\n   - Data format compatibility across chart types\n   - Color theme system consistency\n   - Configuration structure standardization\n   - Error handling uniformity\n   - Schema loading consistency\n   - Performance and memory handling\n   - Custom configuration support\n\n3. Data Format Requirements Validation:\n   - Bar/Column Charts: Support multi-dimensional arrays `(string|number)[][]`\n   - Line Charts: Support multi-dimensional arrays `(string|number)[][]`\n   - Pie Charts: Require key-value pair arrays `Array<[string, number]>`\n\n4. Architecture Validation Results:\n   - BaseChartTool provides unified interface\n   - createChartTool factory pattern enables standardized creation\n   - SchemaMerger system functions correctly\n   - chart-helpers provide complete default configuration generation\n\n5. All tests passed successfully, confirming consistent behavior across:\n   - Theme color system implementation\n   - Configuration structure\n   - Error handling mechanisms\n   - Schema loading functionality\n</info added on 2025-06-10T06:31:37.333Z>",
+          "status": "done",
+          "testStrategy": "Integration tests with sample data across all chart types"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Create Progress Charts Schema",
+      "description": "Implement schemas for progress-based charts (bar-progress, donut-progress) with comprehensive validation and testing",
+      "status": "done",
+      "dependencies": [
+        2
+      ],
+      "priority": "medium",
+      "details": "Schema files created and validated:\n- bar-progress.schema.json (350 lines)\n- donut-progress.schema.json (400 lines)\n\nKey implementations:\n- Draft-07 JSON Schema compliance\n- Common schema integration\n- Complete Chinese documentation\n- Appropriate defaults and constraints\n- SchemaMerger compatibility\n\nTechnical features:\n- 'key_value' data pipeline support\n- [[name, progress]] data format\n- Single-color fill restrictions\n- Specialized display controls for bar/donut\n- Optimized shadow configurations",
+      "testStrategy": "Comprehensive test suite implemented:\n1. progress-charts-schema.test.ts (23 tests)\n   - Schema loading\n   - Structure integrity\n   - Sample validation\n   - Data format verification\n   - Common schema integration\n   - Schema consistency\n\n2. schema-structure-validation.test.ts (18 tests)\n   - JSON Schema metadata\n   - Common schema references\n   - Chart type configurations\n   - Map/Fill/Display settings\n   - Documentation quality\n\nAll 41 tests passing (100% success rate)",
+      "subtasks": [
+        {
+          "id": "8.1",
+          "title": "Create bar-progress schema",
+          "status": "completed",
+          "details": "Created bar-progress.schema.json with 350 lines"
+        },
+        {
+          "id": "8.2",
+          "title": "Create donut-progress schema",
+          "status": "completed",
+          "details": "Created donut-progress.schema.json with 400 lines"
+        },
+        {
+          "id": "8.3",
+          "title": "Create sample configurations",
+          "status": "completed",
+          "details": "Created sample files conforming to schemas"
+        },
+        {
+          "id": "8.4",
+          "title": "Implement test suites",
+          "status": "completed",
+          "details": "Created and validated 41 tests across two test files"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Implement Progress Charts Generators",
+      "description": "Create configuration generators for bar and donut progress charts with comprehensive features and validation",
+      "status": "done",
+      "dependencies": [
+        5,
+        8
+      ],
+      "priority": "medium",
+      "details": "Implemented two main chart generators:\n1. BarProgressChartGenerator for horizontal progress bars with width control, colors, borders and labels\n2. DonutProgressChartGenerator for circular progress with inner radius, gap, angle and rotation controls\n\nKey Features:\n- Unified data format using Array<[string, number]>\n- Progress value validation (0-100 range)\n- Theme color system integration\n- Schema compatibility with SchemaMerger\n- Comprehensive error handling\n- Full TypeScript interface definitions",
+      "testStrategy": "Comprehensive test suite in progress-charts.generator.test.ts covering:\n- Instance creation\n- Input validation\n- Configuration generation\n- Error handling\n- Schema loading\n- Integration testing\n\nAll 28 tests passing with 100% success rate",
+      "subtasks": [
+        {
+          "id": "9.1",
+          "title": "Implement BarProgressChartGenerator",
+          "status": "completed",
+          "details": "Created horizontal progress bar generator with width percent control, background colors, border radius, and label display options"
+        },
+        {
+          "id": "9.2",
+          "title": "Implement DonutProgressChartGenerator",
+          "status": "completed",
+          "details": "Created circular progress chart generator with inner radius ratio, gap percentage, start angle, and rotation direction controls"
+        },
+        {
+          "id": "9.3",
+          "title": "Implement Data Format and Validation",
+          "status": "completed",
+          "details": "Established Array<[string, number]> format with 0-100 range validation"
+        },
+        {
+          "id": "9.4",
+          "title": "Integration with Base Systems",
+          "status": "completed",
+          "details": "Integrated with theme colors, default functions, and SchemaMerger system"
+        },
+        {
+          "id": "9.5",
+          "title": "Testing and Quality Assurance",
+          "status": "completed",
+          "details": "Created comprehensive test suite with 28 passing tests covering all major functionality"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Create Stacked Charts Schema",
+      "description": "Implement and validate schemas for stacked chart variants",
+      "status": "done",
+      "dependencies": [
+        2
+      ],
+      "priority": "medium",
+      "details": "Successfully created and validated three stacked chart schemas:\n\n1. stacked-column.schema.json (695 lines)\n2. stacked-bar.schema.json (715 lines)\n3. stacked-area.schema.json (262 lines)\n\nKey Features:\n- Unified data pipeline ('cross' type)\n- Multi-series stacked data format support\n- Complete fill, shadow, and border configurations\n- Chart-specific display properties\n- Multilingual descriptions with sensible defaults\n- Strict numerical constraints and validation rules\n\nArchitectural Consistency:\n- Full compatibility with common schema (Task 2)\n- Follows design patterns from Tasks 6-9\n- SchemaMerger tool integration\n- Maintains project architecture standards",
+      "testStrategy": "Comprehensive validation completed:\n- 51 total test cases across 2 test files\n- 21 schema structure validation tests passed\n- 30 schema functionality tests passed\n- Common schema reference validation\n- Sample configuration validation\n- SchemaMerger loading verification",
+      "subtasks": [
+        {
+          "id": "10.1",
+          "title": "Create base schema files",
+          "status": "completed",
+          "details": "Created stacked-column.schema.json, stacked-bar.schema.json, and stacked-area.schema.json"
+        },
+        {
+          "id": "10.2",
+          "title": "Implement test suite",
+          "status": "completed",
+          "details": "Created 2 test files with 51 test cases covering structure and functionality"
+        },
+        {
+          "id": "10.3",
+          "title": "Validate schema integration",
+          "status": "completed",
+          "details": "Verified SchemaMerger compatibility and common schema references"
+        },
+        {
+          "id": "10.4",
+          "title": "Sample configuration validation",
+          "status": "completed",
+          "details": "Validated all sample configuration files against the schemas"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Implement Stacked Charts Generators",
+      "description": "Create configuration generators for stacked chart types including column, bar, and area charts",
+      "status": "done",
+      "dependencies": [
+        5,
+        10
+      ],
+      "priority": "medium",
+      "details": "Implement generator functions for stacked charts with validation and interfaces, using 'cross' pipeline for data processing. The implementation includes three main generators (StackedColumnChartGenerator, StackedBarChartGenerator, StackedAreaChartGenerator) built on BaseChartTool architecture and integrated with SchemaMerger.",
+      "testStrategy": "Comprehensive test suite with 23 test cases covering:\n- Basic functionality tests (17 cases)\n- Common functionality tests (6 cases)\n- Input validation, schema loading, and custom configurations",
+      "subtasks": [
+        {
+          "id": "11.1",
+          "title": "Implement StackedColumnChartGenerator",
+          "description": "Stacked column chart generator with customizable column width, stack spacing, colors, and data labels",
+          "status": "completed"
+        },
+        {
+          "id": "11.2",
+          "title": "Implement StackedBarChartGenerator",
+          "description": "Stacked bar chart generator with proper Y-axis categories, X-axis values mapping, and customizable bar height and spacing",
+          "status": "completed"
+        },
+        {
+          "id": "11.3",
+          "title": "Implement StackedAreaChartGenerator",
+          "description": "Stacked area chart generator with line/curve type options, fill opacity settings, and data point customization",
+          "status": "completed"
+        },
+        {
+          "id": "11.4",
+          "title": "Implement Core Features",
+          "description": "Cross pipeline implementation for stack data, custom color schemes, theme support, and input validation",
+          "status": "completed"
+        },
+        {
+          "id": "11.5",
+          "title": "Create Test Suite",
+          "description": "Comprehensive testing covering basic functionality, common features, input validation, and schema integration",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Create Complex Charts Schema",
+      "description": "Implement and validate schemas for complex chart types (voronoi, sankey, treemap)",
+      "status": "done",
+      "dependencies": [
+        2
+      ],
+      "priority": "medium",
+      "details": "Successfully created and validated schemas for:\n\n1. voronoi.schema.json (404 lines)\n- Key-value data pipeline support\n- Three-column data format (category-object-value)\n- Advanced features: multiple shapes, drawing modes, corner radius\n\n2. sankey.schema.json (365 lines)\n- Source-target-value data flow format\n- Node width configuration\n- Gradient links and gap control\n\n3. single-layer-treemap.schema.json (436 lines)\n- Name-value pair data format\n- Border radius and gap configuration\n- Opacity controls\n\nTechnical Achievements:\n- Full compatibility with common schema\n- Comprehensive test coverage (64 test cases)\n- Strict value constraints with sensible defaults\n- Integration with SchemaMerger\n- Adherence to project architecture standards",
+      "testStrategy": "Comprehensive validation strategy:\n1. Schema structure tests (28 cases)\n2. Schema functionality tests (36 cases)\n3. SchemaMerger integration verification\n4. Common schema reference validation\n5. Sample configuration validation",
+      "subtasks": [
+        {
+          "id": "12.1",
+          "title": "Schema Development",
+          "status": "completed",
+          "details": "Created all three schema files with proper structure and validation rules"
+        },
+        {
+          "id": "12.2",
+          "title": "Test Suite Implementation",
+          "status": "completed",
+          "details": "Developed 64 test cases across structure and functionality validation"
+        },
+        {
+          "id": "12.3",
+          "title": "Integration Verification",
+          "status": "completed",
+          "details": "Verified SchemaMerger compatibility and common schema references"
+        },
+        {
+          "id": "12.4",
+          "title": "Sample Configuration Validation",
+          "status": "completed",
+          "details": "Validated all sample configurations against the new schemas"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "title": "Implement Complex Charts Generators",
+      "description": "Create configuration generators for Voronoi, Sankey, and Treemap charts with comprehensive validation and testing",
+      "status": "done",
+      "dependencies": [
+        5,
+        12
+      ],
+      "priority": "medium",
+      "details": "Implemented three complex chart generators with full TypeScript support, theme compatibility, and extensive testing:\n\n1. Voronoi Chart Generator:\n- Supports 7 shape types\n- Auto/fixed drawing modes\n- Configurable corner radius and opacity\n- Automatic color schemes\n\n2. Sankey Chart Generator:\n- Configurable node width and gap distance\n- Line opacity control\n- Multiple color modes (auto, gradient, custom)\n- Automatic color scheme generation\n\n3. Treemap Chart Generator:\n- Configurable gap distance\n- Border and opacity settings\n- Corner radius support\n- Automatic color schemes\n\nKey Technical Features:\n- Inheritance from BaseChartTool\n- Complete Schema integration\n- Type safety with TypeScript/Zod\n- Theme support (light/dark)\n- Comprehensive error handling",
+      "testStrategy": "Comprehensive test suite with 25 test cases covering:\n- VoronoiChartGenerator (6 tests)\n- SankeyChartGenerator (6 tests)\n- TreemapChartGenerator (7 tests)\n- Common functionality (6 tests)\n\nTest coverage includes validation, color schemes, configuration options, and error handling",
+      "subtasks": [
+        {
+          "id": "13.1",
+          "title": "Implement Voronoi Chart Generator",
+          "status": "completed",
+          "details": "Created voronoi-chart.generator.ts with shape support, drawing modes, and color schemes"
+        },
+        {
+          "id": "13.2",
+          "title": "Implement Sankey Chart Generator",
+          "status": "completed",
+          "details": "Created sankey-chart.generator.ts with node configuration, opacity control, and color modes"
+        },
+        {
+          "id": "13.3",
+          "title": "Implement Treemap Chart Generator",
+          "status": "completed",
+          "details": "Created treemap-chart.generator.ts with gap configuration, border settings, and color schemes"
+        },
+        {
+          "id": "13.4",
+          "title": "Implement Test Suite",
+          "status": "completed",
+          "details": "Created complex-charts-generators.test.ts with 25 comprehensive test cases"
+        },
+        {
+          "id": "13.5",
+          "title": "Technical Integration",
+          "status": "completed",
+          "details": "Implemented BaseChartTool inheritance, schema integration, and theme support"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "title": "Create Mixed Charts Schema",
+      "description": "Implement schemas for mixed chart types",
+      "details": "Create schemas for:\n- mixed-line-stacked-column.schema.json\n- mixed-line-grouped-column.schema.json",
+      "testStrategy": "Schema validation and structure verification",
+      "priority": "medium",
+      "dependencies": [
+        2
+      ],
+      "status": "done",
+      "subtasks": []
+    },
+    {
+      "id": 15,
+      "title": "Implement Mixed Charts Generators",
+      "description": "Create configuration generators for mixed chart types including line-stacked-column and line-grouped-column combinations",
+      "status": "done",
+      "dependencies": [
+        5,
+        14
+      ],
+      "priority": "medium",
+      "details": "Implementation of two mixed chart generators with comprehensive features:\n1. Mixed Line-Stacked Column Chart Generator\n- Smart column/line distribution\n- Dual Y-axis support\n- Customizable column and line indices\n- Flexible styling options\n\n2. Mixed Line-Grouped Column Chart Generator\n- Default and custom column/line distribution\n- Dual Y-axis configuration\n- Group mode column width control\n- Comprehensive styling options\n\nBoth generators feature:\n- Full TypeScript support\n- Schema validation\n- Cross pipeline type\n- Extensive configuration options\n- Error handling\n- BaseChartTool architecture integration",
+      "testStrategy": "Comprehensive test suite with 22 test cases covering:\n- Generator instantiation\n- Configuration generation\n- Data mapping validation\n- Custom index configuration\n- Styling options\n- Y-axis setup\n- Data format validation\n- Pipeline type verification\n- Theme support\n- Schema validation",
+      "subtasks": [
+        {
+          "id": "15.1",
+          "title": "Implement Mixed Line-Stacked Column Chart Generator",
+          "status": "completed",
+          "details": "Created mixed-line-stacked-column-chart.generator.ts with smart distribution, dual Y-axis, and customizable features"
+        },
+        {
+          "id": "15.2",
+          "title": "Implement Mixed Line-Grouped Column Chart Generator",
+          "status": "completed",
+          "details": "Created mixed-line-grouped-column-chart.generator.ts with group mode support and flexible configuration options"
+        },
+        {
+          "id": "15.3",
+          "title": "Implement Comprehensive Testing Suite",
+          "status": "completed",
+          "details": "Created mixed-charts-generators.test.ts with 22 test cases covering all functionality"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "title": "Develop Test Framework",
+      "description": "Create automated testing framework for chart generators",
+      "details": "Implement test framework that:\n- Loads sample JSONs\n- Executes generators\n- Compares outputs\n- Reports differences",
+      "testStrategy": "Meta-testing of the test framework itself",
+      "priority": "high",
+      "dependencies": [
+        7,
+        9,
+        11,
+        13,
+        15
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 17,
+      "title": "Implement Sample JSON Loader",
+      "description": "Create utility to load and parse sample JSON files",
+      "details": "Create utility that:\n- Scans configs directory\n- Loads sample JSONs\n- Provides type-safe access",
+      "testStrategy": "Unit tests with sample files",
+      "priority": "medium",
+      "dependencies": [
+        16
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 18,
+      "title": "Create Test Cases",
+      "description": "Implement comprehensive test cases for all chart types",
+      "details": "Create test cases that:\n- Cover all chart types\n- Test various input combinations\n- Verify schema compliance",
+      "testStrategy": "Test coverage analysis",
+      "priority": "high",
+      "dependencies": [
+        16,
+        17
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 19,
+      "title": "Implement Chart Type Registry",
+      "description": "Create comprehensive registry system for managing chart types and their generators with support for categorization, dynamic loading, and event handling",
+      "status": "done",
+      "dependencies": [
+        5
+      ],
+      "priority": "medium",
+      "details": "Implemented registry system with:\n- Singleton ChartTypeRegistry class for managing chart type registration, deregistration and updates\n- Chart categorization system using ChartCategory enum\n- Type-safe chart info management via ChartTypeInfo interface\n- Event listening system for registration/deregistration/update/clear events\n- Batch operation support\n- Dynamic loader system (ChartLoader) with auto-discovery\n- Statistics and export functionality\n- Unified API interface with global initialization\n- Integration with Mastra tools",
+      "testStrategy": "Comprehensive test coverage including:\n- Unit tests for all core functionality\n- Integration tests for complete workflows\n- Error handling tests\n- Mock generators for isolated testing",
+      "subtasks": [
+        {
+          "id": "19.1",
+          "title": "Core Registry Implementation",
+          "description": "Implement ChartTypeRegistry class with registration, deregistration, and update capabilities",
+          "status": "completed"
+        },
+        {
+          "id": "19.2",
+          "title": "Chart Categorization System",
+          "description": "Implement ChartCategory enum and category management",
+          "status": "completed"
+        },
+        {
+          "id": "19.3",
+          "title": "Dynamic Loader System",
+          "description": "Implement ChartLoader with auto-discovery and selective loading capabilities",
+          "status": "completed"
+        },
+        {
+          "id": "19.4",
+          "title": "Event System",
+          "description": "Implement event listening system for registry operations",
+          "status": "completed"
+        },
+        {
+          "id": "19.5",
+          "title": "API Interface",
+          "description": "Create unified API interface with global initialization and utility functions",
+          "status": "completed"
+        },
+        {
+          "id": "19.6",
+          "title": "Test Coverage",
+          "description": "Implement comprehensive test suite with unit and integration tests",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "title": "Create Documentation",
+      "description": "Generate comprehensive documentation for the chart configuration system",
+      "details": "Create documentation covering:\n- System architecture\n- Usage examples\n- Schema definitions\n- Extension guidelines",
+      "testStrategy": "Documentation review and validation",
+      "priority": "medium",
+      "dependencies": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        19
+      ],
+      "status": "pending",
+      "subtasks": []
+    }
+  ]
+}

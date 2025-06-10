@@ -1,0 +1,46 @@
+# Task ID: 11
+# Title: Implement Stacked Charts Generators
+# Status: done
+# Dependencies: 5, 10
+# Priority: medium
+# Description: Create configuration generators for stacked chart types including column, bar, and area charts
+# Details:
+Implement generator functions for stacked charts with validation and interfaces, using 'cross' pipeline for data processing. The implementation includes three main generators (StackedColumnChartGenerator, StackedBarChartGenerator, StackedAreaChartGenerator) built on BaseChartTool architecture and integrated with SchemaMerger.
+
+# Test Strategy:
+Comprehensive test suite with 23 test cases covering:
+- Basic functionality tests (17 cases)
+- Common functionality tests (6 cases)
+- Input validation, schema loading, and custom configurations
+
+# Subtasks:
+## 11.1. Implement StackedColumnChartGenerator [completed]
+### Dependencies: None
+### Description: Stacked column chart generator with customizable column width, stack spacing, colors, and data labels
+### Details:
+
+
+## 11.2. Implement StackedBarChartGenerator [completed]
+### Dependencies: None
+### Description: Stacked bar chart generator with proper Y-axis categories, X-axis values mapping, and customizable bar height and spacing
+### Details:
+
+
+## 11.3. Implement StackedAreaChartGenerator [completed]
+### Dependencies: None
+### Description: Stacked area chart generator with line/curve type options, fill opacity settings, and data point customization
+### Details:
+
+
+## 11.4. Implement Core Features [completed]
+### Dependencies: None
+### Description: Cross pipeline implementation for stack data, custom color schemes, theme support, and input validation
+### Details:
+
+
+## 11.5. Create Test Suite [completed]
+### Dependencies: None
+### Description: Comprehensive testing covering basic functionality, common features, input validation, and schema integration
+### Details:
+
+

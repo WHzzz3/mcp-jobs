@@ -1,0 +1,60 @@
+# Task ID: 15
+# Title: Implement Mixed Charts Generators
+# Status: done
+# Dependencies: 5, 14
+# Priority: medium
+# Description: Create configuration generators for mixed chart types including line-stacked-column and line-grouped-column combinations
+# Details:
+Implementation of two mixed chart generators with comprehensive features:
+1. Mixed Line-Stacked Column Chart Generator
+- Smart column/line distribution
+- Dual Y-axis support
+- Customizable column and line indices
+- Flexible styling options
+
+2. Mixed Line-Grouped Column Chart Generator
+- Default and custom column/line distribution
+- Dual Y-axis configuration
+- Group mode column width control
+- Comprehensive styling options
+
+Both generators feature:
+- Full TypeScript support
+- Schema validation
+- Cross pipeline type
+- Extensive configuration options
+- Error handling
+- BaseChartTool architecture integration
+
+# Test Strategy:
+Comprehensive test suite with 22 test cases covering:
+- Generator instantiation
+- Configuration generation
+- Data mapping validation
+- Custom index configuration
+- Styling options
+- Y-axis setup
+- Data format validation
+- Pipeline type verification
+- Theme support
+- Schema validation
+
+# Subtasks:
+## 15.1. Implement Mixed Line-Stacked Column Chart Generator [completed]
+### Dependencies: None
+### Description: 
+### Details:
+Created mixed-line-stacked-column-chart.generator.ts with smart distribution, dual Y-axis, and customizable features
+
+## 15.2. Implement Mixed Line-Grouped Column Chart Generator [completed]
+### Dependencies: None
+### Description: 
+### Details:
+Created mixed-line-grouped-column-chart.generator.ts with group mode support and flexible configuration options
+
+## 15.3. Implement Comprehensive Testing Suite [completed]
+### Dependencies: None
+### Description: 
+### Details:
+Created mixed-charts-generators.test.ts with 22 test cases covering all functionality
+

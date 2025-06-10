@@ -1,0 +1,63 @@
+# Task ID: 6
+# Title: Create Basic Charts Schema
+# Status: done
+# Dependencies: 2
+# Priority: high
+# Description: Implement schemas for basic chart types (bar, line, pie, column) with standardized structure and comprehensive configurations
+# Details:
+Schema files have been created and validated:
+- basic-bar.schema.json (692 lines) - Standard bar chart with Y-axis categories
+- basic-line.schema.json (257 lines) - Line chart with straight/curve options
+- basic-pie.schema.json (441 lines) - Pie chart with inner radius and gap settings
+- basic-column.schema.json (233 lines) - Standard column chart with X-axis categories
+
+All schemas include:
+- Correct commonChartDefinitions.json references
+- Standard data, pipe, props structure
+- Chart-specific type constants
+- Complete style and display configurations
+
+# Test Strategy:
+Schema validation and structure verification - All schemas have been validated for correct structure, references, and completeness
+
+# Subtasks:
+## 1. Validate Basic Bar Chart Schema [done]
+### Dependencies: None
+### Description: Review and validate the basic-bar.schema.json file to ensure it has all required properties and correct references
+### Details:
+1. Check common.schema.json reference
+2. Verify data mapping structure
+3. Validate style configuration options
+4. Ensure all required bar chart specific properties are present
+5. Verify schema syntax and format
+
+## 2. Validate Basic Line Chart Schema [done]
+### Dependencies: 6.1
+### Description: Review and validate the basic-line.schema.json file to ensure it has all required properties and correct references
+### Details:
+1. Check common.schema.json reference
+2. Verify data mapping structure for x and y axes
+3. Validate line style configuration options
+4. Ensure all required line chart specific properties are present
+5. Verify schema syntax and format
+
+## 3. Validate Basic Pie Chart Schema [done]
+### Dependencies: 6.2
+### Description: Review and validate the basic-pie.schema.json file to ensure it has all required properties and correct references
+### Details:
+1. Check common.schema.json reference
+2. Verify data mapping structure for sectors
+3. Validate pie-specific style configurations
+4. Ensure all required pie chart specific properties are present
+5. Verify schema syntax and format
+
+## 4. Validate Basic Column Chart Schema [done]
+### Dependencies: 6.3
+### Description: Review and validate the basic-column.schema.json file to ensure it has all required properties and correct references
+### Details:
+1. Check common.schema.json reference
+2. Verify data mapping structure
+3. Validate column style configuration options
+4. Ensure all required column chart specific properties are present
+5. Verify schema syntax and format
+

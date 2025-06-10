@@ -1,0 +1,61 @@
+# Task ID: 1
+# Title: Setup Project Structure
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Initialize project directory structure and base configuration files according to the PRD requirements
+# Details:
+Create the following directory structure:
+- src/mastra/tools/chart/configs/
+- src/mastra/tools/chart/schemas/
+- src/mastra/tools/chart/__tests__/
+
+Setup configuration files and dependencies:
+- Initialize package.json with vitest test scripts
+- Configure tsconfig.json
+- Setup vitest.config.ts
+- Install required dependencies including vitest and @vitest/ui
+
+# Test Strategy:
+1. Verify all required directories exist and are properly structured
+2. Confirm all configuration files are present and properly configured
+3. Validate test dependencies are installed and working
+4. Run a sample test to verify the test setup
+
+# Subtasks:
+## 1.1. Create Directory Structure [completed]
+### Dependencies: None
+### Description: Setup required project directories
+### Details:
+
+
+## 1.2. Update package.json [completed]
+### Dependencies: None
+### Description: Add vitest test scripts to package.json
+### Details:
+
+
+## 1.3. Add Test Dependencies [completed]
+### Dependencies: None
+### Description: Install vitest and @vitest/ui
+### Details:
+
+
+## 1.4. Create Vitest Config [completed]
+### Dependencies: None
+### Description: Setup vitest.config.ts configuration file
+### Details:
+
+
+## 1.5. Install Dependencies [completed]
+### Dependencies: None
+### Description: Install all required project dependencies
+### Details:
+
+
+## 1.6. Create Test Directory [completed]
+### Dependencies: None
+### Description: Setup src/mastra/tools/chart/__tests__/ directory
+### Details:
+
+
