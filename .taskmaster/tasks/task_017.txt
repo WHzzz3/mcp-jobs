@@ -1,6 +1,6 @@
 # Task ID: 17
 # Title: Implement Sample JSON Loader
-# Status: pending
+# Status: done
 # Dependencies: 16
 # Priority: medium
 # Description: Create utility to load and parse sample JSON files
