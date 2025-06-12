@@ -1,20 +1,33 @@
-import { z } from 'zod';
-import { BaseChartTool, BaseChartInput, BaseChartOutput, BaseChartInputSchema, BaseChartOutputSchema } from '../interfaces/chart-tool.interface';
-import { SchemaMerger } from '../utils/schema-merger';
-import { 
-  generateDefaultTitle, 
-  generateDefaultBackground, 
+import { z } from "zod";
+import {
+  BaseChartTool,
+  BaseChartInput,
+  BaseChartOutput,
+  BaseChartInputSchema,
+  BaseChartOutputSchema,
+} from "../interfaces/chart-tool.interface";
+import { SchemaMerger } from "../utils/schema-merger";
+import {
+  generateDefaultTitle,
+  generateDefaultBackground,
   generateDefaultLegend,
   getThemeColors,
-  createChartOutput 
-} from '../utils/chart-helpers';
+  createChartOutput,
+} from "../utils/chart-helpers";
 
 // Voronoi图特定输入接口
 export interface VoronoiChartInput extends BaseChartInput {
-  data: Array<Array<string | number>>; // 三列数据格式: [一级分类, 二级对象, 数值]
+  data: Array<Array<Array<string | number>>>; // 三列数据格式: [一级分类, 二级对象, 数值]
   colors?: string[];
-  drawShape?: 'circle' | 'triangle' | 'rectangle' | 'diamond' | 'pentagon' | 'hexagon' | 'octagon';
-  drawStyle?: 'auto' | 'fixed';
+  drawShape?:
+    | "circle"
+    | "triangle"
+    | "rectangle"
+    | "diamond"
+    | "pentagon"
+    | "hexagon"
+    | "octagon";
+  drawStyle?: "auto" | "fixed";
   cornerRadius?: number;
   fillOpacity?: number;
   showBorder?: boolean;
@@ -22,10 +35,10 @@ export interface VoronoiChartInput extends BaseChartInput {
   secondaryBorderWidth?: number;
 }
 
-// Voronoi图特定输出接口  
+// Voronoi图特定输出接口
 export interface VoronoiChartOutput extends BaseChartOutput {
   props: {
-    type: 'voronoi';
+    type: "voronoi";
     title: any;
     background: any;
     map: Array<{
@@ -56,10 +69,21 @@ export interface VoronoiChartOutput extends BaseChartOutput {
 
 // Zod验证schema，扩展基础schema
 export const VoronoiChartInputSchema = BaseChartInputSchema.extend({
-  data: z.array(z.array(z.union([z.string(), z.number()]))).min(1),
+  data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
   colors: z.array(z.string()).optional(),
-  drawShape: z.enum(['circle', 'triangle', 'rectangle', 'diamond', 'pentagon', 'hexagon', 'octagon']).optional().default('hexagon'),
-  drawStyle: z.enum(['auto', 'fixed']).optional().default('auto'),
+  drawShape: z
+    .enum([
+      "circle",
+      "triangle",
+      "rectangle",
+      "diamond",
+      "pentagon",
+      "hexagon",
+      "octagon",
+    ])
+    .optional()
+    .default("hexagon"),
+  drawStyle: z.enum(["auto", "fixed"]).optional().default("auto"),
   cornerRadius: z.number().min(0).optional().default(0),
   fillOpacity: z.number().min(0).max(1).optional().default(0.85),
   showBorder: z.boolean().optional().default(false),
@@ -69,39 +93,44 @@ export const VoronoiChartInputSchema = BaseChartInputSchema.extend({
 
 export class VoronoiChartGenerator extends BaseChartTool {
   constructor() {
-    super('voronoi');
+    super("voronoi");
   }
 
   protected getElementType(): string {
-    return 'voronoi';
+    return "voronoi";
   }
 
   async generateConfig(input: VoronoiChartInput): Promise<VoronoiChartOutput> {
     // 验证输入
     const validatedInput = VoronoiChartInputSchema.parse(input);
-    const inputWithChartType = { ...validatedInput, chartType: 'voronoi' };
+    const inputWithChartType = { ...validatedInput, chartType: "voronoi" };
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
-    
+
     // 获取数据维度
-    const dataRows = validatedInput.data.length;
-    const dataCols = validatedInput.data[0]?.length || 0;
-    
+    const dataRows = validatedInput.data[0].length;
+    const dataCols = validatedInput.data[0][0]?.length || 0;
+
     if (dataCols !== 3) {
-      throw new Error('Voronoi图需要恰好3列数据（一级分类、二级对象、数值）');
+      throw new Error("Voronoi图需要恰好3列数据（一级分类、二级对象、数值）");
     }
 
     // 获取第一列的唯一值作为分类数量（用于颜色）
     const categories = new Set();
-    for (let i = 1; i < dataRows; i++) { // 跳过header行
-      if (validatedInput.data[i] && validatedInput.data[i][0]) {
-        categories.add(validatedInput.data[i][0]);
+    for (let i = 1; i < dataRows; i++) {
+      // 跳过header行
+      if (validatedInput.data[0][i] && validatedInput.data[0][i][0]) {
+        categories.add(validatedInput.data[0][i][0]);
       }
     }
     const categoryCount = categories.size;
 
     // 获取默认配置
-    const themeColors = getThemeColors(mergedInput.theme || 'light', categoryCount);
-    const colors = validatedInput.colors || themeColors.map((c: any) => c.color);
+    const themeColors = getThemeColors(
+      mergedInput.theme || "light",
+      categoryCount
+    );
+    const colors =
+      validatedInput.colors || themeColors.map((c: any) => c.color);
 
     // 构建数据映射 - Voronoi图的特定映射
     const map: Array<{
@@ -121,7 +150,7 @@ export class VoronoiChartGenerator extends BaseChartTool {
         function: "typeCol",
         configurable: true,
         xAxisIndex: 0,
-        type: ""
+        type: "",
       },
       {
         name: "二级对象",
@@ -130,7 +159,7 @@ export class VoronoiChartGenerator extends BaseChartTool {
         function: "objCol",
         configurable: true,
         xAxisIndex: 0,
-        type: ""
+        type: "",
       },
       {
         name: "数值",
@@ -139,8 +168,8 @@ export class VoronoiChartGenerator extends BaseChartTool {
         function: "vCol",
         configurable: true,
         yAxisIndex: 0,
-        type: "voronoi"
-      }
+        type: "voronoi",
+      },
     ];
 
     // 构建填充配置
@@ -154,29 +183,31 @@ export class VoronoiChartGenerator extends BaseChartTool {
           angle: 45,
           blur: 2,
           color: { color: "#000000", opacity: 0.1 },
-          radius: 1
-        }
-      }))
+          radius: 1,
+        },
+      })),
     };
 
     // 构建显示配置
     const display = {
       voronoi: {
-        drawShape: validatedInput.drawShape || "hexagon",
-        drawStyle: validatedInput.drawStyle || "auto",
+        drawShape: validatedInput.drawShape || "circle",
+        drawStyle: validatedInput.drawStyle || "fixed",
         cornerRadius: validatedInput.cornerRadius || 0,
         fillOpacity: validatedInput.fillOpacity || 0.85,
         border: {
           type: "solid" as const,
-          width: validatedInput.showBorder ? (validatedInput.borderWidth || 1) : 0,
-          color: null
+          width: validatedInput.showBorder
+            ? validatedInput.borderWidth || 1
+            : 0,
+          color: null,
         },
         secondaryBorder: {
           type: "solid" as const,
           width: validatedInput.secondaryBorderWidth || 1,
-          color: { color: "#ffffff", opacity: 1 }
-        }
-      }
+          color: { color: "#ffffff", opacity: 1 },
+        },
+      },
     };
 
     // 构建标签配置
@@ -186,37 +217,33 @@ export class VoronoiChartGenerator extends BaseChartTool {
         show: false,
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#333333", opacity: 1 }
+        color: { color: "#333333", opacity: 1 },
       },
       numberLabel: {
         show: false,
         fontFamily: "Misans 常规",
         fontSize: 12,
         color: { color: "#333333", opacity: 1 },
-        suffix: ""
+        suffix: "",
       },
       highlight: false,
-      overlap: false
+      overlap: false,
     };
 
     // 生成图表配置
-    const result = createChartOutput(
-      'voronoi',
-      mergedInput,
-      {
-        type: 'voronoi',
-        title: generateDefaultTitle(mergedInput.title, mergedInput.subtitle),
-        background: generateDefaultBackground(mergedInput.theme),
-        map,
-        fill,
-        display,
-        legend: generateDefaultLegend(),
-        label
-      }
-    );
+    const result = createChartOutput("voronoi", mergedInput, {
+      type: "voronoi",
+      title: generateDefaultTitle(mergedInput.title, mergedInput.subtitle),
+      background: generateDefaultBackground(mergedInput.theme),
+      map,
+      fill,
+      display,
+      legend: generateDefaultLegend(),
+      label,
+    });
 
     // Voronoi图使用key_value管道
-    result.pipe = 'key_value';
+    result.pipe = "key_value";
 
     return result as VoronoiChartOutput;
   }
@@ -232,9 +259,11 @@ export class VoronoiChartGenerator extends BaseChartTool {
   async loadSchema(): Promise<any> {
     const schemaMerger = new SchemaMerger();
     try {
-      return schemaMerger.getMergedSchema('voronoi');
+      return schemaMerger.getMergedSchema("voronoi");
     } catch (error) {
-      throw new Error(`Failed to load voronoi schema: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to load voronoi schema: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
     }
   }
-} 
+}

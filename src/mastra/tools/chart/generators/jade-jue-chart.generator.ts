@@ -1,21 +1,25 @@
-import { z } from 'zod';
-import { BaseChartTool, BaseChartInput, BaseChartOutput } from '../interfaces/chart-tool.interface';
-import { SchemaMerger } from '../utils/schema-merger';
-import { 
-  generateDefaultTitle, 
-  generateDefaultBackground, 
+import { z } from "zod";
+import {
+  BaseChartTool,
+  BaseChartInput,
+  BaseChartOutput,
+} from "../interfaces/chart-tool.interface";
+import { SchemaMerger } from "../utils/schema-merger";
+import {
+  generateDefaultTitle,
+  generateDefaultBackground,
   generateDefaultLegend,
-  getThemeColors 
-} from '../utils/chart-helpers';
+  getThemeColors,
+} from "../utils/chart-helpers";
 
 // 玉玦图特定输入接口
-export interface JadeJueChartInput extends Omit<BaseChartInput, 'chartType'> {
-  data: Array<Array<string | number>>; // [名称, 值] 格式
+export interface JadeJueChartInput extends Omit<BaseChartInput, "chartType"> {
+  data: Array<Array<Array<string | number>>>; // [名称, 值] 格式
   showLabels?: boolean;
   colors?: string[];
   innerRadius?: number; // 内半径比例 (0-1)
   gapPercentage?: number; // 扇形间隙百分比
-  rotateDirection?: 'clockwise' | 'counterclockwise'; // 旋转方向
+  rotateDirection?: "clockwise" | "counterclockwise"; // 旋转方向
   startAngle?: number; // 起始角度
   drawAngle?: number; // 绘制角度，玉玦图的特殊属性
 }
@@ -23,7 +27,7 @@ export interface JadeJueChartInput extends Omit<BaseChartInput, 'chartType'> {
 // 玉玦图特定输出接口
 export interface JadeJueChartOutput extends BaseChartOutput {
   props: {
-    type: 'jade-jue';
+    type: "jade-jue";
     title: any;
     background: any;
     map: Array<{
@@ -55,38 +59,45 @@ export interface JadeJueChartOutput extends BaseChartOutput {
 
 // Zod验证schema
 export const JadeJueChartInputSchema = z.object({
-  data: z.array(z.array(z.union([z.string(), z.number()]))).min(1),
-  title: z.string().optional().default('玉玦图'),
-  subtitle: z.string().optional().default('副标题'),
+  data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
+  title: z.string().optional().default("玉玦图"),
+  subtitle: z.string().optional().default("副标题"),
   showLabels: z.boolean().optional().default(false),
   colors: z.array(z.string()).optional(),
   innerRadius: z.number().min(0).max(1).optional().default(0),
   gapPercentage: z.number().min(0).max(100).optional().default(70),
-  rotateDirection: z.enum(['clockwise', 'counterclockwise']).optional().default('clockwise'),
+  rotateDirection: z
+    .enum(["clockwise", "counterclockwise"])
+    .optional()
+    .default("clockwise"),
   startAngle: z.number().min(0).max(360).optional().default(0),
   drawAngle: z.number().min(0).max(360).optional().default(270),
 });
 
 export class JadeJueChartGenerator extends BaseChartTool {
   constructor() {
-    super('jade-jue');
+    super("jade-jue");
   }
 
   protected getElementType(): string {
-    return 'pie';
+    return "pie";
   }
 
   async generateConfig(input: BaseChartInput): Promise<BaseChartOutput> {
     // 验证输入
     const validatedInput = JadeJueChartInputSchema.parse(input);
-    const inputWithChartType = { ...validatedInput, chartType: 'jade-jue' };
+    const inputWithChartType = { ...validatedInput, chartType: "jade-jue" };
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
-    
+
     // 获取数据长度用于颜色配置
-    const dataLength = validatedInput.data.length;
-    const themeColors = getThemeColors(mergedInput.theme || 'light', dataLength);
-    const colors = validatedInput.colors || themeColors.map((c: any) => c.color);
-    
+    const dataLength = validatedInput.data[0].length - 1;
+    const themeColors = getThemeColors(
+      mergedInput.theme || "light",
+      dataLength
+    );
+    const colors =
+      validatedInput.colors || themeColors.map((c: any) => c.color);
+
     // 构建数据映射 - 玉玦图使用极坐标系统
     const map = [
       {
@@ -96,7 +107,7 @@ export class JadeJueChartGenerator extends BaseChartTool {
         function: "objCol",
         configurable: true,
         radiusIndex: 0,
-        type: ""
+        type: "",
       },
       {
         name: "值",
@@ -105,8 +116,8 @@ export class JadeJueChartGenerator extends BaseChartTool {
         function: "vCol",
         configurable: true,
         angleIndex: 0,
-        type: "pie"
-      }
+        type: "pie",
+      },
     ];
 
     // 构建填充配置
@@ -121,14 +132,14 @@ export class JadeJueChartGenerator extends BaseChartTool {
           angle: 45,
           blur: 0,
           color: { color: "#000000", opacity: 0.5 },
-          radius: 0
+          radius: 0,
         },
         border: {
           type: "solid" as const,
           width: 0,
-          color: null
-        }
-      }))
+          color: null,
+        },
+      })),
     };
 
     // 构建显示配置 - 玉玦图的特殊配置
@@ -136,16 +147,16 @@ export class JadeJueChartGenerator extends BaseChartTool {
       pie: {
         gapPercentage: validatedInput.gapPercentage || 70,
         innerRadiusRatio: validatedInput.innerRadius || 0,
-        rotateDirection: validatedInput.rotateDirection || 'clockwise',
+        rotateDirection: validatedInput.rotateDirection || "clockwise",
         startAngle: validatedInput.startAngle || 0,
         drawAngle: validatedInput.drawAngle || 270, // 玉玦图的关键特征
         border: {
           radius: 0,
           type: "solid" as const,
           width: 0,
-          color: null
-        }
-      }
+          color: null,
+        },
+      },
     };
 
     // 构建标签配置
@@ -157,17 +168,17 @@ export class JadeJueChartGenerator extends BaseChartTool {
         fontFamily: "Misans 常规",
         fontSize: 12,
         color: { color: "#333333", opacity: 1 },
-        suffix: ""
+        suffix: "",
       },
       textLabel: {
         show: validatedInput.showLabels || false,
         positionChoice: "outside" as const,
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#333333", opacity: 1 }
+        color: { color: "#333333", opacity: 1 },
       },
       highlight: false,
-      overlap: false
+      overlap: false,
     };
 
     // 构建极坐标轴配置（玉玦图一般不显示轴）
@@ -175,24 +186,52 @@ export class JadeJueChartGenerator extends BaseChartTool {
       show: false,
       angleAxis: [
         {
-          line: { show: false, width: 1, color: { color: "#4D4D4D", opacity: 1 } },
-          label: { show: false, fontFamily: "Misans 常规", fontSize: 14, color: { color: "#000000", opacity: 1 } },
-          grid: { show: false, width: 1, color: { color: "#D9D9D9", opacity: 1 }, type: "solid" as const },
+          line: {
+            show: false,
+            width: 1,
+            color: { color: "#4D4D4D", opacity: 1 },
+          },
+          label: {
+            show: false,
+            fontFamily: "Misans 常规",
+            fontSize: 14,
+            color: { color: "#000000", opacity: 1 },
+          },
+          grid: {
+            show: false,
+            width: 1,
+            color: { color: "#D9D9D9", opacity: 1 },
+            type: "solid" as const,
+          },
           position: "outside" as const,
-          type: "category" as const
-        }
+          type: "value" as const,
+          stepOfLabel: "auto" as const,
+          range: [],
+        },
       ],
       radiusAxis: [
         {
-          line: { show: false, width: 1, color: { color: "#4D4D4D", opacity: 1 } },
-          label: { show: false, fontFamily: "Misans 常规", fontSize: 14, color: { color: "#000000", opacity: 1 } },
-          grid: { show: false, width: 1, color: { color: "#D9D9D9", opacity: 1 }, type: "solid" as const },
-          type: "value" as const,
-          stepOfLabel: "auto" as const,
+          line: {
+            show: false,
+            width: 1,
+            color: { color: "#4D4D4D", opacity: 1 },
+          },
+          label: {
+            show: false,
+            fontFamily: "Misans 常规",
+            fontSize: 14,
+            color: { color: "#000000", opacity: 1 },
+          },
+          grid: {
+            show: false,
+            width: 1,
+            color: { color: "#D9D9D9", opacity: 1 },
+            type: "solid" as const,
+          },
+          type: "category" as const,
           position: "inside" as const,
-          range: []
-        }
-      ]
+        },
+      ],
     };
 
     // 生成通用配置
@@ -202,7 +241,7 @@ export class JadeJueChartGenerator extends BaseChartTool {
 
     // 构建最终配置
     const props = {
-      type: 'jade-jue' as const,
+      type: "jade-jue" as const,
       title,
       background,
       map,
@@ -213,7 +252,7 @@ export class JadeJueChartGenerator extends BaseChartTool {
       axis,
       numberFormat: {
         separatorType: "1000.00" as const,
-        decimalPlaces: null
+        decimalPlaces: null,
       },
       animation: {
         show: false,
@@ -222,27 +261,27 @@ export class JadeJueChartGenerator extends BaseChartTool {
         duration: 2,
         startDelay: 0,
         endPause: 1,
-        loop: false
+        loop: false,
       },
       tooltip: false,
       padding: {
         top: 20,
         bottom: 23,
         left: 24,
-        right: 24
-      }
+        right: 24,
+      },
     };
 
     return {
-      data: [validatedInput.data],
-      pipe: 'key_value',
-      props
+      data: validatedInput.data,
+      pipe: "key_value",
+      props,
     };
   }
 
   async loadSchema(): Promise<any> {
     const schemaMerger = new SchemaMerger();
-    return await schemaMerger.getMergedSchema('jade-jue');
+    return await schemaMerger.getMergedSchema("jade-jue");
   }
 
   // 数据验证方法
@@ -256,7 +295,7 @@ export class JadeJueChartGenerator extends BaseChartTool {
       if (!Array.isArray(row) || row.length !== 2) {
         return false;
       }
-      if (typeof row[0] !== 'string' || typeof row[1] !== 'number') {
+      if (typeof row[0] !== "string" || typeof row[1] !== "number") {
         return false;
       }
     }
@@ -267,14 +306,14 @@ export class JadeJueChartGenerator extends BaseChartTool {
   // 获取图表元数据
   getChartMetadata() {
     return {
-      type: 'jade-jue',
-      name: '玉玦图',
-      description: '特殊的饼图变体，具有独特的弧形外观，常用于百分比展示',
-      category: 'pie',
-      dataFormat: 'key_value',
+      type: "jade-jue",
+      name: "玉玦图",
+      description: "特殊的饼图变体，具有独特的弧形外观，常用于百分比展示",
+      category: "pie",
+      dataFormat: "key_value",
       minDataColumns: 2,
       maxDataColumns: 2,
-      features: ['partial-circle', 'jade-shape', 'percentage-display']
+      features: ["partial-circle", "jade-shape", "percentage-display"],
     };
   }
-} 
+}

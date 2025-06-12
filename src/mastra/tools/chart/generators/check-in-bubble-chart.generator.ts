@@ -1,17 +1,22 @@
-import { z } from 'zod';
-import { BaseChartTool, BaseChartInput, BaseChartOutput, BaseChartInputSchema } from '../interfaces/chart-tool.interface';
-import { SchemaMerger } from '../utils/schema-merger';
-import { 
-  generateDefaultTitle, 
-  generateDefaultBackground, 
+import { z } from "zod";
+import {
+  BaseChartTool,
+  BaseChartInput,
+  BaseChartOutput,
+  BaseChartInputSchema,
+} from "../interfaces/chart-tool.interface";
+import { SchemaMerger } from "../utils/schema-merger";
+import {
+  generateDefaultTitle,
+  generateDefaultBackground,
   generateDefaultLegend,
   getThemeColors,
-  createChartOutput 
-} from '../utils/chart-helpers';
+  createChartOutput,
+} from "../utils/chart-helpers";
 
 // 签到气泡图特定输入接口
 export interface CheckInBubbleChartInput extends BaseChartInput {
-  data: Array<Array<string | number>>; // 三列数据格式: [X轴分类, Y轴分类, 气泡大小值]
+  data: Array<Array<Array<string | number>>>; // 三列数据格式: [X轴分类, Y轴分类, 气泡大小值]
   colors?: string[];
   bubbleSize?: {
     min?: number;
@@ -23,10 +28,10 @@ export interface CheckInBubbleChartInput extends BaseChartInput {
   showLabels?: boolean;
 }
 
-// 签到气泡图特定输出接口  
+// 签到气泡图特定输出接口
 export interface CheckInBubbleChartOutput extends BaseChartOutput {
   props: {
-    type: 'check-in-bubble';
+    type: "check-in-bubble";
     title: any;
     background: any;
     map: Array<{
@@ -61,59 +66,60 @@ export interface CheckInBubbleChartOutput extends BaseChartOutput {
 
 // Zod验证schema，扩展基础schema
 export const CheckInBubbleChartInputSchema = BaseChartInputSchema.extend({
-  data: z.array(z.array(z.union([z.string(), z.number()]))).min(2, "Data must have at least 2 rows (header and data)"),
+  data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
   colors: z.array(z.string()).optional(),
-  bubbleSize: z.object({
-    min: z.number().positive().optional().default(5),
-    max: z.number().positive().optional().default(50),
-  }).optional(),
+  bubbleSize: z
+    .object({
+      min: z.number().positive().optional().default(5),
+      max: z.number().positive().optional().default(50),
+    })
+    .optional(),
   opacity: z.number().min(0).max(1).optional().default(0.8),
   borderWidth: z.number().min(0).optional().default(1),
-  borderColor: z.string().optional().default('#ffffff'),
+  borderColor: z.string().optional().default("#ffffff"),
   showLabels: z.boolean().optional().default(false),
 });
 
 export class CheckInBubbleChartGenerator extends BaseChartTool {
   constructor() {
-    super('check-in-bubble');
+    super("check-in-bubble");
   }
 
   protected getElementType(): string {
-    return 'bar'; // 气泡图在schema中使用bar类型
+    return "bar"; // 气泡图在schema中使用bar类型
   }
 
-  async generateConfig(input: CheckInBubbleChartInput): Promise<CheckInBubbleChartOutput> {
+  async generateConfig(
+    input: CheckInBubbleChartInput
+  ): Promise<CheckInBubbleChartOutput> {
     // 验证输入
     const validatedInput = CheckInBubbleChartInputSchema.parse(input);
-    const inputWithChartType = { ...validatedInput, chartType: 'check-in-bubble' };
+    const inputWithChartType = {
+      ...validatedInput,
+      chartType: "check-in-bubble",
+    };
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
-    
+
     // 获取数据维度
-    const dataRows = validatedInput.data.length;
-    const dataCols = validatedInput.data[0]?.length || 0;
-    
-    if (dataCols !== 3) {
-      throw new Error('签到气泡图需要恰好3列数据（X轴分类、Y轴分类、气泡大小值）');
-    }
+    const dataRows = validatedInput.data[0].length;
+    const dataCols = validatedInput.data[0][0]?.length || 0;
+
+    // if (dataCols !== 3) {
+    //   throw new Error(
+    //     "签到气泡图需要恰好3列数据（X轴分类、Y轴分类、气泡大小值）"
+    //   );
+    // }
 
     // 获取数据项数量用于颜色分配
-    const itemCount = dataRows - 1; // 减去header行
-    
+    const itemCount = dataCols - 1; // 减去header行
+
     // 获取默认配置
-    const themeColors = getThemeColors(mergedInput.theme || 'light', itemCount);
-    const colors = validatedInput.colors || themeColors.map((c: any) => c.color);
+    const themeColors = getThemeColors(mergedInput.theme || "light", itemCount);
+    const colors =
+      validatedInput.colors || themeColors.map((c: any) => c.color);
 
     // 构建数据映射 - 气泡图的特定映射
-    const map: Array<{
-      name: string;
-      index: number;
-      isLegend: boolean;
-      function: string;
-      configurable: boolean;
-      xAxisIndex?: number;
-      yAxisIndex?: number;
-      type: string;
-    }> = [
+    const map = [
       {
         name: "X轴对象",
         index: 0,
@@ -121,26 +127,22 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
         function: "objCol",
         configurable: true,
         xAxisIndex: 0,
-        type: ""
+        type: "",
       },
-      {
-        name: "Y轴对象",
-        index: 1,
-        isLegend: false,
-        function: "objCol",
-        configurable: true,
-        yAxisIndex: 0,
-        type: ""
-      },
-      {
-        name: "气泡大小值",
-        index: 2,
+    ];
+
+    // 为每个数值系列添加映射
+    for (let i = 1; i <= itemCount; i++) {
+      map.push({
+        name: "数值列",
+        index: i,
         isLegend: false,
         function: "vCol",
         configurable: true,
-        type: "bar"
-      }
-    ];
+        yAxisIndex: 0,
+        type: "bubble",
+      } as any);
+    }
 
     // 构建填充配置
     const fill = {
@@ -153,34 +155,43 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
           angle: 45,
           blur: 3,
           color: { color: "#000000", opacity: 0.2 },
-          radius: 2
+          radius: 2,
         },
         border: {
           type: "solid" as const,
           width: validatedInput.borderWidth || 1,
-          color: validatedInput.borderColor ? 
-            { color: validatedInput.borderColor, opacity: 1 } : 
-            null
-        }
-      }))
+          color: validatedInput.borderColor
+            ? { color: validatedInput.borderColor, opacity: 1 }
+            : null,
+        },
+      })),
     };
 
     // 构建显示配置
     const bubbleConfig = validatedInput.bubbleSize || { min: 5, max: 50 };
     const display = {
-      bar: {
-        sizeMultiplier: 1,
-        minSize: bubbleConfig.min || 5,
-        maxSize: bubbleConfig.max || 50,
-        opacity: validatedInput.opacity || 0.8,
+      bubble: {
+        standard: "radius",
+        size: [5, 15],
+        shape: "circle",
         border: {
-          type: "solid" as const,
-          width: validatedInput.borderWidth || 1,
-          color: validatedInput.borderColor ? 
-            { color: validatedInput.borderColor, opacity: 1 } : 
-            null
-        }
-      }
+          type: "solid",
+          width: 0,
+          color: null,
+        },
+        reference: {
+          show: false,
+          text: "平均值",
+          value: 20,
+          color: { color: "#ffffff", opacity: 0 },
+          border: {
+            type: "solid",
+            width: 1,
+            color: { color: "#333333", opacity: 1 },
+          },
+        },
+        fillOpacity: 0.75,
+      },
     };
 
     // 构建标签配置
@@ -191,10 +202,10 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
         fontFamily: "Misans 常规",
         fontSize: 12,
         color: { color: "#333333", opacity: 1 },
-        position: "center" as const
+        position: "center" as const,
       },
       highlight: false,
-      overlap: false
+      overlap: false,
     };
 
     // 构建坐标轴配置
@@ -205,7 +216,7 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 }
+            color: { color: "#000000", opacity: 1 },
           },
           label: {
             show: true,
@@ -213,24 +224,24 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
             fontFamily: "Misans 常规",
             fontSize: 12,
             color: { color: "#000000", opacity: 1 },
-            angle: 0
+            angle: 0,
           },
           grid: {
             show: true,
             width: 1,
             color: { color: "#cccccc", opacity: 1 },
-            type: "solid" as const
+            type: "solid" as const,
           },
           position: "bottom" as const,
-          type: "category" as const
-        }
+          type: "category" as const,
+        },
       ],
       yAxis: [
         {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 }
+            color: { color: "#000000", opacity: 1 },
           },
           label: {
             show: true,
@@ -238,32 +249,28 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
             fontSize: 12,
             color: { color: "#000000", opacity: 1 },
             angle: 0,
-            suffix: ""
+            suffix: "",
           },
           grid: {
             show: true,
             width: 1,
             color: { color: "#cccccc", opacity: 1 },
-            type: "solid" as const
+            type: "solid" as const,
           },
           position: "left" as const,
-          type: "category" as const
-        }
-      ]
+          type: "category" as const,
+        },
+      ],
     };
 
     // 生成图表配置
-    const result = createChartOutput(
-      'check-in-bubble',
-      mergedInput,
-      {
-        map,
-        fill,
-        display,
-        label,
-        axis,
-      }
-    );
+    const result = createChartOutput("check-in-bubble", mergedInput, {
+      map,
+      fill,
+      display,
+      label,
+      axis,
+    });
 
     return result as CheckInBubbleChartOutput;
   }
@@ -277,7 +284,7 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
       data: z.array(z.any()),
       pipe: z.string(),
       props: z.object({
-        type: z.literal('check-in-bubble'),
+        type: z.literal("check-in-bubble"),
         title: z.any(),
         background: z.any(),
         map: z.array(z.any()),
@@ -292,6 +299,6 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
 
   async loadSchema(): Promise<any> {
     const merger = new SchemaMerger();
-    return await merger.mergeSchemas('check-in-bubble.schema.json');
+    return await merger.mergeSchemas("check-in-bubble.schema.json");
   }
-} 
+}

@@ -1,16 +1,20 @@
-import { z } from 'zod';
-import { BaseChartTool, BaseChartInput, BaseChartOutput } from '../interfaces/chart-tool.interface';
-import { SchemaMerger } from '../utils/schema-merger';
-import { 
-  generateDefaultTitle, 
-  generateDefaultBackground, 
+import { z } from "zod";
+import {
+  BaseChartTool,
+  BaseChartInput,
+  BaseChartOutput,
+} from "../interfaces/chart-tool.interface";
+import { SchemaMerger } from "../utils/schema-merger";
+import {
+  generateDefaultTitle,
+  generateDefaultBackground,
   generateDefaultLegend,
-  getThemeColors 
-} from '../utils/chart-helpers';
+  getThemeColors,
+} from "../utils/chart-helpers";
 
 // 分组条形图特定输入接口
 export interface GroupedBarChartInput extends BaseChartInput {
-  data: Array<Array<[string, ...number[]]>>; // [城市, 全国, 广州市, 上海市, ...] 格式
+  data: Array<Array<Array<string | number>>>; // [城市, 全国, 广州市, 上海市, ...] 格式
   showLabels?: boolean;
   colors?: string[];
   barHeight?: number; // 条形高度百分比 (0-1)
@@ -20,7 +24,7 @@ export interface GroupedBarChartInput extends BaseChartInput {
 // 分组条形图特定输出接口
 export interface GroupedBarChartOutput extends BaseChartOutput {
   props: {
-    type: 'grouped-bar';
+    type: "grouped-bar";
     title: any;
     background: any;
     map: Array<{
@@ -48,9 +52,9 @@ export interface GroupedBarChartOutput extends BaseChartOutput {
 
 // Zod验证schema
 export const GroupedBarChartInputSchema = z.object({
-  data: z.array(z.array(z.union([z.string(), z.number()]))).min(2),
-  title: z.string().optional().default('分组条形图'),
-  subtitle: z.string().optional().default('副标题'),
+  data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
+  title: z.string().optional().default("分组条形图"),
+  subtitle: z.string().optional().default("副标题"),
   showLabels: z.boolean().optional().default(false),
   colors: z.array(z.string()).optional(),
   barHeight: z.number().min(0.1).max(1).optional().default(0.7),
@@ -59,27 +63,33 @@ export const GroupedBarChartInputSchema = z.object({
 
 export class GroupedBarChartGenerator extends BaseChartTool {
   constructor() {
-    super('grouped-bar');
+    super("grouped-bar");
   }
 
   protected getElementType(): string {
-    return 'bar';
+    return "bar";
   }
 
-  async generateConfig(input: GroupedBarChartInput): Promise<GroupedBarChartOutput> {
+  async generateConfig(
+    input: GroupedBarChartInput
+  ): Promise<GroupedBarChartOutput> {
     // 验证输入
     const validatedInput = GroupedBarChartInputSchema.parse(input);
-    const inputWithChartType = { ...validatedInput, chartType: 'grouped-bar' };
+    const inputWithChartType = { ...validatedInput, chartType: "grouped-bar" };
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
-    
+
     // 获取数据结构信息
-    const headerRow = validatedInput.data[0];
+    const headerRow = validatedInput.data[0][0];
     const seriesCount = headerRow.length - 1; // 除去第一列（类别列）的数据系列数量
-    
+
     // 获取默认配置和颜色
-    const themeColors = getThemeColors(mergedInput.theme || 'light', seriesCount);
-    const colors = validatedInput.colors || themeColors.map((c: any) => c.color);
-    
+    const themeColors = getThemeColors(
+      mergedInput.theme || "light",
+      seriesCount
+    );
+    const colors =
+      validatedInput.colors || themeColors.map((c: any) => c.color);
+
     // 构建数据映射 - 第一列是Y轴对象，其余列是数值列
     const map = [
       {
@@ -89,7 +99,7 @@ export class GroupedBarChartGenerator extends BaseChartTool {
         function: "objCol",
         configurable: true,
         yAxisIndex: 0,
-        type: ""
+        type: "",
       },
       // 为每个数据系列创建映射
       ...Array.from({ length: seriesCount }, (_, i) => ({
@@ -99,8 +109,8 @@ export class GroupedBarChartGenerator extends BaseChartTool {
         function: "vCol",
         configurable: true,
         xAxisIndex: 0,
-        type: "bar"
-      }))
+        type: "bar",
+      })),
     ];
 
     // 构建填充配置
@@ -115,14 +125,14 @@ export class GroupedBarChartGenerator extends BaseChartTool {
           angle: 45,
           blur: 0,
           color: { color: "#000000", opacity: 0.5 },
-          radius: 0
+          radius: 0,
         },
         border: {
           type: "solid" as const,
           width: 0,
-          color: null
-        }
-      }))
+          color: null,
+        },
+      })),
     };
 
     // 构建显示配置
@@ -133,9 +143,9 @@ export class GroupedBarChartGenerator extends BaseChartTool {
           radius: [0, 0, 0, 0],
           type: "solid" as const,
           width: 0,
-          color: null
-        }
-      }
+          color: null,
+        },
+      },
     };
 
     // 构建标签配置
@@ -147,10 +157,10 @@ export class GroupedBarChartGenerator extends BaseChartTool {
         fontFamily: "Misans 常规",
         fontSize: 12,
         color: { color: "#333333", opacity: 1 },
-        suffix: ""
+        suffix: "",
       },
       highlight: false,
-      overlap: false
+      overlap: false,
     };
 
     // 构建坐标轴配置
@@ -161,7 +171,7 @@ export class GroupedBarChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 }
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
@@ -170,44 +180,44 @@ export class GroupedBarChartGenerator extends BaseChartTool {
             fontSize: 14,
             color: { color: "#000000", opacity: 1 },
             angle: 0,
-            suffix: ""
+            suffix: "",
           },
           grid: {
             show: true,
             width: 1,
             color: { color: "#D9D9D9", opacity: 1 },
-            type: "solid" as const
+            type: "solid" as const,
           },
           position: "bottom" as const,
           type: "value" as const,
           stepOfLabel: "auto" as const,
-          range: []
-        }
+          range: [],
+        },
       ],
       yAxis: [
         {
           line: {
             show: true,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 }
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
             fontSize: 14,
             color: { color: "#000000", opacity: 1 },
-            angle: 0
+            angle: 0,
           },
           grid: {
             show: false,
             width: 1,
             color: { color: "#D9D9D9", opacity: 1 },
-            type: "solid" as const
+            type: "solid" as const,
           },
           position: "left" as const,
-          type: "category" as const
-        }
-      ]
+          type: "category" as const,
+        },
+      ],
     };
 
     // 生成通用配置
@@ -217,7 +227,7 @@ export class GroupedBarChartGenerator extends BaseChartTool {
 
     // 构建最终配置
     const props = {
-      type: 'grouped-bar' as const,
+      type: "grouped-bar" as const,
       title,
       background,
       map,
@@ -228,7 +238,7 @@ export class GroupedBarChartGenerator extends BaseChartTool {
       axis,
       numberFormat: {
         separatorType: "1000.00" as const,
-        decimalPlaces: null
+        decimalPlaces: null,
       },
       animation: {
         show: false,
@@ -237,27 +247,27 @@ export class GroupedBarChartGenerator extends BaseChartTool {
         duration: 2,
         startDelay: 0,
         endPause: 1,
-        loop: false
+        loop: false,
       },
       tooltip: false,
       padding: {
         top: 20,
         bottom: 23,
         left: 24,
-        right: 24
-      }
+        right: 24,
+      },
     };
 
     return {
-      data: [validatedInput.data],
-      pipe: 'cross',
-      props
+      data: validatedInput.data,
+      pipe: "cross",
+      props,
     };
   }
 
   async loadSchema(): Promise<any> {
     const schemaMerger = new SchemaMerger();
-    return await schemaMerger.getMergedSchema('grouped-bar');
+    return await schemaMerger.getMergedSchema("grouped-bar");
   }
 
   // 数据验证方法
@@ -277,11 +287,11 @@ export class GroupedBarChartGenerator extends BaseChartTool {
         return false;
       }
       // 检查第一列是否为字符串（类别），其余列是否为数字
-      if (typeof data[i][0] !== 'string') {
+      if (typeof data[i][0] !== "string") {
         return false;
       }
       for (let j = 1; j < data[i].length; j++) {
-        if (typeof data[i][j] !== 'number') {
+        if (typeof data[i][j] !== "number") {
           return false;
         }
       }
@@ -293,14 +303,15 @@ export class GroupedBarChartGenerator extends BaseChartTool {
   // 获取图表元数据
   getChartMetadata() {
     return {
-      type: 'grouped-bar',
-      name: '分组条形图',
-      description: '支持多系列数据的分组条形图，适用于水平比较不同类别下多个系列的数值',
-      category: 'bar',
-      dataFormat: 'cross',
+      type: "grouped-bar",
+      name: "分组条形图",
+      description:
+        "支持多系列数据的分组条形图，适用于水平比较不同类别下多个系列的数值",
+      category: "bar",
+      dataFormat: "cross",
       minDataColumns: 2,
       maxDataColumns: 10,
-      features: ['grouping', 'multiple-series', 'horizontal-comparison']
+      features: ["grouping", "multiple-series", "horizontal-comparison"],
     };
   }
-} 
+}

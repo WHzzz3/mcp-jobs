@@ -1,18 +1,22 @@
-import { z } from 'zod';
-import { BaseChartTool, BaseChartInput, BaseChartOutput } from '../interfaces/chart-tool.interface';
-import { SchemaMerger } from '../utils/schema-merger';
-import { 
-  generateDefaultTitle, 
-  generateDefaultBackground, 
+import { z } from "zod";
+import {
+  BaseChartTool,
+  BaseChartInput,
+  BaseChartOutput,
+} from "../interfaces/chart-tool.interface";
+import { SchemaMerger } from "../utils/schema-merger";
+import {
+  generateDefaultTitle,
+  generateDefaultBackground,
   generateDefaultLegend,
   getThemeColors,
-  processChartData 
-} from '../utils/chart-helpers';
+  processChartData,
+} from "../utils/chart-helpers";
 
 // 折线图特定输入接口
 export interface BasicLineChartInput extends BaseChartInput {
-  data: (string | number)[][];
-  lineType?: 'straight' | 'curve';
+  data: Array<Array<Array<string | number>>>;
+  lineType?: "straight" | "curve";
   lineWidth?: number;
   showPoints?: boolean;
   pointRadius?: number;
@@ -23,7 +27,7 @@ export interface BasicLineChartInput extends BaseChartInput {
 // 折线图特定输出接口
 export interface BasicLineChartOutput extends BaseChartOutput {
   props: {
-    type: 'basic-line';
+    type: "basic-line";
     title: any;
     background: any;
     map: Array<{
@@ -39,7 +43,7 @@ export interface BasicLineChartOutput extends BaseChartOutput {
     fill: any;
     display: {
       line: {
-        type: 'straight' | 'curve';
+        type: "straight" | "curve";
         width: number;
         endPoint: any;
       };
@@ -47,16 +51,24 @@ export interface BasicLineChartOutput extends BaseChartOutput {
     legend: any;
     label: any;
     axis: any;
+    numberFormat: any;
+    animation: any;
+    tooltip: boolean;
+    padding: any;
   };
 }
 
 // Zod验证schema
 export const BasicLineChartInputSchema = z.object({
-  data: z.array(z.array(z.union([z.string(), z.number()])))
-    .min(2, '数据至少需要包含标题行和一行数据'),
-  title: z.string().optional().default('基础折线图'),
-  subtitle: z.string().optional().default('副标题'),
-  lineType: z.enum(['straight', 'curve']).optional().default('straight'),
+  data: z.array(
+    z
+      .array(z.array(z.union([z.string(), z.number()])))
+      .min(2, "数据至少需要包含标题行和一行数据")
+  ),
+  title: z.string().optional().default("基础折线图"),
+  subtitle: z.string().optional().default("副标题"),
+  colors: z.array(z.string()).optional(),
+  lineType: z.enum(["straight", "curve"]).optional().default("straight"),
   lineWidth: z.number().min(1).max(10).optional().default(3),
   showPoints: z.boolean().optional().default(true),
   pointRadius: z.number().min(0).max(10).optional().default(4),
@@ -66,49 +78,55 @@ export const BasicLineChartInputSchema = z.object({
 
 export class BasicLineChartGenerator extends BaseChartTool {
   constructor() {
-    super('basic-line');
+    super("basic-line");
   }
 
   protected getElementType(): string {
-    return 'line';
+    return "line";
   }
 
-  async generateConfig(input: BasicLineChartInput): Promise<BasicLineChartOutput> {
+  async generateConfig(
+    input: BasicLineChartInput
+  ): Promise<BasicLineChartOutput> {
     // 先进行基本的数据验证
-    if (!input.data || input.data.length === 0) {
-      throw new Error('数据格式无效：需要至少包含标题行和一行数据');
+    if (!input.data || input.data[0].length === 0) {
+      throw new Error("数据格式无效：需要至少包含标题行和一行数据");
     }
-    
-    if (input.data.length < 2) {
-      throw new Error('数据格式无效：需要至少包含标题行和一行数据');
+
+    if (input.data[0].length < 2) {
+      throw new Error("数据格式无效：需要至少包含标题行和一行数据");
     }
 
     // 验证输入
     const validatedInput = BasicLineChartInputSchema.parse(input);
-    const inputWithChartType = { ...validatedInput, chartType: 'basic-line' };
+    const inputWithChartType = { ...validatedInput, chartType: "basic-line" };
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
-    
-    const [headers, ...dataRows] = validatedInput.data;
-    
+
+    const [headers, ...dataRows] = validatedInput.data[0];
+
     if (!headers || !dataRows.length) {
-      throw new Error('数据格式无效：需要至少包含标题行和一行数据');
+      throw new Error("数据格式无效：需要至少包含标题行和一行数据");
     }
 
     // 验证数据格式
     const categoryColumn = headers[0];
     const valueColumns = headers.slice(1);
-    
+
     if (valueColumns.length === 0) {
-      throw new Error('至少需要一个数值列用于绘制折线');
+      throw new Error("至少需要一个数值列用于绘制折线");
     }
 
     // 获取默认配置
-    const themeColors = getThemeColors(mergedInput.theme || 'light', valueColumns.length);
-    const colors = validatedInput.customColors || themeColors.map((c: any) => c.color);
+    const themeColors = getThemeColors(
+      mergedInput.theme || "light",
+      valueColumns.length
+    );
+    const colors =
+      validatedInput.colors || themeColors.map((c: any) => c.color);
 
     // 使用导入的默认配置函数
     const title = generateDefaultTitle(mergedInput.title, mergedInput.subtitle);
-    const background = generateDefaultBackground(mergedInput.theme || 'light');
+    const background = generateDefaultBackground(mergedInput.theme || "light");
     const legend = generateDefaultLegend();
 
     // 构建数据映射
@@ -120,7 +138,7 @@ export class BasicLineChartGenerator extends BaseChartTool {
         function: "objCol",
         configurable: true,
         xAxisIndex: 0,
-        type: ""
+        type: "",
       },
       ...valueColumns.map((_, index) => ({
         name: "数值列",
@@ -129,8 +147,8 @@ export class BasicLineChartGenerator extends BaseChartTool {
         function: "vCol",
         configurable: true,
         yAxisIndex: 0,
-        type: "line"
-      }))
+        type: "line",
+      })),
     ];
 
     // 构建填充配置
@@ -145,23 +163,25 @@ export class BasicLineChartGenerator extends BaseChartTool {
           angle: 45,
           blur: 0,
           color: { color: "#000000", opacity: 0.5 },
-          radius: 0
-        }
-      }))
+          radius: 0,
+        },
+      })),
     };
 
     // 构建显示配置
     const display = {
       line: {
-        type: validatedInput.lineType || 'straight',
+        type: validatedInput.lineType || "straight",
         width: validatedInput.lineWidth || 3,
         endPoint: {
-          radius: validatedInput.showPoints ? (validatedInput.pointRadius || 4) : 0,
+          radius: validatedInput.showPoints
+            ? validatedInput.pointRadius || 4
+            : 0,
           width: 1,
           color: { color: "#ffffff", opacity: 1 },
-          fill: null
-        }
-      }
+          fill: null,
+        },
+      },
     };
 
     // 构建标签配置
@@ -173,10 +193,10 @@ export class BasicLineChartGenerator extends BaseChartTool {
         fontFamily: "Misans 常规",
         fontSize: 12,
         color: { color: "#333333", opacity: 1 },
-        suffix: ""
+        suffix: "",
       },
       highlight: false,
-      overlap: false
+      overlap: false,
     };
 
     // 构建坐标轴配置
@@ -187,7 +207,7 @@ export class BasicLineChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 }
+            color: { color: "#000000", opacity: 1 },
           },
           label: {
             show: true,
@@ -195,24 +215,24 @@ export class BasicLineChartGenerator extends BaseChartTool {
             fontFamily: "Misans 常规",
             fontSize: 12,
             color: { color: "#000000", opacity: 1 },
-            angle: 0
+            angle: 0,
           },
           grid: {
             show: true,
             width: 1,
             color: { color: "#cccccc", opacity: 0.5 },
-            type: "dashed" as const
+            type: "dashed" as const,
           },
           position: "bottom" as const,
-          type: "category" as const
-        }
+          type: "category" as const,
+        },
       ],
       yAxis: [
         {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 }
+            color: { color: "#000000", opacity: 1 },
           },
           label: {
             show: true,
@@ -220,20 +240,45 @@ export class BasicLineChartGenerator extends BaseChartTool {
             fontSize: 12,
             color: { color: "#000000", opacity: 1 },
             angle: 0,
-            suffix: ""
+            suffix: "",
           },
           grid: {
             show: true,
             width: 1,
             color: { color: "#cccccc", opacity: 1 },
-            type: "solid" as const
+            type: "solid" as const,
           },
           position: "left" as const,
           type: "value" as const,
           stepOfLabel: "auto",
-          range: []
-        }
-      ]
+          range: [],
+        },
+      ],
+    };
+
+    // 构建数字格式配置
+    const numberFormat = {
+      separatorType: "1000.00",
+      decimalPlaces: null,
+    };
+
+    // 构建动画配置
+    const animation = {
+      show: false,
+      transition: false,
+      moveStyle: null,
+      duration: 2,
+      startDelay: 0,
+      endPause: 1,
+      loop: false,
+    };
+
+    // 构建内边距配置
+    const padding = {
+      top: 20,
+      bottom: 23,
+      left: 24,
+      right: 24,
     };
 
     // 处理数据并创建输出
@@ -241,9 +286,9 @@ export class BasicLineChartGenerator extends BaseChartTool {
 
     return {
       data: processedData,
-      pipe: 'cross', // 折线图使用cross管道
+      pipe: "cross", // 折线图使用cross管道
       props: {
-        type: 'basic-line',
+        type: "basic-line",
         title,
         background,
         legend,
@@ -251,13 +296,17 @@ export class BasicLineChartGenerator extends BaseChartTool {
         fill,
         display,
         label,
-        axis
-      }
+        axis,
+        numberFormat,
+        animation,
+        tooltip: false,
+        padding,
+      },
     } as BasicLineChartOutput;
   }
 
   async loadSchema(): Promise<any> {
     const merger = new SchemaMerger();
-    return merger.getMergedSchema('basic-line');
+    return merger.getMergedSchema("basic-line");
   }
-} 
+}

@@ -1,28 +1,32 @@
-import { z } from 'zod';
-import { BaseChartTool, BaseChartInput, BaseChartOutput } from '../interfaces/chart-tool.interface';
-import { SchemaMerger } from '../utils/schema-merger';
-import { 
-  generateDefaultTitle, 
-  generateDefaultBackground, 
+import { z } from "zod";
+import {
+  BaseChartTool,
+  BaseChartInput,
+  BaseChartOutput,
+} from "../interfaces/chart-tool.interface";
+import { SchemaMerger } from "../utils/schema-merger";
+import {
+  generateDefaultTitle,
+  generateDefaultBackground,
   generateDefaultLegend,
-  getThemeColors 
-} from '../utils/chart-helpers';
+  getThemeColors,
+} from "../utils/chart-helpers";
 
 // 玫瑰饼图特定输入接口
-export interface RosePieChartInput extends Omit<BaseChartInput, 'chartType'> {
-  data: Array<Array<[string, number]>>; // [名称, 值] 格式
+export interface RosePieChartInput extends BaseChartInput {
+  data: Array<Array<Array<string | number>>>; // [名称, 值] 格式
   showLabels?: boolean;
   colors?: string[];
   innerRadius?: number; // 内半径比例 (0-1)
   gapPercentage?: number; // 扇形间隙百分比
-  rotateDirection?: 'clockwise' | 'counterclockwise'; // 旋转方向
+  rotateDirection?: "clockwise" | "counterclockwise"; // 旋转方向
   startAngle?: number; // 起始角度
 }
 
 // 玫瑰饼图特定输出接口
 export interface RosePieChartOutput extends BaseChartOutput {
   props: {
-    type: 'rose-pie';
+    type: "rose-pie";
     title: any;
     background: any;
     map: Array<{
@@ -51,37 +55,44 @@ export interface RosePieChartOutput extends BaseChartOutput {
 
 // Zod验证schema
 export const RosePieChartInputSchema = z.object({
-  data: z.array(z.array(z.tuple([z.string(), z.number()]))).min(1),
-  title: z.string().optional().default('玫瑰图'),
-  subtitle: z.string().optional().default('副标题'),
+  data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
+  title: z.string().optional().default("玫瑰图"),
+  subtitle: z.string().optional().default("副标题"),
   showLabels: z.boolean().optional().default(false),
   colors: z.array(z.string()).optional(),
   innerRadius: z.number().min(0).max(1).optional().default(0),
   gapPercentage: z.number().min(0).max(100).optional().default(1),
-  rotateDirection: z.enum(['clockwise', 'counterclockwise']).optional().default('clockwise'),
+  rotateDirection: z
+    .enum(["clockwise", "counterclockwise"])
+    .optional()
+    .default("clockwise"),
   startAngle: z.number().min(0).max(360).optional().default(0),
 });
 
 export class RosePieChartGenerator extends BaseChartTool {
   constructor() {
-    super('rose-pie');
+    super("rose-pie");
   }
 
   protected getElementType(): string {
-    return 'pie';
+    return "pie";
   }
 
   async generateConfig(input: RosePieChartInput): Promise<RosePieChartOutput> {
     // 验证输入
     const validatedInput = RosePieChartInputSchema.parse(input);
-    const inputWithChartType = { ...validatedInput, chartType: 'rose-pie' };
+    const inputWithChartType = { ...validatedInput, chartType: "rose-pie" };
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
-    
+
     // 获取数据长度用于颜色配置
-    const dataLength = validatedInput.data.length;
-    const themeColors = getThemeColors(mergedInput.theme || 'light', dataLength);
-    const colors = validatedInput.colors || themeColors.map((c: any) => c.color);
-    
+    const dataLength = validatedInput.data[0].length - 1;
+    const themeColors = getThemeColors(
+      mergedInput.theme || "light",
+      dataLength
+    );
+    const colors =
+      validatedInput.colors || themeColors.map((c: any) => c.color);
+
     // 构建数据映射 - 玫瑰图使用极坐标系统
     const map = [
       {
@@ -91,7 +102,7 @@ export class RosePieChartGenerator extends BaseChartTool {
         function: "objCol",
         configurable: true,
         angleIndex: 0,
-        type: ""
+        type: "",
       },
       {
         name: "值",
@@ -100,8 +111,8 @@ export class RosePieChartGenerator extends BaseChartTool {
         function: "vCol",
         configurable: true,
         radiusIndex: 0,
-        type: "pie"
-      }
+        type: "pie",
+      },
     ];
 
     // 构建填充配置
@@ -116,14 +127,14 @@ export class RosePieChartGenerator extends BaseChartTool {
           angle: 45,
           blur: 0,
           color: { color: "#000000", opacity: 0.5 },
-          radius: 0
+          radius: 0,
         },
         border: {
           type: "solid" as const,
           width: 0,
-          color: null
-        }
-      }))
+          color: null,
+        },
+      })),
     };
 
     // 构建显示配置
@@ -135,9 +146,9 @@ export class RosePieChartGenerator extends BaseChartTool {
           radius: 0,
           type: "solid" as const,
           width: 0,
-          color: null
-        }
-      }
+          color: null,
+        },
+      },
     };
 
     // 构建标签配置
@@ -148,7 +159,7 @@ export class RosePieChartGenerator extends BaseChartTool {
         positionChoice: "inside" as const,
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#333333", opacity: 1 }
+        color: { color: "#333333", opacity: 1 },
       },
       numberLabel: {
         show: validatedInput.showLabels || false,
@@ -156,45 +167,45 @@ export class RosePieChartGenerator extends BaseChartTool {
         fontFamily: "Misans 常规",
         fontSize: 12,
         color: { color: "#333333", opacity: 1 },
-        suffix: ""
+        suffix: "",
       },
       highlight: false,
-      overlap: false
+      overlap: false,
     };
 
     // 构建极坐标轴配置
     const axis = {
-      show: true,
+      show: false,
       angleAxis: [
         {
           line: {
             show: true,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 }
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
             direction: "circumference" as const,
             fontFamily: "Misans 常规",
             fontSize: 14,
-            color: { color: "#000000", opacity: 1 }
+            color: { color: "#000000", opacity: 1 },
           },
           grid: {
             show: true,
             width: 1,
             color: { color: "#D9D9D9", opacity: 1 },
-            type: "solid" as const
+            type: "solid" as const,
           },
           position: "outside" as const,
-          type: "category" as const
-        }
+          type: "category" as const,
+        },
       ],
       radiusAxis: [
         {
           line: {
             show: true,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 }
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
@@ -202,20 +213,20 @@ export class RosePieChartGenerator extends BaseChartTool {
             fontSize: 14,
             color: { color: "#000000", opacity: 1 },
             angle: 0,
-            suffix: ""
+            suffix: "",
           },
           grid: {
             show: true,
             width: 1,
             color: { color: "#D9D9D9", opacity: 1 },
-            type: "solid" as const
+            type: "solid" as const,
           },
           type: "value" as const,
           stepOfLabel: "auto" as const,
           position: "inside" as const,
-          range: []
-        }
-      ]
+          range: [],
+        },
+      ],
     };
 
     // 生成通用配置
@@ -225,7 +236,7 @@ export class RosePieChartGenerator extends BaseChartTool {
 
     // 构建最终配置
     const props = {
-      type: 'rose-pie' as const,
+      type: "rose-pie" as const,
       title,
       background,
       map,
@@ -236,7 +247,7 @@ export class RosePieChartGenerator extends BaseChartTool {
       axis,
       numberFormat: {
         separatorType: "1000.00" as const,
-        decimalPlaces: null
+        decimalPlaces: null,
       },
       animation: {
         show: false,
@@ -245,27 +256,27 @@ export class RosePieChartGenerator extends BaseChartTool {
         duration: 2,
         startDelay: 0,
         endPause: 1,
-        loop: false
+        loop: false,
       },
       tooltip: false,
       padding: {
         top: 20,
         bottom: 23,
         left: 24,
-        right: 24
-      }
+        right: 24,
+      },
     };
 
     return {
-      data: [validatedInput.data],
-      pipe: 'key_value',
-      props
+      data: validatedInput.data,
+      pipe: "key_value",
+      props,
     };
   }
 
   async loadSchema(): Promise<any> {
     const schemaMerger = new SchemaMerger();
-    return await schemaMerger.getMergedSchema('rose-pie');
+    return await schemaMerger.getMergedSchema("rose-pie");
   }
 
   // 数据验证方法
@@ -279,7 +290,7 @@ export class RosePieChartGenerator extends BaseChartTool {
       if (!Array.isArray(row) || row.length !== 2) {
         return false;
       }
-      if (typeof row[0] !== 'string' || typeof row[1] !== 'number') {
+      if (typeof row[0] !== "string" || typeof row[1] !== "number") {
         return false;
       }
     }
@@ -290,14 +301,14 @@ export class RosePieChartGenerator extends BaseChartTool {
   // 获取图表元数据
   getChartMetadata() {
     return {
-      type: 'rose-pie',
-      name: '玫瑰图',
-      description: '基于极坐标系统的饼图变体，可以更好地显示数值差异',
-      category: 'pie',
-      dataFormat: 'key_value',
+      type: "rose-pie",
+      name: "玫瑰图",
+      description: "基于极坐标系统的饼图变体，可以更好地显示数值差异",
+      category: "pie",
+      dataFormat: "key_value",
       minDataColumns: 2,
       maxDataColumns: 2,
-      features: ['polar-coordinates', 'radius-mapping', 'angle-mapping']
+      features: ["polar-coordinates", "radius-mapping", "angle-mapping"],
     };
   }
-} 
+}

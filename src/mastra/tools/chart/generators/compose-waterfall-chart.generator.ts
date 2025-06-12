@@ -1,31 +1,36 @@
-import { z } from 'zod';
-import { BaseChartTool, BaseChartInput, BaseChartOutput, BaseChartInputSchema } from '../interfaces/chart-tool.interface';
-import { SchemaMerger } from '../utils/schema-merger';
-import { 
-  generateDefaultTitle, 
-  generateDefaultBackground, 
+import { z } from "zod";
+import {
+  BaseChartTool,
+  BaseChartInput,
+  BaseChartOutput,
+  BaseChartInputSchema,
+} from "../interfaces/chart-tool.interface";
+import { SchemaMerger } from "../utils/schema-merger";
+import {
+  generateDefaultTitle,
+  generateDefaultBackground,
   generateDefaultLegend,
   getThemeColors,
-  createChartOutput 
-} from '../utils/chart-helpers';
+  createChartOutput,
+} from "../utils/chart-helpers";
 
 // 复合瀑布图特定输入接口
 export interface ComposeWaterfallChartInput extends BaseChartInput {
-  data: Array<Array<string | number>>; // 两列数据格式: [阶段/分类, 数值]
+  data: Array<Array<Array<string | number>>>; // 两列数据格式: [阶段/分类, 数值]
   colors?: string[];
-  waterfallType?: 'standard' | 'cumulative'; // 瀑布图类型
+  waterfallType?: "standard" | "cumulative"; // 瀑布图类型
   showConnectors?: boolean; // 是否显示连接线
   connectorColor?: string;
   connectorWidth?: number;
   barWidth?: number;
   showLabels?: boolean;
-  labelPosition?: 'top' | 'inside' | 'bottom';
+  labelPosition?: "top" | "inside" | "bottom";
 }
 
-// 复合瀑布图特定输出接口  
+// 复合瀑布图特定输出接口
 export interface ComposeWaterfallChartOutput extends BaseChartOutput {
   props: {
-    type: 'compose-waterfall';
+    type: "compose-waterfall";
     title: any;
     background: any;
     map: Array<{
@@ -59,48 +64,56 @@ export interface ComposeWaterfallChartOutput extends BaseChartOutput {
 
 // Zod验证schema，扩展基础schema
 export const ComposeWaterfallChartInputSchema = BaseChartInputSchema.extend({
-  data: z.array(z.array(z.union([z.string(), z.number()]))).min(2, "Data must have at least 2 rows (header and data)"),
+  data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
   colors: z.array(z.string()).optional(),
-  waterfallType: z.enum(['standard', 'cumulative']).optional().default('standard'),
+  waterfallType: z
+    .enum(["standard", "cumulative"])
+    .optional()
+    .default("standard"),
   showConnectors: z.boolean().optional().default(true),
-  connectorColor: z.string().optional().default('#cccccc'),
+  connectorColor: z.string().optional().default("#cccccc"),
   connectorWidth: z.number().positive().optional().default(1),
   barWidth: z.number().min(0.1).max(1).optional().default(0.6),
   showLabels: z.boolean().optional().default(true),
-  labelPosition: z.enum(['top', 'inside', 'bottom']).optional().default('top'),
+  labelPosition: z.enum(["top", "inside", "bottom"]).optional().default("top"),
 });
 
 export class ComposeWaterfallChartGenerator extends BaseChartTool {
   constructor() {
-    super('compose-waterfall');
+    super("compose-waterfall");
   }
 
   protected getElementType(): string {
-    return 'bar'; // 瀑布图使用bar类型
+    return "bar"; // 瀑布图使用bar类型
   }
 
-  async generateConfig(input: ComposeWaterfallChartInput): Promise<ComposeWaterfallChartOutput> {
+  async generateConfig(
+    input: ComposeWaterfallChartInput
+  ): Promise<ComposeWaterfallChartOutput> {
     // 验证输入
     const validatedInput = ComposeWaterfallChartInputSchema.parse(input);
-    const inputWithChartType = { ...validatedInput, chartType: 'compose-waterfall' };
+    const inputWithChartType = {
+      ...validatedInput,
+      chartType: "compose-waterfall",
+    };
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
-    
+
     // 获取数据维度
-    const dataRows = validatedInput.data.length;
+    const dataRows = validatedInput.data[0][0].length;
     const dataCols = validatedInput.data[0]?.length || 0;
-    
-    if (dataCols !== 2) {
-      throw new Error('复合瀑布图需要恰好2列数据（阶段/分类、数值）');
-    }
+
+    // if (dataCols !== 2) {
+    //   throw new Error("复合瀑布图需要恰好2列数据（阶段/分类、数值）");
+    // }
 
     // 获取数据项数量用于颜色分配
     const itemCount = dataRows - 1; // 减去header行
-    
+
     // 获取默认配置
-    const themeColors = getThemeColors(mergedInput.theme || 'light', itemCount);
-    
+    const themeColors = getThemeColors(mergedInput.theme || "light", itemCount);
+
     // 瀑布图通常使用特定的颜色方案：增长（绿色）、减少（红色）、总计（蓝色）
-    const defaultWaterfallColors = ['#52c41a', '#ff4d4f', '#1890ff']; // 绿、红、蓝
+    const defaultWaterfallColors = ["#52c41a", "#ff4d4f", "#1890ff"]; // 绿、红、蓝
     const colors = validatedInput.colors || defaultWaterfallColors;
 
     // 构建数据映射 - 瀑布图的特定映射
@@ -117,11 +130,11 @@ export class ComposeWaterfallChartGenerator extends BaseChartTool {
       {
         name: "名称",
         index: 0,
-        isLegend: false,
+        isLegend: true,
         function: "objCol",
         configurable: true,
         xAxisIndex: 0,
-        type: ""
+        type: "",
       },
       {
         name: "值",
@@ -130,8 +143,8 @@ export class ComposeWaterfallChartGenerator extends BaseChartTool {
         function: "vCol",
         configurable: true,
         yAxisIndex: 0,
-        type: "bar"
-      }
+        type: "bar",
+      },
     ];
 
     // 构建填充配置
@@ -145,14 +158,14 @@ export class ComposeWaterfallChartGenerator extends BaseChartTool {
           angle: 45,
           blur: 3,
           color: { color: "#000000", opacity: 0.2 },
-          radius: 2
+          radius: 2,
         },
         border: {
           type: "solid" as const,
           width: 0,
-          color: null
-        }
-      }))
+          color: null,
+        },
+      })),
     };
 
     // 构建显示配置
@@ -162,11 +175,14 @@ export class ComposeWaterfallChartGenerator extends BaseChartTool {
         showConnectors: validatedInput.showConnectors || true,
         connectorStyle: {
           width: validatedInput.connectorWidth || 1,
-          color: { color: validatedInput.connectorColor || '#cccccc', opacity: 1 },
-          type: "dashed" as const
+          color: {
+            color: validatedInput.connectorColor || "#cccccc",
+            opacity: 1,
+          },
+          type: "dashed" as const,
         },
-        labelPosition: validatedInput.labelPosition || 'top'
-      }
+        labelPosition: validatedInput.labelPosition || "top",
+      },
     };
 
     // 构建标签配置
@@ -177,7 +193,7 @@ export class ComposeWaterfallChartGenerator extends BaseChartTool {
         fontFamily: "Misans 常规",
         fontSize: 12,
         color: { color: "#333333", opacity: 1 },
-        position: validatedInput.labelPosition || 'top'
+        position: validatedInput.labelPosition || "top",
       },
       numberLabel: {
         show: true,
@@ -185,10 +201,10 @@ export class ComposeWaterfallChartGenerator extends BaseChartTool {
         fontSize: 12,
         color: { color: "#333333", opacity: 1 },
         suffix: "",
-        position: validatedInput.labelPosition || 'top'
+        position: validatedInput.labelPosition || "top",
       },
       highlight: false,
-      overlap: false
+      overlap: false,
     };
 
     // 构建坐标轴配置
@@ -199,7 +215,7 @@ export class ComposeWaterfallChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 }
+            color: { color: "#000000", opacity: 1 },
           },
           label: {
             show: true,
@@ -207,24 +223,24 @@ export class ComposeWaterfallChartGenerator extends BaseChartTool {
             fontFamily: "Misans 常规",
             fontSize: 12,
             color: { color: "#000000", opacity: 1 },
-            angle: 0
+            angle: 0,
           },
           grid: {
             show: true,
             width: 1,
             color: { color: "#cccccc", opacity: 1 },
-            type: "solid" as const
+            type: "solid" as const,
           },
           position: "bottom" as const,
-          type: "category" as const
-        }
+          type: "category" as const,
+        },
       ],
       yAxis: [
         {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 }
+            color: { color: "#000000", opacity: 1 },
           },
           label: {
             show: true,
@@ -232,32 +248,28 @@ export class ComposeWaterfallChartGenerator extends BaseChartTool {
             fontSize: 12,
             color: { color: "#000000", opacity: 1 },
             angle: 0,
-            suffix: ""
+            suffix: "",
           },
           grid: {
             show: true,
             width: 1,
             color: { color: "#cccccc", opacity: 1 },
-            type: "solid" as const
+            type: "solid" as const,
           },
           position: "left" as const,
-          type: "value" as const
-        }
-      ]
+          type: "value" as const,
+        },
+      ],
     };
 
     // 生成图表配置
-    const result = createChartOutput(
-      'compose-waterfall',
-      mergedInput,
-      {
-        map,
-        fill,
-        display,
-        label,
-        axis,
-      }
-    );
+    const result = createChartOutput("compose-waterfall", mergedInput, {
+      map,
+      fill,
+      display,
+      label,
+      axis,
+    });
 
     return result as ComposeWaterfallChartOutput;
   }
@@ -271,7 +283,7 @@ export class ComposeWaterfallChartGenerator extends BaseChartTool {
       data: z.array(z.any()),
       pipe: z.string(),
       props: z.object({
-        type: z.literal('compose-waterfall'),
+        type: z.literal("compose-waterfall"),
         title: z.any(),
         background: z.any(),
         map: z.array(z.any()),
@@ -286,6 +298,6 @@ export class ComposeWaterfallChartGenerator extends BaseChartTool {
 
   async loadSchema(): Promise<any> {
     const merger = new SchemaMerger();
-    return await merger.mergeSchemas('compose-waterfall.schema.json');
+    return await merger.mergeSchemas("compose-waterfall.schema.json");
   }
-} 
+}

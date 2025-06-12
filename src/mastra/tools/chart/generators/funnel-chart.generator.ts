@@ -1,17 +1,21 @@
-import { z } from 'zod';
-import { BaseChartTool, BaseChartInput, BaseChartOutput } from '../interfaces/chart-tool.interface';
-import { SchemaMerger } from '../utils/schema-merger';
-import { 
-  generateDefaultTitle, 
-  generateDefaultBackground, 
+import { z } from "zod";
+import {
+  BaseChartTool,
+  BaseChartInput,
+  BaseChartOutput,
+} from "../interfaces/chart-tool.interface";
+import { SchemaMerger } from "../utils/schema-merger";
+import {
+  generateDefaultTitle,
+  generateDefaultBackground,
   generateDefaultLegend,
   getThemeColors,
-  createChartOutput 
-} from '../utils/chart-helpers';
+  createChartOutput,
+} from "../utils/chart-helpers";
 
 // 漏斗图特定输入接口
-export interface FunnelChartInput extends Omit<BaseChartInput, 'chartType'> {
-  data: Array<Array<string | number>>; // [阶段名称, 值] 格式
+export interface FunnelChartInput extends Omit<BaseChartInput, "chartType"> {
+  data: Array<Array<Array<string | number>>>; // [阶段名称, 值] 格式
   gapDistance?: number; // 段间距离
   fillOpacity?: number; // 填充不透明度
   showLabels?: boolean;
@@ -20,7 +24,7 @@ export interface FunnelChartInput extends Omit<BaseChartInput, 'chartType'> {
 // 漏斗图特定输出接口
 export interface FunnelChartOutput extends BaseChartOutput {
   props: {
-    type: 'funnel';
+    type: "funnel";
     title: any;
     background: any;
     map: Array<{
@@ -48,9 +52,10 @@ export interface FunnelChartOutput extends BaseChartOutput {
 
 // Zod验证schema
 export const FunnelChartInputSchema = z.object({
-  data: z.array(z.array(z.union([z.string(), z.number()]))).min(2),
-  title: z.string().optional().default('漏斗图'),
-  subtitle: z.string().optional().default('副标题'),
+  data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
+  title: z.string().optional().default("漏斗图"),
+  subtitle: z.string().optional().default("副标题"),
+  colors: z.array(z.string()).optional(),
   gapDistance: z.number().min(0).optional().default(0),
   fillOpacity: z.number().min(0).max(1).optional().default(1),
   showLabels: z.boolean().optional().default(false),
@@ -58,25 +63,27 @@ export const FunnelChartInputSchema = z.object({
 
 export class FunnelChartGenerator extends BaseChartTool {
   constructor() {
-    super('funnel');
+    super("funnel");
   }
 
   protected getElementType(): string {
-    return 'bar';
+    return "bar";
   }
 
   async generateConfig(input: BaseChartInput): Promise<BaseChartOutput> {
     // 验证输入
     const validatedInput = FunnelChartInputSchema.parse(input);
-    const inputWithChartType = { ...validatedInput, chartType: 'funnel' };
+    const inputWithChartType = { ...validatedInput, chartType: "funnel" };
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
-    
+
     // 获取数据行数（除去标题行）
-    const dataLength = validatedInput.data.length - 1;
-    
+    const dataLength = validatedInput.data[0].length - 1;
+
     // 获取主题颜色
-    const themeColors = getThemeColors(mergedInput.theme || 'light', dataLength);
-    
+    const themeColors =
+      validatedInput.colors ||
+      getThemeColors(mergedInput.theme || "light", dataLength);
+
     // 构建数据映射
     const map = [
       {
@@ -86,7 +93,7 @@ export class FunnelChartGenerator extends BaseChartTool {
         function: "objCol",
         configurable: true,
         xAxisIndex: 0,
-        type: ""
+        type: "",
       },
       {
         name: "值",
@@ -95,8 +102,8 @@ export class FunnelChartGenerator extends BaseChartTool {
         function: "vCol",
         configurable: true,
         yAxisIndex: 0,
-        type: "bar"
-      }
+        type: "bar",
+      },
     ];
 
     // 构建填充配置 - 漏斗图通常每个阶段不同颜色
@@ -111,14 +118,14 @@ export class FunnelChartGenerator extends BaseChartTool {
           angle: 45,
           blur: 0,
           color: { color: "#000000", opacity: 0.5 },
-          radius: 0
+          radius: 0,
         },
         border: {
           type: "solid" as const,
           width: 0,
-          color: null
-        }
-      }))
+          color: null,
+        },
+      })),
     };
 
     // 构建显示配置
@@ -129,9 +136,9 @@ export class FunnelChartGenerator extends BaseChartTool {
         border: {
           type: "solid" as const,
           width: 0,
-          color: null
-        }
-      }
+          color: null,
+        },
+      },
     };
 
     // 构建标签配置
@@ -142,7 +149,7 @@ export class FunnelChartGenerator extends BaseChartTool {
         positionChoice: "outside-follow" as const,
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#333333", opacity: 1 }
+        color: { color: "#333333", opacity: 1 },
       },
       numberLabel: {
         show: validatedInput.showLabels || false,
@@ -150,23 +157,30 @@ export class FunnelChartGenerator extends BaseChartTool {
         fontFamily: "Misans 常规",
         fontSize: 12,
         color: { color: "#333333", opacity: 1 },
-        suffix: ""
+        suffix: "",
+      },
+      percentLabel: {
+        show: validatedInput.showLabels || false,
+        positionChoice: "outside-follow",
+        fontFamily: "Misans 常规" as const,
+        fontSize: 12,
+        color: { color: "#333333", opacity: 1 },
       },
       highlight: false,
-      overlap: false
+      overlap: false,
     };
 
-    return createChartOutput('funnel', mergedInput, {
+    return createChartOutput("funnel", mergedInput, {
       map,
       fill,
       display,
-      label
+      label,
     });
   }
 
   async loadSchema(): Promise<any> {
     const merger = new SchemaMerger();
-    return merger.getMergedSchema('funnel');
+    return merger.getMergedSchema("funnel");
   }
 
   validateData(data: any[][]): boolean {
@@ -186,9 +200,9 @@ export class FunnelChartGenerator extends BaseChartTool {
       if (!Array.isArray(row) || row.length !== 2) {
         return false;
       }
-      
+
       // 第一列应该是字符串，第二列应该是数字
-      if (typeof row[0] !== 'string' || typeof row[1] !== 'number') {
+      if (typeof row[0] !== "string" || typeof row[1] !== "number") {
         return false;
       }
     }
@@ -198,16 +212,16 @@ export class FunnelChartGenerator extends BaseChartTool {
 
   getChartMetadata() {
     return {
-      type: 'funnel',
-      name: '漏斗图',
-      description: '用于显示业务流程中各阶段的转化情况，适合分析用户转化漏斗',
-      category: '特殊图表',
-      tags: ['转化', '流程', '阶段', '漏斗'],
-      dataFormat: 'key_value',
+      type: "funnel",
+      name: "漏斗图",
+      description: "用于显示业务流程中各阶段的转化情况，适合分析用户转化漏斗",
+      category: "特殊图表",
+      tags: ["转化", "流程", "阶段", "漏斗"],
+      dataFormat: "key_value",
       minDataPoints: 2,
       maxDataPoints: 20,
-      requiredFields: ['阶段名称', '数值'],
-      optionalFields: ['标题', '副标题', '段间距', '填充透明度', '标签显示']
+      requiredFields: ["阶段名称", "数值"],
+      optionalFields: ["标题", "副标题", "段间距", "填充透明度", "标签显示"],
     };
   }
-} 
+}

@@ -1,17 +1,22 @@
-import { z } from 'zod';
-import { BaseChartTool, BaseChartInput, BaseChartOutput } from '../interfaces/chart-tool.interface';
-import { SchemaMerger } from '../utils/schema-merger';
-import { 
-  generateDefaultTitle, 
-  generateDefaultBackground, 
+import { z } from "zod";
+import {
+  BaseChartTool,
+  BaseChartInput,
+  BaseChartOutput,
+} from "../interfaces/chart-tool.interface";
+import { SchemaMerger } from "../utils/schema-merger";
+import {
+  generateDefaultTitle,
+  generateDefaultBackground,
   generateDefaultLegend,
   getThemeColors,
-  createChartOutput 
-} from '../utils/chart-helpers';
+  createChartOutput,
+} from "../utils/chart-helpers";
 
 // 笛卡尔热力图特定输入接口
-export interface DescartesHeatmapChartInput extends Omit<BaseChartInput, 'chartType'> {
-  data: Array<Array<string | number>>; // [Y轴分类, X轴值1, X轴值2, ...] 格式
+export interface DescartesHeatmapChartInput
+  extends Omit<BaseChartInput, "chartType"> {
+  data: Array<Array<Array<string | number>>>; // [Y轴分类, X轴值1, X轴值2, ...] 格式
   gapDistance?: number; // 单元格间距
   borderRadius?: number[]; // 边框圆角
   useGradient?: boolean; // 是否使用渐变色
@@ -21,7 +26,7 @@ export interface DescartesHeatmapChartInput extends Omit<BaseChartInput, 'chartT
 // 笛卡尔热力图特定输出接口
 export interface DescartesHeatmapChartOutput extends BaseChartOutput {
   props: {
-    type: 'descartes-heatmap';
+    type: "descartes-heatmap";
     title: any;
     background: any;
     map: Array<{
@@ -50,9 +55,10 @@ export interface DescartesHeatmapChartOutput extends BaseChartOutput {
 
 // Zod验证schema
 export const DescartesHeatmapChartInputSchema = z.object({
-  data: z.array(z.array(z.union([z.string(), z.number()]))).min(2),
-  title: z.string().optional().default('笛卡尔热力图'),
-  subtitle: z.string().optional().default('副标题'),
+  data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
+  title: z.string().optional().default("笛卡尔热力图"),
+  subtitle: z.string().optional().default("副标题"),
+  colors: z.array(z.string()).optional(),
   gapDistance: z.number().min(0).optional().default(0),
   borderRadius: z.array(z.number()).length(4).optional().default([0, 0, 0, 0]),
   useGradient: z.boolean().optional().default(true),
@@ -61,23 +67,26 @@ export const DescartesHeatmapChartInputSchema = z.object({
 
 export class DescartesHeatmapChartGenerator extends BaseChartTool {
   constructor() {
-    super('descartes-heatmap');
+    super("descartes-heatmap");
   }
 
   protected getElementType(): string {
-    return 'bar';
+    return "bar";
   }
 
   async generateConfig(input: BaseChartInput): Promise<BaseChartOutput> {
     // 验证输入
     const validatedInput = DescartesHeatmapChartInputSchema.parse(input);
-    const inputWithChartType = { ...validatedInput, chartType: 'descartes-heatmap' };
+    const inputWithChartType = {
+      ...validatedInput,
+      chartType: "descartes-heatmap",
+    };
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
-    
+
     // 获取数据结构信息
-    const headerRow = validatedInput.data[0];
+    const headerRow = validatedInput.data[0][0];
     const xAxisCount = headerRow.length - 1; // 除去第一列（Y轴分类列）的X轴数据数量
-    
+
     // 构建数据映射 - 热力图需要Y轴分类和多个X轴数据列
     const map = [
       {
@@ -87,7 +96,7 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
         function: "objCol",
         configurable: true,
         yAxisIndex: 0,
-        type: ""
+        type: "",
       },
       // 为每个X轴数据列创建映射
       ...Array.from({ length: xAxisCount }, (_, i) => ({
@@ -97,39 +106,41 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
         function: "vCol",
         configurable: true,
         xAxisIndex: 0,
-        type: "bar"
-      }))
+        type: "bar",
+      })),
     ];
-
+    const colors = validatedInput.colors;
     // 构建填充配置 - 热力图通常使用单一渐变色
     const fill = {
       controlType: "single" as const,
       props: [
         {
-          color: validatedInput.useGradient ? {
-            color: {
-              type: "linear" as const,
-              angle: 0,
-              colorStops: [
-                {
-                  color: "#5AAEF3",
-                  opacity: 1,
-                  offset: 0
+          color: validatedInput.useGradient
+            ? {
+                color: {
+                  type: "linear" as const,
+                  angle: 0,
+                  colorStops: [
+                    {
+                      color: colors?.[0] || "#5AAEF3",
+                      opacity: 1,
+                      offset: 0,
+                    },
+                    {
+                      color: colors?.[1] || "#FFE88E",
+                      opacity: 1,
+                      offset: 0.5,
+                    },
+                    {
+                      color: colors?.[2] || "#E65A56",
+                      opacity: 1,
+                      offset: 1,
+                    },
+                  ],
                 },
-                {
-                  color: "#FFE88E",
-                  opacity: 1,
-                  offset: 0.5
-                },
-                {
-                  color: "#E65A56",
-                  opacity: 1,
-                  offset: 1
-                }
-              ]
-            },
-            opacity: 1
-          } : { color: "#5AAEF3", opacity: 1 },
+                opacity: 1,
+              }
+            : { color: "#5AAEF3", opacity: 1 },
           texture: { url: "" },
           shadow: {
             show: false,
@@ -137,15 +148,15 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
             angle: 45,
             blur: 0,
             color: { color: "#000000", opacity: 0.5 },
-            radius: 0
+            radius: 0,
           },
           border: {
             type: "solid" as const,
             width: 0,
-            color: null
-          }
-        }
-      ]
+            color: null,
+          },
+        },
+      ],
     };
 
     // 构建显示配置
@@ -157,9 +168,9 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
           radius: validatedInput.borderRadius || [0, 0, 0, 0],
           type: "solid" as const,
           width: 0,
-          color: null
-        }
-      }
+          color: null,
+        },
+      },
     };
 
     // 构建标签配置
@@ -170,10 +181,10 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
         fontFamily: "Misans 常规",
         fontSize: 12,
         color: { color: "#333333", opacity: 1 },
-        suffix: ""
+        suffix: "",
       },
       highlight: false,
-      overlap: false
+      overlap: false,
     };
 
     // 构建坐标轴配置
@@ -184,63 +195,63 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
           line: {
             show: false,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 }
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
             fontSize: 14,
             color: { color: "#000000", opacity: 1 },
-            suffix: ""
+            suffix: "",
           },
           grid: {
             show: false,
             width: 1,
             color: { color: "#D9D9D9", opacity: 1 },
-            type: "solid" as const
+            type: "solid" as const,
           },
           type: "category" as const,
-          stepOfLabel: 1
-        }
+          stepOfLabel: 1,
+        },
       ],
       yAxis: [
         {
           line: {
             show: false,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 }
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
             fontSize: 14,
             color: { color: "#000000", opacity: 1 },
-            suffix: ""
+            suffix: "",
           },
           grid: {
             show: false,
             width: 1,
             color: { color: "#D9D9D9", opacity: 1 },
-            type: "solid" as const
+            type: "solid" as const,
           },
           type: "category" as const,
-          stepOfLabel: 1
-        }
-      ]
+          stepOfLabel: 1,
+        },
+      ],
     };
 
-    return createChartOutput('descartes-heatmap', mergedInput, {
+    return createChartOutput("descartes-heatmap", mergedInput, {
       map,
       fill,
       display,
       label,
-      axis
+      axis,
     });
   }
 
   async loadSchema(): Promise<any> {
     const merger = new SchemaMerger();
-    return merger.getMergedSchema('descartes-heatmap');
+    return merger.getMergedSchema("descartes-heatmap");
   }
 
   validateData(data: any[][]): boolean {
@@ -260,14 +271,14 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
       if (!Array.isArray(row) || row.length !== headerRow.length) {
         return false;
       }
-      
+
       // 第一列应该是字符串，其余列应该是数字
-      if (typeof row[0] !== 'string') {
+      if (typeof row[0] !== "string") {
         return false;
       }
-      
+
       for (let j = 1; j < row.length; j++) {
-        if (typeof row[j] !== 'number') {
+        if (typeof row[j] !== "number") {
           return false;
         }
       }
@@ -278,16 +289,23 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
 
   getChartMetadata() {
     return {
-      type: 'descartes-heatmap',
-      name: '笛卡尔热力图',
-      description: '用于展示二维数据的强度分布，通过颜色深浅表示数值大小',
-      category: '热力图',
-      tags: ['热力图', '二维数据', '强度分布', '颜色映射'],
-      dataFormat: 'cross',
+      type: "descartes-heatmap",
+      name: "笛卡尔热力图",
+      description: "用于展示二维数据的强度分布，通过颜色深浅表示数值大小",
+      category: "热力图",
+      tags: ["热力图", "二维数据", "强度分布", "颜色映射"],
+      dataFormat: "cross",
       minDataPoints: 4,
       maxDataPoints: 200,
-      requiredFields: ['Y轴分类', 'X轴数据'],
-      optionalFields: ['标题', '副标题', '单元格间距', '边框圆角', '渐变色', '标签显示']
+      requiredFields: ["Y轴分类", "X轴数据"],
+      optionalFields: [
+        "标题",
+        "副标题",
+        "单元格间距",
+        "边框圆角",
+        "渐变色",
+        "标签显示",
+      ],
     };
   }
-} 
+}
