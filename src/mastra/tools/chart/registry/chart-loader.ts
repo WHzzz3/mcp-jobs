@@ -8,6 +8,28 @@ import { BasicLineChartGenerator } from '../generators/basic-line-chart.generato
 import { BasicPieChartGenerator } from '../generators/basic-pie-chart.generator';
 import { BarProgressChartGenerator } from '../generators/bar-progress-chart.generator';
 import { DonutProgressChartGenerator } from '../generators/donut-progress-chart.generator';
+import { DifferenceArrowColumnChartGenerator } from '../generators/difference-arrow-column-chart.generator';
+import { DifferenceArrowBarChartGenerator } from '../generators/difference-arrow-bar-chart.generator';
+import { GroupedBarChartGenerator } from '../generators/grouped-bar-chart.generator';
+import { GroupedColumnChartGenerator } from '../generators/grouped-column-chart.generator';
+import { StackedBarChartGenerator } from '../generators/stacked-bar-chart.generator';
+import { StackedColumnChartGenerator } from '../generators/stacked-column-chart.generator';
+import { StackedAreaChartGenerator } from '../generators/stacked-area-chart.generator';
+import { MixedLineGroupedColumnChartGenerator } from '../generators/mixed-line-grouped-column-chart.generator';
+import { MixedLineStackedColumnChartGenerator } from '../generators/mixed-line-stacked-column-chart.generator';
+import { FunnelChartGenerator } from '../generators/funnel-chart.generator';
+import { BasicRadarChartGenerator } from '../generators/basic-radar-chart.generator';
+import { RosePieChartGenerator } from '../generators/rose-pie-chart.generator';
+import { JadeJueChartGenerator } from '../generators/jade-jue-chart.generator';
+import { DescartesHeatmapChartGenerator } from '../generators/descartes-heatmap-chart.generator';
+import { SankeyChartGenerator } from '../generators/sankey-chart.generator';
+import { VoronoiChartGenerator } from '../generators/voronoi-chart.generator';
+import { TreemapChartGenerator } from '../generators/single-layer-treemap-chart.generator';
+import { RiverAreaChartGenerator } from '../generators/river-area-chart.generator';
+import { CascadedAreaChartGenerator } from '../generators/cascaded-area-chart.generator';
+import { ButterflyChartGenerator } from '../generators/butterfly-chart.generator';
+import { CheckInBubbleChartGenerator } from '../generators/check-in-bubble-chart.generator';
+import { ComposeWaterfallChartGenerator } from '../generators/compose-waterfall-chart.generator';
 
 /**
  * 图表加载器配置
@@ -81,6 +103,42 @@ export class ChartLoader {
       // 进度图表
       new BarProgressChartGenerator(),
       new DonutProgressChartGenerator(),
+      
+      // 分组图表
+      new GroupedBarChartGenerator(),
+      new GroupedColumnChartGenerator(),
+      
+      // 堆叠图表
+      new StackedBarChartGenerator(),
+      new StackedColumnChartGenerator(),
+      new StackedAreaChartGenerator(),
+      
+      // 混合图表
+      new MixedLineGroupedColumnChartGenerator(),
+      new MixedLineStackedColumnChartGenerator(),
+      
+      // 差异箭头图表
+      new DifferenceArrowColumnChartGenerator(),
+      new DifferenceArrowBarChartGenerator(),
+      
+      // 专业图表
+      new FunnelChartGenerator(),
+      new BasicRadarChartGenerator(),
+      new RosePieChartGenerator(),
+      new JadeJueChartGenerator(),
+      new DescartesHeatmapChartGenerator(),
+      new SankeyChartGenerator(),
+      new VoronoiChartGenerator(),
+      new TreemapChartGenerator(),
+      
+      // 复杂区域图表
+      new RiverAreaChartGenerator(),
+      new CascadedAreaChartGenerator(),
+      new ButterflyChartGenerator(),
+      
+      // 新增图表
+      new CheckInBubbleChartGenerator(),
+      new ComposeWaterfallChartGenerator(),
     ];
 
     // 应用包含/排除过滤
@@ -196,6 +254,9 @@ export class ChartLoader {
     if (chartType.includes('mixed')) {
       return ChartCategory.MIXED;
     }
+    if (chartType.includes('difference-arrow')) {
+      return ChartCategory.STATISTICAL;
+    }
     if (chartType.includes('basic')) {
       return ChartCategory.BASIC;
     }
@@ -236,6 +297,9 @@ export class ChartLoader {
       return ['cross'];
     }
     if (chartType.includes('pie') || chartType.includes('donut')) {
+      return ['key_value'];
+    }
+    if (chartType.includes('difference-arrow')) {
       return ['key_value'];
     }
     

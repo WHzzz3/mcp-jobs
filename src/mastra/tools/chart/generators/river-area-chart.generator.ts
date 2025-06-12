@@ -8,20 +8,23 @@ import {
   getThemeColors
 } from '../utils/chart-helpers';
 
-// 柱状图特定输入接口
-export interface BasicColumnChartInput extends BaseChartInput {
-  data: Array<Array<string | number>>; // 二维数组数据 [标题, 数值]
+// 河流面积图特定输入接口
+export interface RiverAreaChartInput extends BaseChartInput {
+  data: Array<Array<(string | number)[]>>; // 多系列时间序列数据
   title?: string;
   subtitle?: string;
   showLabels?: boolean;
   colors?: string[];
-  barWidth?: number; // 柱体宽度百分比 (0-1)
+  areaType?: 'straight' | 'curve'; // 边界线类型
+  areaOpacity?: number; // 区域透明度
+  centerBaseline?: boolean; // 是否居中基线
+  chartType: 'river-area';
 }
 
-// 柱状图特定输出接口
-export interface BasicColumnChartOutput extends BaseChartOutput {
+// 河流面积图特定输出接口
+export interface RiverAreaChartOutput extends BaseChartOutput {
   props: {
-    type: 'basic-column';
+    type: 'river-area';
     title: any;
     background: any;
     map: Array<{
@@ -36,9 +39,11 @@ export interface BasicColumnChartOutput extends BaseChartOutput {
     }>;
     fill: any;
     display: {
-      bar: {
-        widthPercent: number;
-        border: any;
+      area: {
+        type: string;
+        width: number;
+        opacity: number;
+        centerBaseline: boolean;
       };
     };
     legend: any;
@@ -48,98 +53,100 @@ export interface BasicColumnChartOutput extends BaseChartOutput {
 }
 
 // Zod验证schema
-export const BasicColumnChartInputSchema = z.object({
-  data: z.array(z.array(z.union([z.string(), z.number()]))).min(2, "Data must have at least 2 rows (header and data)"),
-  title: z.string().optional().default('基础柱状图'),
+export const RiverAreaChartInputSchema = z.object({
+  data: z.array(z.array(z.array(z.union([z.string(), z.number()])))).min(1),
+  title: z.string().optional().default('河流面积图'),
   subtitle: z.string().optional().default('副标题'),
   showLabels: z.boolean().optional().default(false),
   colors: z.array(z.string()).optional(),
-  barWidth: z.number().min(0.1).max(1).optional().default(0.7),
+  areaType: z.enum(['straight', 'curve']).optional().default('curve'),
+  areaOpacity: z.number().min(0).max(1).optional().default(0.7),
+  centerBaseline: z.boolean().optional().default(true),
+  chartType: z.literal('river-area'),
 });
 
-export class BasicColumnChartGenerator extends BaseChartTool {
+export class RiverAreaChartGenerator extends BaseChartTool {
   constructor() {
-    super('basic-column');
+    super('river-area');
   }
 
   protected getElementType(): string {
-    return 'bar'; // 柱状图也是用bar元素
+    return 'area';
   }
 
-  async generateConfig(input: BasicColumnChartInput): Promise<BasicColumnChartOutput> {
+  async generateConfig(input: RiverAreaChartInput): Promise<RiverAreaChartOutput> {
     // 验证输入
-    const validatedInput = BasicColumnChartInputSchema.parse(input);
-    const inputWithChartType = { ...validatedInput, chartType: 'basic-column' };
+    const validatedInput = RiverAreaChartInputSchema.parse(input);
+    const inputWithChartType = { ...validatedInput, chartType: 'river-area' };
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
     
+    // 获取数据维度
+    const firstRow = validatedInput.data[0];
+    const seriesCount = firstRow ? firstRow.length - 1 : 0; // 减去第一列（时间轴）
+    
     // 获取默认配置
-    const dataLength = validatedInput.data[0]?.length || 5;
-    const themeColors = getThemeColors(mergedInput.theme || 'light', dataLength);
+    const themeColors = getThemeColors(mergedInput.theme || 'light', seriesCount);
     const colors = validatedInput.colors || themeColors.map((c: any) => c.color);
     
-    // 构建数据映射（与条形图相反：X轴分类，Y轴数值）
+    // 构建数据映射（X轴时间，多个Y轴数值系列）
     const map = [
       {
-        name: "名称",
+        name: "X轴对象",
         index: 0,
-        isLegend: true,
+        isLegend: false,
         function: "objCol",
         configurable: true,
         xAxisIndex: 0,
         type: ""
-      },
-      {
-        name: "值",
-        index: 1,
+      }
+    ];
+
+    // 为每个数值系列添加映射
+    for (let i = 1; i <= seriesCount; i++) {
+      map.push({
+        name: "数值列",
+        index: i,
         isLegend: false,
         function: "vCol",
         configurable: true,
         yAxisIndex: 0,
-        type: "bar"
-      }
-    ];
+        type: "area"
+      } as any);
+    }
 
     // 构建填充配置
     const fill = {
       controlType: "multiple" as const,
-      props: colors.map((color: string) => ({
-        color: { color: color, opacity: 1 },
+      props: colors.slice(0, seriesCount).map((color: string) => ({
+        color: { color: color, opacity: validatedInput.areaOpacity || 0.7 },
         texture: { url: "" },
         shadow: {
           show: false,
           type: "outer" as const,
           angle: 45,
-          blur: 0,
-          color: { color: "#000000", opacity: 0.5 },
-          radius: 0
-        },
-        border: {
-          type: "solid" as const,
-          width: 0,
-          color: null
+          blur: 5,
+          color: { color: "#000000", opacity: 0.1 },
+          radius: 3
         }
       }))
     };
 
     // 构建显示配置
     const display = {
-      bar: {
-        widthPercent: validatedInput.barWidth || 0.7,
-        border: {
-          radius: [0, 0, 0, 0],
-          type: "solid" as const,
-          width: 0,
-          color: null
-        }
+      area: {
+        type: validatedInput.areaType || 'curve',
+        width: 1,
+        opacity: validatedInput.areaOpacity || 0.7,
+        centerBaseline: validatedInput.centerBaseline !== false
       }
     };
 
     // 构建标签配置
     const label = {
       show: validatedInput.showLabels || false,
-      barLabel: {
+      areaLabel: {
         show: validatedInput.showLabels || false,
-        positionChoice: "top" as const, // 柱状图标签在顶部
+        positionChoice: "top" as const,
         fontFamily: "Misans 常规",
         fontSize: 12,
         color: { color: "#333333", opacity: 1 },
@@ -149,7 +156,7 @@ export class BasicColumnChartGenerator extends BaseChartTool {
       overlap: false
     };
 
-    // 构建坐标轴配置（与条形图相反）
+    // 构建坐标轴配置
     const axis = {
       show: true,
       xAxis: [
@@ -157,20 +164,20 @@ export class BasicColumnChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 }
+            color: { color: "#4D4D4D", opacity: 1 }
           },
           label: {
             show: true,
             direction: "auto" as const,
             fontFamily: "Misans 常规",
-            fontSize: 12,
+            fontSize: 14,
             color: { color: "#000000", opacity: 1 },
             angle: 0
           },
           grid: {
-            show: false,
+            show: true,
             width: 1,
-            color: { color: "#cccccc", opacity: 1 },
+            color: { color: "#D9D9D9", opacity: 1 },
             type: "solid" as const
           },
           position: "bottom" as const,
@@ -182,12 +189,12 @@ export class BasicColumnChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 }
+            color: { color: "#4D4D4D", opacity: 1 }
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
-            fontSize: 12,
+            fontSize: 14,
             color: { color: "#000000", opacity: 1 },
             angle: 0,
             suffix: ""
@@ -195,20 +202,22 @@ export class BasicColumnChartGenerator extends BaseChartTool {
           grid: {
             show: true,
             width: 1,
-            color: { color: "#cccccc", opacity: 1 },
-            type: "dashed" as const
+            color: { color: "#D9D9D9", opacity: 1 },
+            type: "solid" as const
           },
           position: "left" as const,
-          type: "value" as const
+          type: "value" as const,
+          max: "auto" as const,
+          min: "auto" as const
         }
       ]
     };
 
-    const result: BasicColumnChartOutput = {
-      data: [validatedInput.data],
-      pipe: "key_value",
+    return {
+      data: validatedInput.data,
+      pipe: "cross",
       props: {
-        type: 'basic-column',
+        type: 'river-area',
         title: generateDefaultTitle(validatedInput.title, validatedInput.subtitle),
         background: generateDefaultBackground(),
         map,
@@ -216,15 +225,21 @@ export class BasicColumnChartGenerator extends BaseChartTool {
         display,
         legend: generateDefaultLegend(),
         label,
-        axis
+        axis,
       }
     };
+  }
 
-    return result;
+  getInputSchema(): z.ZodType<RiverAreaChartInput> {
+    return RiverAreaChartInputSchema;
+  }
+
+  getOutputSchema(): z.ZodType<RiverAreaChartOutput> {
+    return z.any(); // 可以根据需要进一步细化
   }
 
   async loadSchema(): Promise<any> {
     const schemaMerger = new SchemaMerger();
-    return schemaMerger.getMergedSchema('basic-column');
+    return schemaMerger.getMergedSchema('river-area');
   }
 } 

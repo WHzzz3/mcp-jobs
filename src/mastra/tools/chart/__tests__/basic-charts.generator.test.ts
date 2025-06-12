@@ -46,7 +46,8 @@ describe('Basic Charts Generators', () => {
 
     it('should handle custom colors', async () => {
       const input = {
-        data: [sampleData],
+        chartType: 'basic-bar' as const,
+        data: sampleData,
         colors: ['#FF0000', '#00FF00', '#0000FF']
       };
 
@@ -60,7 +61,8 @@ describe('Basic Charts Generators', () => {
 
     it('should configure axis correctly for bar chart', async () => {
       const input = {
-        data: [sampleData]
+        chartType: 'basic-bar' as const,
+        data: sampleData
       };
 
       const result = await generator.generateConfig(input);
@@ -76,7 +78,8 @@ describe('Basic Charts Generators', () => {
 
     it('should handle label configuration', async () => {
       const input = {
-        data: [sampleData],
+        chartType: 'basic-bar' as const,
+        data: sampleData,
         showLabels: true
       };
 
@@ -102,7 +105,8 @@ describe('Basic Charts Generators', () => {
 
     it('should generate basic column chart configuration', async () => {
       const input = {
-        data: [sampleData],
+        chartType: 'basic-column' as const,
+        data: sampleData,
         title: '基础柱状图测试',
         subtitle: '测试副标题'
       };
@@ -119,7 +123,8 @@ describe('Basic Charts Generators', () => {
 
     it('should configure axis correctly for column chart', async () => {
       const input = {
-        data: [sampleData]
+        chartType: 'basic-column' as const,
+        data: sampleData
       };
 
       const result = await generator.generateConfig(input);
@@ -135,7 +140,8 @@ describe('Basic Charts Generators', () => {
 
     it('should configure labels for column chart', async () => {
       const input = {
-        data: [sampleData],
+        chartType: 'basic-column' as const,
+        data: sampleData,
         showLabels: true
       };
 
@@ -148,7 +154,8 @@ describe('Basic Charts Generators', () => {
 
     it('should handle bar width configuration', async () => {
       const input = {
-        data: [sampleData],
+        chartType: 'basic-column' as const,
+        data: sampleData,
         barWidth: 0.5
       };
 
@@ -163,10 +170,11 @@ describe('Basic Charts Generators', () => {
       const barGenerator = new BasicBarChartGenerator();
       const columnGenerator = new BasicColumnChartGenerator();
       
-      const input = { data: [sampleData] };
+      const barInput = { chartType: 'basic-bar' as const, data: sampleData };
+      const columnInput = { chartType: 'basic-column' as const, data: sampleData };
       
-      const barResult = await barGenerator.generateConfig(input);
-      const columnResult = await columnGenerator.generateConfig(input);
+      const barResult = await barGenerator.generateConfig(barInput);
+      const columnResult = await columnGenerator.generateConfig(columnInput);
       
       // 条形图和柱状图的轴配置应该相反
       expect(barResult.props.axis.xAxis[0].type).toBe('value');
@@ -180,10 +188,11 @@ describe('Basic Charts Generators', () => {
       const barGenerator = new BasicBarChartGenerator();
       const columnGenerator = new BasicColumnChartGenerator();
       
-      const input = { data: [sampleData], showLabels: true };
+      const barInput = { chartType: 'basic-bar' as const, data: sampleData, showLabels: true };
+      const columnInput = { chartType: 'basic-column' as const, data: sampleData, showLabels: true };
       
-      const barResult = await barGenerator.generateConfig(input);
-      const columnResult = await columnGenerator.generateConfig(input);
+      const barResult = await barGenerator.generateConfig(barInput);
+      const columnResult = await columnGenerator.generateConfig(columnInput);
       
       expect(barResult.props.label.barLabel.positionChoice).toBe('right');
       expect(columnResult.props.label.barLabel.positionChoice).toBe('top');

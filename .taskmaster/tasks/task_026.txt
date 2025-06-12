@@ -1,0 +1,11 @@
+# Task ID: 26
+# Title: 实现复杂面积图生成器
+# Status: done
+# Dependencies: 21
+# Priority: medium
+# Description: 为river-area（河流面积图）、cascaded-area（层叠面积图）、butterfly（蝴蝶图）创建生成器，这些是复杂的面积图变体
+# Details:
+
+
+# Test Strategy:
+

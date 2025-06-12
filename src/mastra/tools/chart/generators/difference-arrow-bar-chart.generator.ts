@@ -5,22 +5,29 @@ import {
   generateDefaultTitle, 
   generateDefaultBackground, 
   generateDefaultLegend,
-  getThemeColors,
-  createChartOutput 
+  getThemeColors
 } from '../utils/chart-helpers';
 
-// 条形图特定输入接口
-export interface BasicBarChartInput extends BaseChartInput {
-  data: Array<Array<string | number>>; // 二维数组数据 [标题, 数值]
+// 差异箭头条形图特定输入接口
+export interface DifferenceArrowBarChartInput extends BaseChartInput {
+  data: Array<Array<(string | number)[]>>; // 兼容表格格式数据
+  title?: string;
+  subtitle?: string;
   showLabels?: boolean;
+  showArrowLabels?: boolean;
   colors?: string[];
-  barWidth?: number; // 条形宽度百分比 (0-1)
+  barHeight?: number; // 条形高度百分比 (0-1)
+  arrowColors?: {
+    growth?: string; // 增长箭头颜色
+    decrease?: string; // 下降箭头颜色
+  };
+  chartType: 'difference-arrow-bar';
 }
 
-// 条形图特定输出接口
-export interface BasicBarChartOutput extends BaseChartOutput {
+// 差异箭头条形图特定输出接口
+export interface DifferenceArrowBarChartOutput extends BaseChartOutput {
   props: {
-    type: 'basic-bar';
+    type: 'difference-arrow-bar';
     title: any;
     background: any;
     map: Array<{
@@ -39,6 +46,12 @@ export interface BasicBarChartOutput extends BaseChartOutput {
         widthPercent: number;
         border: any;
       };
+      arrow: {
+        growthArrowColor: any;
+        decreaseArrowColor: any;
+        width: number;
+        endLine: any;
+      };
     };
     legend: any;
     label: any;
@@ -47,49 +60,67 @@ export interface BasicBarChartOutput extends BaseChartOutput {
 }
 
 // Zod验证schema
-export const BasicBarChartInputSchema = z.object({
-  data: z.array(z.array(z.union([z.string(), z.number()]))).min(2, "Data must have at least 2 rows (header and data)"),
-  title: z.string().optional().default('基础条形图'),
+export const DifferenceArrowBarChartInputSchema = z.object({
+  data: z.array(z.array(z.array(z.union([z.string(), z.number()])))).min(1),
+  title: z.string().optional().default('差异箭头条形图'),
   subtitle: z.string().optional().default('副标题'),
   showLabels: z.boolean().optional().default(false),
+  showArrowLabels: z.boolean().optional().default(false),
   colors: z.array(z.string()).optional(),
-  barWidth: z.number().min(0.1).max(1).optional().default(0.7),
+  barHeight: z.number().min(0.1).max(1).optional().default(0.7),
+  arrowColors: z.object({
+    growth: z.string().optional().default('#62D9AD'),
+    decrease: z.string().optional().default('#E65A56'),
+  }).optional().default({}),
+  chartType: z.literal('difference-arrow-bar'),
 });
 
-export class BasicBarChartGenerator extends BaseChartTool {
+export class DifferenceArrowBarChartGenerator extends BaseChartTool {
   constructor() {
-    super('basic-bar');
+    super('difference-arrow-bar');
   }
 
   protected getElementType(): string {
     return 'bar';
   }
 
-  async generateConfig(input: BasicBarChartInput): Promise<BasicBarChartOutput> {
+  async generateConfig(input: DifferenceArrowBarChartInput): Promise<DifferenceArrowBarChartOutput> {
     // 验证输入
-    const validatedInput = BasicBarChartInputSchema.parse(input);
-    const inputWithChartType = { ...validatedInput, chartType: 'basic-bar' };
+    const validatedInput = DifferenceArrowBarChartInputSchema.parse(input);
+    const inputWithChartType = { ...validatedInput, chartType: 'difference-arrow-bar' };
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
     
     // 获取默认配置
-    const dataLength = validatedInput.data[0]?.length || 5;
-    const themeColors = getThemeColors(mergedInput.theme || 'light', dataLength);
-    const colors = validatedInput.colors || themeColors.map((c: any) => c.color);
+    const themeColors = getThemeColors(mergedInput.theme || 'light', 2);
+    const colors = validatedInput.colors || ['#5AAEF3', '#62D9AD'];
+    const arrowColors = {
+      growth: validatedInput.arrowColors?.growth || '#62D9AD',
+      decrease: validatedInput.arrowColors?.decrease || '#E65A56',
+    };
     
-    // 构建数据映射
+    // 构建数据映射（条形图：Y轴分类，X轴数值）
     const map = [
       {
-        name: "名称",
+        name: "Y轴对象",
         index: 0,
-        isLegend: true,
+        isLegend: false,
         function: "objCol",
         configurable: true,
         yAxisIndex: 0,
         type: ""
       },
       {
-        name: "值",
+        name: "基数",
         index: 1,
+        isLegend: false,
+        function: "vCol",
+        configurable: true,
+        xAxisIndex: 0,
+        type: "bar"
+      },
+      {
+        name: "对比数",
+        index: 2,
         isLegend: false,
         function: "vCol",
         configurable: true,
@@ -120,15 +151,25 @@ export class BasicBarChartGenerator extends BaseChartTool {
       }))
     };
 
-    // 构建显示配置
+    // 构建显示配置（包含箭头配置）
     const display = {
       bar: {
-        widthPercent: validatedInput.barWidth || 0.7,
+        widthPercent: validatedInput.barHeight || 0.7,
         border: {
           radius: [0, 0, 0, 0],
           type: "solid" as const,
           width: 0,
           color: null
+        }
+      },
+      arrow: {
+        growthArrowColor: { color: arrowColors.growth, opacity: 1 },
+        decreaseArrowColor: { color: arrowColors.decrease, opacity: 1 },
+        width: 2,
+        endLine: {
+          type: "solid" as const,
+          width: 2,
+          color: { color: "#333333", opacity: 1 }
         }
       }
     };
@@ -138,17 +179,23 @@ export class BasicBarChartGenerator extends BaseChartTool {
       show: validatedInput.showLabels || false,
       barLabel: {
         show: validatedInput.showLabels || false,
-        positionChoice: "right" as const,
+        positionChoice: "center" as const,
         fontFamily: "Misans 常规",
         fontSize: 12,
         color: { color: "#333333", opacity: 1 },
         suffix: ""
       },
+      arrowLabel: {
+        show: validatedInput.showArrowLabels || false,
+        fontFamily: "Misans 常规",
+        fontSize: 12,
+        color: { color: "#333333", opacity: 1 }
+      },
       highlight: false,
       overlap: false
     };
 
-    // 构建坐标轴配置
+    // 构建坐标轴配置（条形图：X轴数值，Y轴分类）
     const axis = {
       show: true,
       xAxis: [
@@ -156,12 +203,12 @@ export class BasicBarChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 }
+            color: { color: "#4D4D4D", opacity: 1 }
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
-            fontSize: 12,
+            fontSize: 14,
             color: { color: "#000000", opacity: 1 },
             angle: 0,
             suffix: ""
@@ -169,11 +216,13 @@ export class BasicBarChartGenerator extends BaseChartTool {
           grid: {
             show: true,
             width: 1,
-            color: { color: "#cccccc", opacity: 1 },
+            color: { color: "#D9D9D9", opacity: 1 },
             type: "solid" as const
           },
           position: "bottom" as const,
-          type: "value" as const
+          type: "value" as const,
+          max: "auto" as const,
+          min: "auto" as const
         }
       ],
       yAxis: [
@@ -181,19 +230,20 @@ export class BasicBarChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 }
+            color: { color: "#4D4D4D", opacity: 1 }
           },
           label: {
             show: true,
+            direction: "auto" as const,
             fontFamily: "Misans 常规",
-            fontSize: 12,
+            fontSize: 14,
             color: { color: "#000000", opacity: 1 },
             angle: 0
           },
           grid: {
-            show: false,
+            show: true,
             width: 1,
-            color: { color: "#cccccc", opacity: 1 },
+            color: { color: "#D9D9D9", opacity: 1 },
             type: "solid" as const
           },
           position: "left" as const,
@@ -202,11 +252,11 @@ export class BasicBarChartGenerator extends BaseChartTool {
       ]
     };
 
-    const result: BasicBarChartOutput = {
-      data: [validatedInput.data],
+    return {
+      data: validatedInput.data,
       pipe: "key_value",
       props: {
-        type: 'basic-bar',
+        type: 'difference-arrow-bar',
         title: generateDefaultTitle(validatedInput.title, validatedInput.subtitle),
         background: generateDefaultBackground(),
         map,
@@ -214,15 +264,21 @@ export class BasicBarChartGenerator extends BaseChartTool {
         display,
         legend: generateDefaultLegend(),
         label,
-        axis
+        axis,
       }
     };
+  }
 
-    return result;
+  getInputSchema(): z.ZodType<DifferenceArrowBarChartInput> {
+    return DifferenceArrowBarChartInputSchema;
+  }
+
+  getOutputSchema(): z.ZodType<DifferenceArrowBarChartOutput> {
+    return z.any(); // 可以根据需要进一步细化
   }
 
   async loadSchema(): Promise<any> {
     const schemaMerger = new SchemaMerger();
-    return schemaMerger.getMergedSchema('basic-bar');
+    return schemaMerger.getMergedSchema('difference-arrow-bar');
   }
 } 

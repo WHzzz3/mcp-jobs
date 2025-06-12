@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { VoronoiChartGenerator } from '../generators/voronoi-chart.generator';
 import { SankeyChartGenerator } from '../generators/sankey-chart.generator';
-import { TreemapChartGenerator } from '../generators/treemap-chart.generator';
+import { TreemapChartGenerator } from '../generators/single-layer-treemap-chart.generator';
 
 describe('Complex Charts Generators Tests', () => {
   // Voronoi图测试数据 - 三列: 一级分类, 二级对象, 数值

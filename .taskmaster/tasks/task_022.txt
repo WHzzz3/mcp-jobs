@@ -1,0 +1,11 @@
+# Task ID: 22
+# Title: 实现分组图表生成器
+# Status: done
+# Dependencies: 21
+# Priority: high
+# Description: 为grouped-column和grouped-bar图表创建生成器，这两个图表类型支持多系列数据的分组显示
+# Details:
+
+
+# Test Strategy:
+

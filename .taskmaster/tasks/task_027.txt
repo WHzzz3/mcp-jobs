@@ -1,0 +1,11 @@
+# Task ID: 27
+# Title: 实现高级特殊图表生成器
+# Status: done
+# Dependencies: 21
+# Priority: low
+# Description: 为check-in-bubble（签到气泡图）和compose-waterfall（复合瀑布图）创建生成器，这些是最复杂的图表类型
+# Details:
+
+
+# Test Strategy:
+

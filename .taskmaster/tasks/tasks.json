@@ -743,6 +743,95 @@
       ],
       "status": "done",
       "subtasks": []
+    },
+    {
+      "id": 21,
+      "title": "分析遗漏的图表类型",
+      "description": "分析schemas目录中28个图表类型，确定缺少生成器的14个图表类型，包括rose-pie、butterfly、check-in-bubble等，制定实现计划",
+      "details": "",
+      "testStrategy": "",
+      "status": "done",
+      "dependencies": [],
+      "priority": "high",
+      "subtasks": []
+    },
+    {
+      "id": 22,
+      "title": "实现分组图表生成器",
+      "description": "为grouped-column和grouped-bar图表创建生成器，这两个图表类型支持多系列数据的分组显示",
+      "details": "",
+      "testStrategy": "",
+      "status": "done",
+      "dependencies": [
+        21
+      ],
+      "priority": "high",
+      "subtasks": []
+    },
+    {
+      "id": 23,
+      "title": "实现特殊饼图生成器",
+      "description": "为rose-pie（玫瑰饼图）和jade-jue（玉玦图）创建生成器，这两种图表是饼图的特殊变体",
+      "details": "",
+      "testStrategy": "",
+      "status": "done",
+      "dependencies": [
+        21
+      ],
+      "priority": "high",
+      "subtasks": []
+    },
+    {
+      "id": 24,
+      "title": "实现差异箭头图表生成器",
+      "description": "为difference-arrow-column和difference-arrow-bar图表创建生成器，这些图表专门用于显示数据差异和变化趋势",
+      "details": "",
+      "testStrategy": "",
+      "status": "done",
+      "dependencies": [
+        21
+      ],
+      "priority": "medium",
+      "subtasks": []
+    },
+    {
+      "id": 25,
+      "title": "实现专业图表生成器",
+      "description": "为funnel（漏斗图）、basic-radar（雷达图）、descartes-heatmap（热力图）创建生成器，这些是专业分析常用的图表类型",
+      "details": "",
+      "testStrategy": "",
+      "status": "done",
+      "dependencies": [
+        21
+      ],
+      "priority": "medium",
+      "subtasks": []
+    },
+    {
+      "id": 26,
+      "title": "实现复杂面积图生成器",
+      "description": "为river-area（河流面积图）、cascaded-area（层叠面积图）、butterfly（蝴蝶图）创建生成器，这些是复杂的面积图变体",
+      "details": "",
+      "testStrategy": "",
+      "status": "done",
+      "dependencies": [
+        21
+      ],
+      "priority": "medium",
+      "subtasks": []
+    },
+    {
+      "id": 27,
+      "title": "实现高级特殊图表生成器",
+      "description": "为check-in-bubble（签到气泡图）和compose-waterfall（复合瀑布图）创建生成器，这些是最复杂的图表类型",
+      "details": "",
+      "testStrategy": "",
+      "status": "done",
+      "dependencies": [
+        21
+      ],
+      "priority": "low",
+      "subtasks": []
     }
   ]
 }

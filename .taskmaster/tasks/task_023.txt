@@ -1,0 +1,11 @@
+# Task ID: 23
+# Title: 实现特殊饼图生成器
+# Status: done
+# Dependencies: 21
+# Priority: high
+# Description: 为rose-pie（玫瑰饼图）和jade-jue（玉玦图）创建生成器，这两种图表是饼图的特殊变体
+# Details:
+
+
+# Test Strategy:
+

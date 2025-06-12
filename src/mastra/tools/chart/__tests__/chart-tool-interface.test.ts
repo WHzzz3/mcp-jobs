@@ -221,7 +221,7 @@ describe('Chart Tool Interface', () => {
 
       it('should reject invalid data formats', () => {
         expect(() => validateChartData([])).toThrow('at least 2 rows');
-        expect(() => validateChartData([['A']])).toThrow('at least 2 columns');
+        expect(() => validateChartData([['A'], ['B']])).toThrow('at least 2 columns');
         expect(() => validateChartData([['A', 'B'], [1]])).toThrow('inconsistent column count');
       });
     });

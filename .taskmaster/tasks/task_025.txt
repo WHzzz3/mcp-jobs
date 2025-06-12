@@ -1,0 +1,11 @@
+# Task ID: 25
+# Title: 实现专业图表生成器
+# Status: done
+# Dependencies: 21
+# Priority: medium
+# Description: 为funnel（漏斗图）、basic-radar（雷达图）、descartes-heatmap（热力图）创建生成器，这些是专业分析常用的图表类型
+# Details:
+
+
+# Test Strategy:
+

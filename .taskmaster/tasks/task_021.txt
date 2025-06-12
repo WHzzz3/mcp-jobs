@@ -1,0 +1,11 @@
+# Task ID: 21
+# Title: 分析遗漏的图表类型
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: 分析schemas目录中28个图表类型，确定缺少生成器的14个图表类型，包括rose-pie、butterfly、check-in-bubble等，制定实现计划
+# Details:
+
+
+# Test Strategy:
+

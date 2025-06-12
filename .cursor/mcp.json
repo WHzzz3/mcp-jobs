@@ -12,7 +12,7 @@
       "args": ["-y", "task-master-ai"],
       "stdio": "pipe",
       "env": {
-        "OPENROUTER_API_KEY": "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"
+        "OPENROUTER_API_KEY": "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"
       }
     }
   }
