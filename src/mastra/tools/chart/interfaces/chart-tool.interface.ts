@@ -1,24 +1,25 @@
-import { z } from 'zod';
-import { Tool } from '@mastra/core/tools';
+import { z } from "zod";
+import { Tool } from "@mastra/core/tools";
 
 /**
  * 图表配置输入参数的基础接口
  */
 export interface BaseChartInput {
   chartType: string;
-  data?: any[][];
+  data?: (string | number)[][][];
   title?: string;
   subtitle?: string;
   width?: number;
   height?: number;
-  theme?: 'light' | 'dark';
+  theme?: "light" | "dark";
+  colors?: string[];
 }
 
 /**
  * 图表配置输出的基础接口
  */
 export interface BaseChartOutput {
-  data: any[][][];
+  data: (string | number)[][][];
   pipe: string;
   props: {
     type: string;
@@ -61,32 +62,40 @@ export interface ChartToolOptions {
  * 基础 Zod schema 定义
  */
 export const BaseChartInputSchema = z.object({
-  chartType: z.string().describe('图表类型'),
-  data: z.array(z.array(z.union([z.string(), z.number()]))).optional().describe('图表数据数组'),
-  title: z.string().optional().describe('图表主标题'),
-  subtitle: z.string().optional().describe('图表副标题'),
-  width: z.number().optional().describe('图表宽度'),
-  height: z.number().optional().describe('图表高度'),
-  theme: z.enum(['light', 'dark']).optional().describe('图表主题'),
+  chartType: z.string().describe("图表类型"),
+  data: z
+    .array(z.array(z.array(z.union([z.string(), z.number()]))))
+    .optional()
+    .describe("图表数据数组"),
+  title: z.string().optional().describe("图表主标题"),
+  subtitle: z.string().optional().describe("图表副标题"),
+  width: z.number().optional().describe("图表宽度"),
+  height: z.number().optional().describe("图表高度"),
+  theme: z.enum(["light", "dark"]).optional().describe("图表主题"),
+  colors: z.array(z.string()).optional(),
 });
 
 export const BaseChartOutputSchema = z.object({
-  data: z.array(z.array(z.array(z.union([z.string(), z.number()])))).describe('图表数据'),
-  pipe: z.string().describe('数据处理方式'),
-  props: z.object({
-    type: z.string().describe('图表类型'),
-    title: z.any().optional().describe('标题配置'),
-    background: z.any().optional().describe('背景配置'),
-    map: z.array(z.any()).optional().describe('数据映射配置'),
-    fill: z.any().optional().describe('填充配置'),
-    display: z.any().optional().describe('显示配置'),
-    legend: z.any().optional().describe('图例配置'),
-    label: z.any().optional().describe('标签配置'),
-    numberFormat: z.any().optional().describe('数字格式配置'),
-    animation: z.any().optional().describe('动画配置'),
-    tooltip: z.boolean().optional().describe('工具提示'),
-    padding: z.any().optional().describe('内边距配置'),
-  }).describe('图表属性配置'),
+  data: z
+    .array(z.array(z.array(z.union([z.string(), z.number()]))))
+    .describe("图表数据"),
+  pipe: z.string().describe("数据处理方式"),
+  props: z
+    .object({
+      type: z.string().describe("图表类型"),
+      title: z.any().optional().describe("标题配置"),
+      background: z.any().optional().describe("背景配置"),
+      map: z.array(z.any()).optional().describe("数据映射配置"),
+      fill: z.any().optional().describe("填充配置"),
+      display: z.any().optional().describe("显示配置"),
+      legend: z.any().optional().describe("图例配置"),
+      label: z.any().optional().describe("标签配置"),
+      numberFormat: z.any().optional().describe("数字格式配置"),
+      animation: z.any().optional().describe("动画配置"),
+      tooltip: z.boolean().optional().describe("工具提示"),
+      padding: z.any().optional().describe("内边距配置"),
+    })
+    .describe("图表属性配置"),
 });
 
 /**
@@ -99,7 +108,7 @@ export abstract class BaseChartTool {
   constructor(chartType: string, defaultValues: Partial<BaseChartInput> = {}) {
     this.chartType = chartType;
     this.defaultValues = {
-      theme: 'light',
+      theme: "light",
       ...defaultValues,
     };
   }
@@ -127,7 +136,9 @@ export abstract class BaseChartTool {
    */
   protected validateInput(input: BaseChartInput): void {
     if (!input.chartType || input.chartType !== this.chartType) {
-      throw new Error(`Invalid chart type. Expected: ${this.chartType}, got: ${input.chartType}`);
+      throw new Error(
+        `Invalid chart type. Expected: ${this.chartType}, got: ${input.chartType}`
+      );
     }
   }
 
@@ -136,25 +147,25 @@ export abstract class BaseChartTool {
    */
   protected createDefaultDataMapping(data: any[][]): any[] {
     if (!data || data.length === 0) {
-      throw new Error('Data is required for chart generation');
+      throw new Error("Data is required for chart generation");
     }
 
     // 基础映射：第一列为分类，第二列为数值
     return [
       {
-        name: '分类',
+        name: "分类",
         index: 0,
         isLegend: true,
-        function: 'objCol',
+        function: "objCol",
         configurable: true,
         xAxisIndex: 0,
-        type: '',
+        type: "",
       },
       {
-        name: '数值',
+        name: "数值",
         index: 1,
         isLegend: false,
-        function: 'vCol',
+        function: "vCol",
         configurable: true,
         yAxisIndex: 0,
         type: this.getElementType(),
@@ -170,7 +181,9 @@ export abstract class BaseChartTool {
   /**
    * 生成图表配置（子类需要实现）
    */
-  public abstract generateConfig(input: BaseChartInput): Promise<BaseChartOutput>;
+  public abstract generateConfig(
+    input: BaseChartInput
+  ): Promise<BaseChartOutput>;
 
   /**
    * 获取输入 schema（子类可以重写）
@@ -194,4 +207,4 @@ export type ChartToolFactory<T = BaseChartInput> = (options: {
   chartTool: BaseChartTool;
   inputSchema?: z.ZodType<T>;
   outputSchema?: z.ZodType<BaseChartOutput>;
-}) => Tool<T, BaseChartOutput>; 
+}) => Tool<T, BaseChartOutput>;

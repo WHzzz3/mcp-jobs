@@ -1,28 +1,34 @@
-import { z } from 'zod';
-import { BaseChartTool, BaseChartInput, BaseChartOutput, BaseChartInputSchema, BaseChartOutputSchema } from '../interfaces/chart-tool.interface';
-import { SchemaMerger } from '../utils/schema-merger';
-import { 
-  generateDefaultTitle, 
-  generateDefaultBackground, 
+import { z } from "zod";
+import {
+  BaseChartTool,
+  BaseChartInput,
+  BaseChartOutput,
+  BaseChartInputSchema,
+  BaseChartOutputSchema,
+} from "../interfaces/chart-tool.interface";
+import { SchemaMerger } from "../utils/schema-merger";
+import {
+  generateDefaultTitle,
+  generateDefaultBackground,
   generateDefaultLegend,
   getThemeColors,
-  createChartOutput 
-} from '../utils/chart-helpers';
+  createChartOutput,
+} from "../utils/chart-helpers";
 
 // Sankey图特定输入接口
 export interface SankeyChartInput extends BaseChartInput {
-  data: Array<Array<string | number>>; // 三列数据格式: [source, target, value]
+  data: Array<Array<Array<string | number>>>; // 三列数据格式: [source, target, value]
   colors?: string[];
   nodeWidth?: number; // 节点宽度
   gapDistance?: number; // 节点间隙
   fillOpacity?: number; // 连线透明度
-  linkColor?: 'auto' | 'gradient' | string; // 连线颜色模式
+  linkColor?: "auto" | "gradient" | string; // 连线颜色模式
 }
 
-// Sankey图特定输出接口  
+// Sankey图特定输出接口
 export interface SankeyChartOutput extends BaseChartOutput {
   props: {
-    type: 'sankey';
+    type: "sankey";
     title: any;
     background: any;
     map: Array<{
@@ -51,47 +57,47 @@ export interface SankeyChartOutput extends BaseChartOutput {
 
 // Zod验证schema，扩展基础schema
 export const SankeyChartInputSchema = BaseChartInputSchema.extend({
-  data: z.array(z.array(z.union([z.string(), z.number()]))).min(1),
+  data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
   colors: z.array(z.string()).optional(),
   nodeWidth: z.number().min(1).optional().default(10),
   gapDistance: z.number().min(0).optional().default(8),
   fillOpacity: z.number().min(0).max(1).optional().default(0.3),
-  linkColor: z.union([
-    z.literal('auto'),
-    z.literal('gradient'),
-    z.string()
-  ]).optional().default('auto'),
+  linkColor: z
+    .union([z.literal("auto"), z.literal("gradient"), z.string()])
+    .optional()
+    .default("auto"),
 });
 
 export class SankeyChartGenerator extends BaseChartTool {
   constructor() {
-    super('sankey');
+    super("sankey");
   }
 
   protected getElementType(): string {
-    return 'sankey';
+    return "sankey";
   }
 
   async generateConfig(input: SankeyChartInput): Promise<SankeyChartOutput> {
     // 验证输入
     const validatedInput = SankeyChartInputSchema.parse(input);
-    const inputWithChartType = { ...validatedInput, chartType: 'sankey' };
+    const inputWithChartType = { ...validatedInput, chartType: "sankey" };
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
-    
+
     // 获取数据维度
-    const dataRows = validatedInput.data.length;
-    const dataCols = validatedInput.data[0]?.length || 0;
-    
+    const dataRows = validatedInput.data[0].length;
+    const dataCols = validatedInput.data[0][0]?.length || 0;
+
     if (dataCols !== 3) {
-      throw new Error('Sankey图需要恰好3列数据（source、target、value）');
+      throw new Error("Sankey图需要恰好3列数据（source、target、value）");
     }
 
     // 获取所有唯一的节点（source和target）用于颜色分配
     const nodes = new Set<string>();
-    for (let i = 1; i < dataRows; i++) { // 跳过header行
-      if (validatedInput.data[i]) {
-        const source = validatedInput.data[i][0];
-        const target = validatedInput.data[i][1];
+    for (let i = 1; i < dataRows; i++) {
+      // 跳过header行
+      if (validatedInput.data[0][i]) {
+        const source = validatedInput.data[0][i][0];
+        const target = validatedInput.data[0][i][1];
         if (source) nodes.add(String(source));
         if (target) nodes.add(String(target));
       }
@@ -99,8 +105,9 @@ export class SankeyChartGenerator extends BaseChartTool {
     const nodeCount = nodes.size;
 
     // 获取默认配置
-    const themeColors = getThemeColors(mergedInput.theme || 'light', nodeCount);
-    const colors = validatedInput.colors || themeColors.map((c: any) => c.color);
+    const themeColors = getThemeColors(mergedInput.theme || "light", nodeCount);
+    const colors =
+      validatedInput.colors || themeColors.map((c: any) => c.color);
 
     // 构建数据映射 - Sankey图的特定映射
     const map: Array<{
@@ -120,7 +127,7 @@ export class SankeyChartGenerator extends BaseChartTool {
         function: "sourceCol",
         configurable: true,
         xAxisIndex: 0,
-        type: ""
+        type: "",
       },
       {
         name: "目标项",
@@ -129,7 +136,7 @@ export class SankeyChartGenerator extends BaseChartTool {
         function: "targetCol",
         configurable: true,
         xAxisIndex: 0,
-        type: ""
+        type: "",
       },
       {
         name: "数值",
@@ -138,8 +145,8 @@ export class SankeyChartGenerator extends BaseChartTool {
         function: "vCol",
         configurable: true,
         yAxisIndex: 0,
-        type: "sankey"
-      }
+        type: "sankey",
+      },
     ];
 
     // 构建填充配置
@@ -153,9 +160,9 @@ export class SankeyChartGenerator extends BaseChartTool {
           angle: 45,
           blur: 3,
           color: { color: "#000000", opacity: 0.2 },
-          radius: 2
-        }
-      }))
+          radius: 2,
+        },
+      })),
     };
 
     // 构建显示配置
@@ -163,20 +170,23 @@ export class SankeyChartGenerator extends BaseChartTool {
       sankey: {
         gapDistance: validatedInput.gapDistance || 8,
         nodeWidth: validatedInput.nodeWidth || 10,
-        fillOpacity: validatedInput.fillOpacity || 0.3
-      }
+        fillOpacity: validatedInput.fillOpacity || 0.3,
+      },
     };
 
     // 处理连线颜色配置
-    if (validatedInput.linkColor === 'gradient') {
-      displayConfig.sankey.color = 'gradient';
-    } else if (validatedInput.linkColor === 'auto' || !validatedInput.linkColor) {
+    if (validatedInput.linkColor === "gradient") {
+      displayConfig.sankey.color = "gradient";
+    } else if (
+      validatedInput.linkColor === "auto" ||
+      !validatedInput.linkColor
+    ) {
       displayConfig.sankey.color = null; // 自动颜色
     } else {
       // 自定义颜色
       displayConfig.sankey.color = {
         color: validatedInput.linkColor,
-        opacity: 1
+        opacity: 1,
       };
     }
 
@@ -187,37 +197,33 @@ export class SankeyChartGenerator extends BaseChartTool {
         show: false,
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#333333", opacity: 1 }
+        color: { color: "#333333", opacity: 1 },
       },
       numberLabel: {
         show: false,
         fontFamily: "Misans 常规",
         fontSize: 12,
         color: { color: "#333333", opacity: 1 },
-        suffix: ""
+        suffix: "",
       },
       highlight: false,
-      overlap: false
+      overlap: false,
     };
 
     // 生成图表配置
-    const result = createChartOutput(
-      'sankey',
-      mergedInput,
-      {
-        type: 'sankey',
-        title: generateDefaultTitle(mergedInput.title, mergedInput.subtitle),
-        background: generateDefaultBackground(mergedInput.theme),
-        map,
-        fill,
-        display: displayConfig,
-        legend: generateDefaultLegend(),
-        label
-      }
-    );
+    const result = createChartOutput("sankey", mergedInput, {
+      type: "sankey",
+      title: generateDefaultTitle(mergedInput.title, mergedInput.subtitle),
+      background: generateDefaultBackground(mergedInput.theme),
+      map,
+      fill,
+      display: displayConfig,
+      legend: generateDefaultLegend(),
+      label,
+    });
 
     // Sankey图使用key_value管道
-    result.pipe = 'key_value';
+    result.pipe = "key_value";
 
     return result as SankeyChartOutput;
   }
@@ -233,9 +239,11 @@ export class SankeyChartGenerator extends BaseChartTool {
   async loadSchema(): Promise<any> {
     const schemaMerger = new SchemaMerger();
     try {
-      return schemaMerger.getMergedSchema('sankey');
+      return schemaMerger.getMergedSchema("sankey");
     } catch (error) {
-      throw new Error(`Failed to load sankey schema: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to load sankey schema: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
     }
   }
-} 
+}

@@ -1,29 +1,35 @@
-import { z } from 'zod';
-import { BaseChartTool, BaseChartInput, BaseChartOutput, BaseChartInputSchema, BaseChartOutputSchema } from '../interfaces/chart-tool.interface';
-import { SchemaMerger } from '../utils/schema-merger';
-import { 
-  generateDefaultTitle, 
-  generateDefaultBackground, 
+import { z } from "zod";
+import {
+  BaseChartTool,
+  BaseChartInput,
+  BaseChartOutput,
+  BaseChartInputSchema,
+  BaseChartOutputSchema,
+} from "../interfaces/chart-tool.interface";
+import { SchemaMerger } from "../utils/schema-merger";
+import {
+  generateDefaultTitle,
+  generateDefaultBackground,
   generateDefaultLegend,
   getThemeColors,
-  createChartOutput 
-} from '../utils/chart-helpers';
+  createChartOutput,
+} from "../utils/chart-helpers";
 
 // 堆叠面积图特定输入接口
 export interface StackedAreaChartInput extends BaseChartInput {
-  data: Array<Array<string | number>>; // 交叉表数据格式
+  data: Array<Array<Array<string | number>>>; // 交叉表数据格式
   showLabels?: boolean;
   colors?: string[];
-  lineType?: 'straight' | 'curve'; // 区域顶线类型
+  lineType?: "straight" | "curve"; // 区域顶线类型
   fillOpacity?: number; // 面积填充透明度
   showPoints?: boolean; // 是否显示数据点
   pointRadius?: number; // 数据点半径
 }
 
-// 堆叠面积图特定输出接口  
+// 堆叠面积图特定输出接口
 export interface StackedAreaChartOutput extends BaseChartOutput {
   props: {
-    type: 'stacked-area';
+    type: "stacked-area";
     title: any;
     background: any;
     map: Array<{
@@ -53,10 +59,10 @@ export interface StackedAreaChartOutput extends BaseChartOutput {
 
 // Zod验证schema，扩展基础schema
 export const StackedAreaChartInputSchema = BaseChartInputSchema.extend({
-  data: z.array(z.array(z.union([z.string(), z.number()]))).min(1),
+  data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
   showLabels: z.boolean().optional().default(false),
   colors: z.array(z.string()).optional(),
-  lineType: z.enum(['straight', 'curve']).optional().default('straight'),
+  lineType: z.enum(["straight", "curve"]).optional().default("straight"),
   fillOpacity: z.number().min(0).max(1).optional().default(0.7),
   showPoints: z.boolean().optional().default(true),
   pointRadius: z.number().min(0).max(10).optional().default(3),
@@ -64,31 +70,37 @@ export const StackedAreaChartInputSchema = BaseChartInputSchema.extend({
 
 export class StackedAreaChartGenerator extends BaseChartTool {
   constructor() {
-    super('stacked-area');
+    super("stacked-area");
   }
 
   protected getElementType(): string {
-    return 'area';
+    return "area";
   }
 
-  async generateConfig(input: StackedAreaChartInput): Promise<StackedAreaChartOutput> {
+  async generateConfig(
+    input: StackedAreaChartInput
+  ): Promise<StackedAreaChartOutput> {
     // 验证输入
     const validatedInput = StackedAreaChartInputSchema.parse(input);
-    const inputWithChartType = { ...validatedInput, chartType: 'stacked-area' };
+    const inputWithChartType = { ...validatedInput, chartType: "stacked-area" };
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
-    
+
     // 获取数据维度
-    const dataRows = validatedInput.data.length;
-    const dataCols = validatedInput.data[0]?.length || 0;
-    
-    if (dataCols < 2) {
-      throw new Error('堆叠面积图需要至少2列数据（1列分类+至少1列数值）');
-    }
+    const dataRows = validatedInput.data[0].length;
+    const dataCols = validatedInput.data[0][0]?.length || 0;
+
+    // if (dataCols < 2) {
+    //   throw new Error('堆叠面积图需要至少2列数据（1列分类+至少1列数值）');
+    // }
 
     // 获取默认配置
     const seriesCount = dataCols - 1; // 减去分类列
-    const themeColors = getThemeColors(mergedInput.theme || 'light', seriesCount);
-    const colors = validatedInput.colors || themeColors.map((c: any) => c.color);
+    const themeColors = getThemeColors(
+      mergedInput.theme || "light",
+      seriesCount
+    );
+    const colors =
+      validatedInput.colors || themeColors.map((c: any) => c.color);
 
     // 构建数据映射
     const map: Array<{
@@ -104,12 +116,12 @@ export class StackedAreaChartGenerator extends BaseChartTool {
       {
         name: "X轴对象",
         index: 0,
-        isLegend: true,
+        isLegend: false,
         function: "objCol",
         configurable: true,
         xAxisIndex: 0,
-        type: ""
-      }
+        type: "",
+      },
     ];
 
     // 添加数值列映射
@@ -121,7 +133,7 @@ export class StackedAreaChartGenerator extends BaseChartTool {
         function: "vCol",
         configurable: true,
         yAxisIndex: 0,
-        type: "area"
+        type: "area",
       });
     }
 
@@ -136,9 +148,9 @@ export class StackedAreaChartGenerator extends BaseChartTool {
           angle: 45,
           blur: 5,
           color: { color: "#000000", opacity: 0.1 },
-          radius: 3
-        }
-      }))
+          radius: 3,
+        },
+      })),
     };
 
     // 构建显示配置
@@ -148,12 +160,14 @@ export class StackedAreaChartGenerator extends BaseChartTool {
         width: 2,
         fillOpacity: validatedInput.fillOpacity || 0.7,
         endPoint: {
-          radius: validatedInput.showPoints ? (validatedInput.pointRadius || 3) : 0,
+          radius: validatedInput.showPoints
+            ? validatedInput.pointRadius || 3
+            : 0,
           width: 1,
           color: null, // 自动颜色
-          fill: null   // 自动颜色
-        }
-      }
+          fill: null, // 自动颜色
+        },
+      },
     };
 
     // 构建标签配置
@@ -165,10 +179,10 @@ export class StackedAreaChartGenerator extends BaseChartTool {
         fontFamily: "Misans 常规",
         fontSize: 12,
         color: { color: "#333333", opacity: 1 },
-        suffix: ""
+        suffix: "",
       },
       highlight: false,
-      overlap: false
+      overlap: false,
     };
 
     // 构建坐标轴配置
@@ -179,7 +193,7 @@ export class StackedAreaChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 }
+            color: { color: "#000000", opacity: 1 },
           },
           label: {
             show: true,
@@ -187,24 +201,24 @@ export class StackedAreaChartGenerator extends BaseChartTool {
             fontFamily: "Misans 常规",
             fontSize: 12,
             color: { color: "#000000", opacity: 1 },
-            angle: 0
+            angle: 0,
           },
           grid: {
             show: true,
             width: 1,
             color: { color: "#cccccc", opacity: 0.5 },
-            type: "dashed" as const
+            type: "dashed" as const,
           },
           position: "bottom" as const,
-          type: "category" as const
-        }
+          type: "category" as const,
+        },
       ],
       yAxis: [
         {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 }
+            color: { color: "#000000", opacity: 1 },
           },
           label: {
             show: true,
@@ -213,39 +227,35 @@ export class StackedAreaChartGenerator extends BaseChartTool {
             fontSize: 12,
             color: { color: "#000000", opacity: 1 },
             angle: 0,
-            suffix: ""
+            suffix: "",
           },
           grid: {
             show: true,
             width: 1,
             color: { color: "#cccccc", opacity: 0.5 },
-            type: "dashed" as const
+            type: "dashed" as const,
           },
           position: "left" as const,
-          type: "value" as const
-        }
-      ]
+          type: "value" as const,
+        },
+      ],
     };
 
     // 生成图表配置
-    const result = createChartOutput(
-      'stacked-area',
-      mergedInput,
-      {
-        type: 'stacked-area',
-        title: generateDefaultTitle(mergedInput.title, mergedInput.subtitle),
-        background: generateDefaultBackground(mergedInput.theme),
-        map,
-        fill,
-        display,
-        legend: generateDefaultLegend(),
-        label,
-        axis
-      }
-    );
+    const result = createChartOutput("stacked-area", mergedInput, {
+      type: "stacked-area",
+      title: generateDefaultTitle(mergedInput.title, mergedInput.subtitle),
+      background: generateDefaultBackground(mergedInput.theme),
+      map,
+      fill,
+      display,
+      legend: generateDefaultLegend(),
+      label,
+      axis,
+    });
 
     // 修正管道类型为cross（用于堆叠图表）
-    result.pipe = 'cross';
+    result.pipe = "cross";
 
     return result as StackedAreaChartOutput;
   }
@@ -261,9 +271,11 @@ export class StackedAreaChartGenerator extends BaseChartTool {
   async loadSchema(): Promise<any> {
     const schemaMerger = new SchemaMerger();
     try {
-      return schemaMerger.getMergedSchema('stacked-area');
+      return schemaMerger.getMergedSchema("stacked-area");
     } catch (error) {
-      throw new Error(`Failed to load stacked-area schema: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to load stacked-area schema: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
     }
   }
-} 
+}

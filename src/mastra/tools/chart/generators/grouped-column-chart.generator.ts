@@ -1,17 +1,21 @@
-import { z } from 'zod';
-import { BaseChartTool, BaseChartInput, BaseChartOutput } from '../interfaces/chart-tool.interface';
-import { SchemaMerger } from '../utils/schema-merger';
-import { 
-  generateDefaultTitle, 
-  generateDefaultBackground, 
+import { z } from "zod";
+import {
+  BaseChartTool,
+  BaseChartInput,
+  BaseChartOutput,
+} from "../interfaces/chart-tool.interface";
+import { SchemaMerger } from "../utils/schema-merger";
+import {
+  generateDefaultTitle,
+  generateDefaultBackground,
   generateDefaultLegend,
   getThemeColors,
-  createChartOutput 
-} from '../utils/chart-helpers';
+  createChartOutput,
+} from "../utils/chart-helpers";
 
 // 分组柱状图特定输入接口
-export interface GroupedColumnChartInput extends Omit<BaseChartInput, 'chartType'> {
-  data: Array<Array<string | number>>; // [省份, 城市1, 城市2, ...] 格式
+export interface GroupedColumnChartInput extends BaseChartInput {
+  data: Array<Array<Array<string | number>>>; // [省份, 城市1, 城市2, ...] 格式
   showLabels?: boolean;
   colors?: string[];
   columnWidth?: number; // 列宽百分比 (0-1)
@@ -21,7 +25,7 @@ export interface GroupedColumnChartInput extends Omit<BaseChartInput, 'chartType
 // 分组柱状图特定输出接口
 export interface GroupedColumnChartOutput extends BaseChartOutput {
   props: {
-    type: 'grouped-column';
+    type: "grouped-column";
     title: any;
     background: any;
     map: Array<{
@@ -49,9 +53,9 @@ export interface GroupedColumnChartOutput extends BaseChartOutput {
 
 // Zod验证schema
 export const GroupedColumnChartInputSchema = z.object({
-  data: z.array(z.array(z.union([z.string(), z.number()]))).min(2),
-  title: z.string().optional().default('分组柱状图'),
-  subtitle: z.string().optional().default('副标题'),
+  data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
+  title: z.string().optional().default("分组柱状图"),
+  subtitle: z.string().optional().default("副标题"),
   showLabels: z.boolean().optional().default(false),
   colors: z.array(z.string()).optional(),
   columnWidth: z.number().min(0.1).max(1).optional().default(0.7),
@@ -60,27 +64,36 @@ export const GroupedColumnChartInputSchema = z.object({
 
 export class GroupedColumnChartGenerator extends BaseChartTool {
   constructor() {
-    super('grouped-column');
+    super("grouped-column");
   }
 
   protected getElementType(): string {
-    return 'bar';
+    return "bar";
   }
 
-  async generateConfig(input: GroupedColumnChartInput): Promise<GroupedColumnChartOutput> {
+  async generateConfig(
+    input: GroupedColumnChartInput
+  ): Promise<GroupedColumnChartOutput> {
     // 验证输入
     const validatedInput = GroupedColumnChartInputSchema.parse(input);
-    const inputWithChartType = { ...validatedInput, chartType: 'grouped-column' };
+    const inputWithChartType = {
+      ...validatedInput,
+      chartType: "grouped-column",
+    };
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
-    
+
     // 获取数据结构信息
-    const headerRow = validatedInput.data[0];
+    const headerRow = validatedInput.data[0][0];
     const seriesCount = headerRow.length - 1; // 除去第一列（类别列）的数据系列数量
-    
+
     // 获取默认配置和颜色
-    const themeColors = getThemeColors(mergedInput.theme || 'light', seriesCount);
-    const colors = validatedInput.colors || themeColors.map((c: any) => c.color);
-    
+    const themeColors = getThemeColors(
+      mergedInput.theme || "light",
+      seriesCount
+    );
+    const colors =
+      validatedInput.colors || themeColors.map((c: any) => c.color);
+
     // 构建数据映射 - 第一列是X轴对象，其余列是数值列
     const map = [
       {
@@ -90,7 +103,7 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
         function: "objCol",
         configurable: true,
         xAxisIndex: 0,
-        type: ""
+        type: "",
       },
       // 为每个数据系列创建映射
       ...Array.from({ length: seriesCount }, (_, i) => ({
@@ -100,8 +113,8 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
         function: "vCol",
         configurable: true,
         yAxisIndex: 0,
-        type: "bar"
-      }))
+        type: "bar",
+      })),
     ];
 
     // 构建填充配置
@@ -116,14 +129,14 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
           angle: 45,
           blur: 0,
           color: { color: "#000000", opacity: 0.5 },
-          radius: 0
+          radius: 0,
         },
         border: {
           type: "solid" as const,
           width: 0,
-          color: null
-        }
-      }))
+          color: null,
+        },
+      })),
     };
 
     // 构建显示配置
@@ -134,9 +147,9 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
           radius: [0, 0, 0, 0],
           type: "solid" as const,
           width: 0,
-          color: null
-        }
-      }
+          color: null,
+        },
+      },
     };
 
     // 构建标签配置
@@ -148,10 +161,10 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
         fontFamily: "Misans 常规",
         fontSize: 12,
         color: { color: "#333333", opacity: 1 },
-        suffix: ""
+        suffix: "",
       },
       highlight: false,
-      overlap: false
+      overlap: false,
     };
 
     // 构建坐标轴配置
@@ -162,7 +175,7 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 }
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
@@ -170,24 +183,24 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
             fontFamily: "Misans 常规",
             fontSize: 14,
             color: { color: "#000000", opacity: 1 },
-            angle: 0
+            angle: 0,
           },
           grid: {
             show: false,
             width: 1,
             color: { color: "#D9D9D9", opacity: 1 },
-            type: "solid" as const
+            type: "solid" as const,
           },
           position: "bottom" as const,
-          type: "category" as const
-        }
+          type: "category" as const,
+        },
       ],
       yAxis: [
         {
           line: {
             show: true,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 }
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
@@ -195,20 +208,20 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
             fontSize: 14,
             color: { color: "#000000", opacity: 1 },
             angle: 0,
-            suffix: ""
+            suffix: "",
           },
           grid: {
             show: true,
             width: 1,
             color: { color: "#D9D9D9", opacity: 1 },
-            type: "solid" as const
+            type: "solid" as const,
           },
           position: "left" as const,
           type: "value" as const,
           stepOfLabel: "auto" as const,
-          range: []
-        }
-      ]
+          range: [],
+        },
+      ],
     };
 
     // 生成通用配置
@@ -218,7 +231,7 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
 
     // 构建最终配置
     const props = {
-      type: 'grouped-column' as const,
+      type: "grouped-column" as const,
       title,
       background,
       map,
@@ -229,7 +242,7 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
       axis,
       numberFormat: {
         separatorType: "1000.00" as const,
-        decimalPlaces: null
+        decimalPlaces: null,
       },
       animation: {
         show: false,
@@ -238,27 +251,27 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
         duration: 2,
         startDelay: 0,
         endPause: 1,
-        loop: false
+        loop: false,
       },
       tooltip: false,
       padding: {
         top: 20,
         bottom: 23,
         left: 24,
-        right: 24
-      }
+        right: 24,
+      },
     };
 
     return {
-      data: [validatedInput.data],
-      pipe: 'cross',
-      props
+      data: validatedInput.data,
+      pipe: "cross",
+      props,
     };
   }
 
   async loadSchema(): Promise<any> {
     const schemaMerger = new SchemaMerger();
-    return await schemaMerger.getMergedSchema('grouped-column');
+    return await schemaMerger.getMergedSchema("grouped-column");
   }
 
   // 数据验证方法
@@ -278,11 +291,11 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
         return false;
       }
       // 检查第一列是否为字符串（类别），其余列是否为数字
-      if (typeof data[i][0] !== 'string') {
+      if (typeof data[i][0] !== "string") {
         return false;
       }
       for (let j = 1; j < data[i].length; j++) {
-        if (typeof data[i][j] !== 'number') {
+        if (typeof data[i][j] !== "number") {
           return false;
         }
       }
@@ -294,14 +307,15 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
   // 获取图表元数据
   getChartMetadata() {
     return {
-      type: 'grouped-column',
-      name: '分组柱状图',
-      description: '支持多系列数据的分组柱状图，适用于比较不同类别下多个系列的数值',
-      category: 'column',
-      dataFormat: 'cross',
+      type: "grouped-column",
+      name: "分组柱状图",
+      description:
+        "支持多系列数据的分组柱状图，适用于比较不同类别下多个系列的数值",
+      category: "column",
+      dataFormat: "cross",
       minDataColumns: 2,
       maxDataColumns: 10,
-      features: ['grouping', 'multiple-series', 'comparison']
+      features: ["grouping", "multiple-series", "comparison"],
     };
   }
-} 
+}

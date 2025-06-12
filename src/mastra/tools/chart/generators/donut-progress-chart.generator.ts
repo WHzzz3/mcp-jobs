@@ -1,21 +1,25 @@
-import { z } from 'zod';
-import { BaseChartTool, BaseChartInput, BaseChartOutput } from '../interfaces/chart-tool.interface';
-import { SchemaMerger } from '../utils/schema-merger';
-import { 
-  generateDefaultTitle, 
-  generateDefaultBackground, 
+import { z } from "zod";
+import {
+  BaseChartTool,
+  BaseChartInput,
+  BaseChartOutput,
+} from "../interfaces/chart-tool.interface";
+import { SchemaMerger } from "../utils/schema-merger";
+import {
+  generateDefaultTitle,
+  generateDefaultBackground,
   generateDefaultLegend,
   getThemeColors,
-  processChartData 
-} from '../utils/chart-helpers';
+  processChartData,
+} from "../utils/chart-helpers";
 
 // 圆环进度图特定输入接口
 export interface DonutProgressChartInput extends BaseChartInput {
-  data: Array<[string, number]>; // Key-value对格式 [名称, 进度值]
+  data: Array<Array<Array<string | number>>>; // Key-value对格式 [名称, 进度值]
   innerRadiusRatio?: number;
   gapPercentage?: number;
   startAngle?: number;
-  rotateDirection?: 'clockwise' | 'counterclockwise';
+  rotateDirection?: "clockwise" | "counterclockwise";
   customColor?: string;
   showLabels?: boolean;
 }
@@ -23,7 +27,7 @@ export interface DonutProgressChartInput extends BaseChartInput {
 // 圆环进度图特定输出接口
 export interface DonutProgressChartOutput extends BaseChartOutput {
   props: {
-    type: 'donut-progress';
+    type: "donut-progress";
     title: any;
     background: any;
     map: Array<{
@@ -41,7 +45,7 @@ export interface DonutProgressChartOutput extends BaseChartOutput {
       pie: {
         innerRadiusRatio: number;
         gapPercentage: number;
-        rotateDirection: 'clockwise' | 'counterclockwise';
+        rotateDirection: "clockwise" | "counterclockwise";
         startAngle: number;
         backgroundColor: string | null;
         border: {
@@ -63,55 +67,60 @@ export interface DonutProgressChartOutput extends BaseChartOutput {
 
 // Zod验证schema
 export const DonutProgressChartInputSchema = z.object({
-  data: z.array(z.tuple([z.string(), z.number().min(0).max(100)]))
-    .min(1, '至少需要一个进度数据项'),
-  title: z.string().optional().default('圆环进度图'),
-  subtitle: z.string().optional().default('副标题'),
+  data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
+  title: z.string().optional().default("圆环进度图"),
+  subtitle: z.string().optional().default("副标题"),
+  colors: z.array(z.string()).optional(),
   innerRadiusRatio: z.number().min(0).max(0.99).optional().default(0.65),
   gapPercentage: z.number().min(0).max(100).optional().default(0),
-  startAngle: z.number().refine(val => [0, 90, 180, 270].includes(val), {
-    message: "起始角度必须是 0, 90, 180, 或 270 度之一"
-  }).optional().default(0),
-  rotateDirection: z.enum(['clockwise', 'counterclockwise']).optional().default('clockwise'),
+  startAngle: z
+    .number()
+    .refine((val) => [0, 90, 180, 270].includes(val), {
+      message: "起始角度必须是 0, 90, 180, 或 270 度之一",
+    })
+    .optional()
+    .default(0),
+  rotateDirection: z
+    .enum(["clockwise", "counterclockwise"])
+    .optional()
+    .default("clockwise"),
   customColor: z.string().optional(),
   showLabels: z.boolean().optional().default(false),
 });
 
 export class DonutProgressChartGenerator extends BaseChartTool {
   constructor() {
-    super('donut-progress');
+    super("donut-progress");
   }
 
   protected getElementType(): string {
-    return 'pie';
+    return "pie";
   }
 
-  async generateConfig(input: DonutProgressChartInput): Promise<DonutProgressChartOutput> {
+  async generateConfig(
+    input: DonutProgressChartInput
+  ): Promise<DonutProgressChartOutput> {
     // 先进行基本的数据验证
-    if (!input.data || input.data.length === 0) {
-      throw new Error('数据格式无效：需要至少包含一个进度数据项');
-    }
-
-    // 验证进度值范围 - 在Zod验证之前进行，确保抛出自定义错误消息
-    for (const [name, value] of input.data) {
-      if (value < 0 || value > 100) {
-        throw new Error(`进度值 "${name}: ${value}" 必须在 0-100 范围内`);
-      }
+    if (!input.data || input.data[0].length === 0) {
+      throw new Error("数据格式无效：需要至少包含一个进度数据项");
     }
 
     // 验证输入
     const validatedInput = DonutProgressChartInputSchema.parse(input);
-    const inputWithChartType = { ...validatedInput, chartType: 'donut-progress' };
+    const inputWithChartType = {
+      ...validatedInput,
+      chartType: "donut-progress",
+    };
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
 
     // 使用导入的默认配置函数
     const title = generateDefaultTitle(mergedInput.title, mergedInput.subtitle);
-    const background = generateDefaultBackground(mergedInput.theme || 'light');
+    const background = generateDefaultBackground(mergedInput.theme || "light");
     const legend = generateDefaultLegend();
 
     // 获取主题颜色
-    const themeColors = getThemeColors(mergedInput.theme || 'light', 1);
-    const color = validatedInput.customColor || themeColors[0].color;
+    const themeColors = getThemeColors(mergedInput.theme || "light", 1);
+    const color = validatedInput.colors?.[0] || themeColors[0].color;
 
     // 构建数据映射 - Progress charts 使用固定的两列映射
     const map = [
@@ -122,7 +131,7 @@ export class DonutProgressChartGenerator extends BaseChartTool {
         function: "objCol",
         configurable: true,
         xAxisIndex: 0,
-        type: ""
+        type: "",
       },
       {
         name: "值",
@@ -131,8 +140,8 @@ export class DonutProgressChartGenerator extends BaseChartTool {
         function: "vCol",
         configurable: true,
         yAxisIndex: 0,
-        type: "pie"
-      }
+        type: "pie",
+      },
     ];
 
     // 构建填充配置 - Progress charts 只支持单色
@@ -148,15 +157,15 @@ export class DonutProgressChartGenerator extends BaseChartTool {
             angle: 45,
             blur: 3,
             color: { color: "#000000", opacity: 0.2 },
-            radius: 2
+            radius: 2,
           },
           border: {
             type: "solid",
             width: 0,
-            color: null
-          }
-        }
-      ]
+            color: null,
+          },
+        },
+      ],
     };
 
     // 构建显示配置
@@ -164,16 +173,16 @@ export class DonutProgressChartGenerator extends BaseChartTool {
       pie: {
         innerRadiusRatio: validatedInput.innerRadiusRatio || 0.65,
         gapPercentage: validatedInput.gapPercentage || 0,
-        rotateDirection: validatedInput.rotateDirection || 'clockwise',
+        rotateDirection: validatedInput.rotateDirection || "clockwise",
         startAngle: validatedInput.startAngle || 0,
         backgroundColor: null,
         border: {
           radius: 0,
           type: "solid",
           width: 0,
-          color: null
-        }
-      }
+          color: null,
+        },
+      },
     };
 
     // 构建标签配置
@@ -183,22 +192,22 @@ export class DonutProgressChartGenerator extends BaseChartTool {
         show: validatedInput.showLabels || false,
         fontFamily: "Misans 常规",
         fontSize: 21,
-        color: { color: "#333333", opacity: 1 }
+        color: { color: "#333333", opacity: 1 },
       },
       numberLabel: {
         show: validatedInput.showLabels || false,
         fontFamily: "Misans 常规",
         fontSize: 21,
-        color: { color: "#333333", opacity: 1 }
+        color: { color: "#333333", opacity: 1 },
       },
       highlight: false,
-      overlap: false
+      overlap: false,
     };
 
     // 构建数字格式配置
     const numberFormat = {
       separatorType: "1000.00",
-      decimalPlaces: null
+      decimalPlaces: null,
     };
 
     // 构建动画配置
@@ -209,7 +218,7 @@ export class DonutProgressChartGenerator extends BaseChartTool {
       duration: 2,
       startDelay: 0,
       endPause: 1,
-      loop: false
+      loop: false,
     };
 
     // 构建内边距配置
@@ -217,21 +226,18 @@ export class DonutProgressChartGenerator extends BaseChartTool {
       top: 20,
       bottom: 23,
       left: 24,
-      right: 24
+      right: 24,
     };
 
-    // 处理数据 - 将 key-value 对转换为标准格式
-    const formattedData = [
-      ["名称", "进度"],
-      ...validatedInput.data
-    ];
-    const processedData = processChartData(formattedData);
+    // // 处理数据 - 将 key-value 对转换为标准格式
+    // const formattedData = [["名称", "进度"], ...validatedInput.data];
+    // const processedData = processChartData(formattedData);
 
     return {
-      data: processedData,
-      pipe: 'key_value', // Progress charts 使用 key_value 管道
+      data: validatedInput.data,
+      pipe: "key_value", // Progress charts 使用 key_value 管道
       props: {
-        type: 'donut-progress',
+        type: "donut-progress",
         title,
         background,
         legend,
@@ -242,13 +248,13 @@ export class DonutProgressChartGenerator extends BaseChartTool {
         numberFormat,
         animation,
         tooltip: false,
-        padding
-      }
+        padding,
+      },
     } as DonutProgressChartOutput;
   }
 
   async loadSchema(): Promise<any> {
     const merger = new SchemaMerger();
-    return merger.getMergedSchema('donut-progress');
+    return merger.getMergedSchema("donut-progress");
   }
-} 
+}
