@@ -4,7 +4,7 @@ import {
   BaseChartInput,
   BaseChartOutput,
 } from "../interfaces/chart-tool.interface";
-import { SchemaMerger } from "../utils/schema-merger";
+// import { SchemaMerger } from "../utils/schema-merger";
 import {
   generateDefaultTitle,
   generateDefaultBackground,
@@ -269,8 +269,8 @@ export class BasicColumnChartGenerator extends BaseChartTool {
     return result;
   }
 
-  async loadSchema(): Promise<any> {
-    const schemaMerger = new SchemaMerger();
-    return schemaMerger.getMergedSchema("basic-column");
-  }
+  // async loadSchema(): Promise<any> {
+  //   const schemaMerger = new SchemaMerger();
+  //   return schemaMerger.getMergedSchema("basic-column");
+  // }
 }

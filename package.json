@@ -1,6 +1,6 @@
 {
-  "name": "@whzzz3/jobs-chart",
-  "version": "1.0.0",
+  "name": "@editorup/jobs-chart",
+  "version": "1.0.1",
   "description": "A dedicated package for chart generation tools.",
   "main": "dist/chart/index.js",
   "module": "dist/chart/index.mjs",
@@ -33,13 +33,17 @@
   },
   "devDependencies": {
     "@mastra/core": "^0.10.3",
-    "zod": "^3.25.56",
+    "@rollup/plugin-json": "^6.1.0",
     "@types/node": "^22.15.30",
     "mastra": "^0.10.3",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "zod": "^3.25.56"
   },
   "peerDependencies": {
     "@mastra/core": "^0.10.3",
     "zod": "^3.23.56"
+  },
+  "dependencies": {
+    "rimraf": "^6.0.1"
   }
 }

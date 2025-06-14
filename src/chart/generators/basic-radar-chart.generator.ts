@@ -4,7 +4,7 @@ import {
   BaseChartInput,
   BaseChartOutput,
 } from "../interfaces/chart-tool.interface";
-import { SchemaMerger } from "../utils/schema-merger";
+// import { SchemaMerger } from "../utils/schema-merger";
 import {
   generateDefaultTitle,
   generateDefaultBackground,
@@ -221,10 +221,10 @@ export class BasicRadarChartGenerator extends BaseChartTool {
     });
   }
 
-  async loadSchema(): Promise<any> {
-    const merger = new SchemaMerger();
-    return merger.getMergedSchema("basic-radar");
-  }
+  // async loadSchema(): Promise<any> {
+  //   const merger = new SchemaMerger();
+  //   return merger.getMergedSchema("basic-radar");
+  // }
 
   validateData(data: any[][]): boolean {
     if (!Array.isArray(data) || data.length < 2) {

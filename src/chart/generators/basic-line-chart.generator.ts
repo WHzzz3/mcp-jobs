@@ -4,7 +4,7 @@ import {
   BaseChartInput,
   BaseChartOutput,
 } from "../interfaces/chart-tool.interface";
-import { SchemaMerger } from "../utils/schema-merger";
+// import { SchemaMerger } from "../utils/schema-merger";
 import {
   generateDefaultTitle,
   generateDefaultBackground,
@@ -305,8 +305,8 @@ export class BasicLineChartGenerator extends BaseChartTool {
     } as BasicLineChartOutput;
   }
 
-  async loadSchema(): Promise<any> {
-    const merger = new SchemaMerger();
-    return merger.getMergedSchema("basic-line");
-  }
+  // async loadSchema(): Promise<any> {
+  //   const merger = new SchemaMerger();
+  //   return merger.getMergedSchema("basic-line");
+  // }
 }

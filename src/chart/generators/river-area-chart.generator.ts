@@ -4,7 +4,7 @@ import {
   BaseChartInput,
   BaseChartOutput,
 } from "../interfaces/chart-tool.interface";
-import { SchemaMerger } from "../utils/schema-merger";
+// import { SchemaMerger } from "../utils/schema-merger";
 import {
   generateDefaultTitle,
   generateDefaultBackground,
@@ -275,8 +275,8 @@ export class RiverAreaChartGenerator extends BaseChartTool {
     return z.any(); // 可以根据需要进一步细化
   }
 
-  async loadSchema(): Promise<any> {
-    const schemaMerger = new SchemaMerger();
-    return schemaMerger.getMergedSchema("river-area");
-  }
+  // async loadSchema(): Promise<any> {
+  //   const schemaMerger = new SchemaMerger();
+  //   return schemaMerger.getMergedSchema("river-area");
+  // }
 }

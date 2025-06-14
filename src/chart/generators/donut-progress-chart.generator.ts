@@ -4,7 +4,7 @@ import {
   BaseChartInput,
   BaseChartOutput,
 } from "../interfaces/chart-tool.interface";
-import { SchemaMerger } from "../utils/schema-merger";
+// import { SchemaMerger } from "../utils/schema-merger";
 import {
   generateDefaultTitle,
   generateDefaultBackground,
@@ -253,8 +253,8 @@ export class DonutProgressChartGenerator extends BaseChartTool {
     } as DonutProgressChartOutput;
   }
 
-  async loadSchema(): Promise<any> {
-    const merger = new SchemaMerger();
-    return merger.getMergedSchema("donut-progress");
-  }
+  // async loadSchema(): Promise<any> {
+  //   const merger = new SchemaMerger();
+  //   return merger.getMergedSchema("donut-progress");
+  // }
 }

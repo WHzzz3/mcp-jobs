@@ -4,7 +4,7 @@ import {
   BaseChartInput,
   BaseChartOutput,
 } from "../interfaces/chart-tool.interface";
-import { SchemaMerger } from "../utils/schema-merger";
+// import { SchemaMerger } from "../utils/schema-merger";
 import {
   generateDefaultTitle,
   generateDefaultBackground,
@@ -203,8 +203,8 @@ export class BasicPieChartGenerator extends BaseChartTool {
     }) as BasicPieChartOutput;
   }
 
-  async loadSchema(): Promise<any> {
-    const merger = new SchemaMerger();
-    return merger.getMergedSchema("basic-pie");
-  }
+  // async loadSchema(): Promise<any> {
+  //   const merger = new SchemaMerger();
+  //   return merger.getMergedSchema("basic-pie");
+  // }
 }

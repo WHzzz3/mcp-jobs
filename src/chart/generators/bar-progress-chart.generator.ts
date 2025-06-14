@@ -4,7 +4,7 @@ import {
   BaseChartInput,
   BaseChartOutput,
 } from "../interfaces/chart-tool.interface";
-import { SchemaMerger } from "../utils/schema-merger";
+// import { SchemaMerger } from "../utils/schema-merger";
 import {
   generateDefaultTitle,
   generateDefaultBackground,
@@ -228,8 +228,8 @@ export class BarProgressChartGenerator extends BaseChartTool {
     } as BarProgressChartOutput;
   }
 
-  async loadSchema(): Promise<any> {
-    const merger = new SchemaMerger();
-    return merger.getMergedSchema("bar-progress");
-  }
+  // async loadSchema(): Promise<any> {
+  //   const merger = new SchemaMerger();
+  //   return merger.getMergedSchema("bar-progress");
+  // }
 }

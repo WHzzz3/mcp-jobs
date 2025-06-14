@@ -5,7 +5,7 @@ import {
   BaseChartOutput,
   BaseChartInputSchema,
 } from "../interfaces/chart-tool.interface";
-import { SchemaMerger } from "../utils/schema-merger";
+// import { SchemaMerger } from "../utils/schema-merger";
 import {
   generateDefaultTitle,
   generateDefaultBackground,
@@ -296,8 +296,8 @@ export class ComposeWaterfallChartGenerator extends BaseChartTool {
     });
   }
 
-  async loadSchema(): Promise<any> {
-    const merger = new SchemaMerger();
-    return await merger.mergeSchemas("compose-waterfall.schema.json");
-  }
+  // async loadSchema(): Promise<any> {
+  //   const merger = new SchemaMerger();
+  //   return await merger.mergeSchemas("compose-waterfall.schema.json");
+  // }
 }

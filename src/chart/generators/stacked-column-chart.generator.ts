@@ -6,7 +6,7 @@ import {
   BaseChartInputSchema,
   BaseChartOutputSchema,
 } from "../interfaces/chart-tool.interface";
-import { SchemaMerger } from "../utils/schema-merger";
+// import { SchemaMerger } from "../utils/schema-merger";
 import {
   generateDefaultTitle,
   generateDefaultBackground,
@@ -268,14 +268,14 @@ export class StackedColumnChartGenerator extends BaseChartTool {
     return BaseChartOutputSchema;
   }
 
-  async loadSchema(): Promise<any> {
-    const schemaMerger = new SchemaMerger();
-    try {
-      return schemaMerger.getMergedSchema("stacked-column");
-    } catch (error) {
-      throw new Error(
-        `Failed to load stacked-column schema: ${error instanceof Error ? error.message : "Unknown error"}`
-      );
-    }
-  }
+  // async loadSchema(): Promise<any> {
+  //   const schemaMerger = new SchemaMerger();
+  //   try {
+  //     return schemaMerger.getMergedSchema("stacked-column");
+  //   } catch (error) {
+  //     throw new Error(
+  //       `Failed to load stacked-column schema: ${error instanceof Error ? error.message : "Unknown error"}`
+  //     );
+  //   }
+  // }
 }
