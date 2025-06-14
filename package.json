@@ -1,12 +1,20 @@
 {
-  "name": "@mcp/jobs-chart",
+  "name": "@whzzz3/jobs-chart",
   "version": "1.0.0",
   "description": "A dedicated package for chart generation tools.",
   "main": "dist/chart/index.js",
+  "module": "dist/chart/index.mjs",
   "types": "dist/chart/index.d.ts",
   "files": [
     "dist/chart"
   ],
+  "exports": {
+    ".": {
+      "import": "./dist/chart/index.mjs",
+      "require": "./dist/chart/index.js",
+      "types": "./dist/chart/index.d.ts"
+    }
+  },
   "scripts": {
     "test": "vitest",
     "test:run": "vitest run",
@@ -14,7 +22,7 @@
     "dev": "mastra dev",
     "build": "mastra build",
     "start": "mastra start",
-    "build:chart": "rimraf dist/chart && tsc -p tsconfig.chart.json"
+    "build:chart": "rimraf dist/chart && rollup -c && tsc -p tsconfig.chart.json --emitDeclarationOnly"
   },
   "keywords": [],
   "author": "",
@@ -23,17 +31,15 @@
   "engines": {
     "node": ">=20.9.0"
   },
-  "dependencies": {
-    "@mastra/core": "^0.10.3",
-    "zod": "^3.25.56"
-  },
   "devDependencies": {
+    "@mastra/core": "^0.10.3",
+    "zod": "^3.25.56",
     "@types/node": "^22.15.30",
     "mastra": "^0.10.3",
-    "rimraf": "^6.0.1",
     "typescript": "^5.8.3"
   },
   "peerDependencies": {
-    "zod": "^3.25.56"
+    "@mastra/core": "^0.10.3",
+    "zod": "^3.23.56"
   }
 }

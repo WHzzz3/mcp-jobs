@@ -1,2 +1,2 @@
 // 导出所有 chart-tool 的核心功能
-export * from "./registry";
+export * from "./registry/index";
