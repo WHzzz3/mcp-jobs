@@ -236,76 +236,107 @@ function generateChartColors(
   return result;
 }
 
-/**
- * 为图表生成颜色（优化版）
- * 核心策略：使用黄金角算法保证色相最大区分度，同时微调饱和度和亮度。
- * @param baseColors 基础颜色数组
- * @param totalCount 总共需要的颜色数量
- * @returns {string[]} 生成的颜色数组
- */
-export function getColors(
-  baseColors: string[] | undefined,
-  totalCount: number
-): string[] {
-  if (!baseColors || baseColors.length === 0) {
+const rand = (a: number, b: number) => a + (b - a) * Math.random();
+const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
+function shuffle(arr: string[]) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function toReadableHex(c: any) {
+  let col = c;
+  if (chroma.contrast(col, "white") < 4.5)
+    col = col.set("hsl.l", clamp(col.get("hsl.l") * 1.1, 0, 1));
+  if (chroma.contrast(col, "black") < 4.5)
+    col = col.set("hsl.l", clamp(col.get("hsl.l") * 0.9, 0, 1));
+  return col.hex().toUpperCase();
+}
+
+const HUE_STEP = 10,
+  SAT_JIT = 0.04,
+  LIT_JIT = 0.15;
+const SAT_RANGE = [0.4, 0.6],
+  LIT_RANGE = [0.4, 0.9],
+  MAX_TRIES = 25;
+
+// 生成后备颜色的函数
+function generateFallbackColors(count: number): string[] {
+  const fallbackColors: string[] = [];
+  const baseHues = [0, 30, 60, 120, 180, 210, 240, 300]; // 基础色相
+
+  for (let i = 0; i < count; i++) {
+    const hue =
+      baseHues[i % baseHues.length] + Math.floor(i / baseHues.length) * 15;
+    const saturation = 0.5 + (i % 3) * 0.1; // 0.5, 0.6, 0.7
+    const lightness = 0.5 + (i % 4) * 0.1; // 0.5, 0.6, 0.7, 0.8
+
+    const color = chroma.hsl(hue % 360, saturation, lightness);
+    fallbackColors.push(toReadableHex(color));
+  }
+
+  return fallbackColors;
+}
+
+export function getColors(seeds: string[], totalCount: number) {
+  if (!seeds || seeds.length === 0) {
     return [];
   }
   if (totalCount <= 0) {
     return [];
   }
-
-  if (totalCount <= baseColors.length) {
-    return baseColors.slice(0, totalCount);
+  if (seeds.length >= totalCount) {
+    return seeds.slice(0, totalCount);
   }
 
-  const result = [...baseColors];
-  const remainingCount = totalCount - baseColors.length;
+  const used = new Set(seeds.map((h) => h.toUpperCase()));
+  const out = [...used];
+  const shuffledSeeds = shuffle([...seeds]); // 只shuffle一次
+  let seedIndex = 0;
+  let totalTries = 0;
+  const maxTotalTries = MAX_TRIES * totalCount; // 防止无限循环
 
-  // 黄金角，~137.5度。这是在圆上均匀分布点的魔法数字。
-  const GOLDEN_ANGLE = 137.5;
+  // 简化为单层循环，提高效率
+  while (out.length < totalCount && totalTries < maxTotalTries) {
+    const seed = shuffledSeeds[seedIndex % shuffledSeeds.length];
+    const [h, s, l] = chroma(seed).hsl();
 
-  // 使用最后一个基础颜色作为我们生成新颜色的起点
-  // 如果没有基础颜色，则随机开始一个
-  const lastBaseColor =
-    baseColors.length > 0
-      ? chroma(baseColors[baseColors.length - 1])
-      : chroma.random();
-  let lastHue = lastBaseColor.hsl()[0] || 0;
+    const hueVariation = HUE_STEP;
+    const h1 =
+      (h + (Math.random() < 0.5 ? hueVariation : -hueVariation) + 360) % 360;
 
-  for (let i = 0; i < remainingCount; i++) {
-    // 1. 色相 (Hue)：使用黄金角算法高效地找到下一个最分散的色相
-    const newHue = (lastHue + GOLDEN_ANGLE) % 360;
+    const s1 = clamp(s + rand(-SAT_JIT, SAT_JIT), SAT_RANGE[0], SAT_RANGE[1]);
+    const l1 = clamp(l + rand(-LIT_JIT, LIT_JIT), LIT_RANGE[0], LIT_RANGE[1]);
 
-    // 2. 饱和度 (Saturation) 和 3. 亮度 (Lightness)：
-    // 进行周期性微调和范围限制
-    const baseSat = lastBaseColor.hsl()[1] || 0.7;
-    const baseLit = lastBaseColor.hsl()[2] || 0.5;
+    const hex = toReadableHex(chroma.hsl(h1, s1, l1));
 
-    // 周期性调整饱和度，使其在 [0.6, 0.8] 范围内波动
-    const newSaturation = Math.max(
-      0.6,
-      Math.min(0.8, baseSat + (i % 2 === 0 ? 0.05 : -0.05))
-    );
+    if (!used.has(hex)) {
+      used.add(hex);
+      out.push(hex);
+      seedIndex++; // 成功生成后切换到下一个seed
+    } else {
+      // 如果连续失败太多次，增加变化幅度或切换seed
+      if (totalTries % 10 === 9) {
+        seedIndex = (seedIndex + 1) % shuffledSeeds.length;
+      }
+    }
 
-    // 周期性调整亮度，使其在 [0.5, 0.75] 范围内波动 (提升亮度以保证对比度)
-    const newLightness = Math.max(
-      0.5,
-      Math.min(0.75, baseLit + (i % 3 === 0 ? 0.08 : i % 3 === 1 ? -0.05 : 0))
-    );
-
-    const newColor = chroma.hsl(newHue, newSaturation, newLightness);
-
-    // （可选的无障碍性检查）确保与白色背景的对比度足够
-    // if (chroma.contrast(newColor, 'white') < 4.5) {
-    //   // 如果对比度不足，可以尝试提高亮度
-    //   newColor = newColor.set('hsl.l', '*1.1');
-    // }
-
-    result.push(newColor.hex());
-    lastHue = newHue; // 更新色相，为下一次迭代做准备
+    totalTries++;
   }
 
-  return result;
+  // 如果仍然不够，使用预定义的后备颜色
+  if (out.length < totalCount) {
+    const fallbackColors = generateFallbackColors(totalCount - out.length);
+    fallbackColors.forEach((color: string) => {
+      if (!used.has(color)) {
+        out.push(color);
+        used.add(color);
+      }
+    });
+  }
+
+  return out.slice(0, totalCount);
 }
 
 /**
