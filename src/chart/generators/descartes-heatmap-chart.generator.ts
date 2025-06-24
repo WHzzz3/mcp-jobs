@@ -11,6 +11,7 @@ import {
   generateDefaultLegend,
   getThemeColors,
   createChartOutput,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 笛卡尔热力图特定输入接口
@@ -109,7 +110,7 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
         type: "bar",
       })),
     ];
-    const colors = validatedInput.colors;
+    const colors = getColors(validatedInput.colors, 3);
     // 构建填充配置 - 热力图通常使用单一渐变色
     const fill = {
       controlType: "single" as const,

@@ -13,6 +13,7 @@ import {
   generateDefaultLegend,
   getThemeColors,
   createChartOutput,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 堆叠条形图特定输入接口
@@ -96,7 +97,8 @@ export class StackedBarChartGenerator extends BaseChartTool {
       seriesCount
     );
     const colors =
-      validatedInput.colors || themeColors.map((c: any) => c.color);
+      getColors(validatedInput.colors, seriesCount) ||
+      themeColors.map((c: any) => c.color);
 
     // 构建数据映射 - 条形图Y轴为分类，X轴为数值
     const map: Array<{
@@ -246,7 +248,7 @@ export class StackedBarChartGenerator extends BaseChartTool {
       map,
       fill,
       display,
-      legend: generateDefaultLegend(),
+      legend: generateDefaultLegend(true),
       label,
       axis,
     });

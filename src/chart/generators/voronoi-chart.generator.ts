@@ -13,6 +13,7 @@ import {
   generateDefaultLegend,
   getThemeColors,
   createChartOutput,
+  getColors,
 } from "../utils/chart-helpers";
 
 // Voronoi图特定输入接口
@@ -130,7 +131,8 @@ export class VoronoiChartGenerator extends BaseChartTool {
       categoryCount
     );
     const colors =
-      validatedInput.colors || themeColors.map((c: any) => c.color);
+      getColors(validatedInput.colors, categoryCount) ||
+      themeColors.map((c: any) => c.color);
 
     // 构建数据映射 - Voronoi图的特定映射
     const map: Array<{

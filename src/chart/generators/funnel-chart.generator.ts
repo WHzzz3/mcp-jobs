@@ -11,6 +11,7 @@ import {
   generateDefaultLegend,
   getThemeColors,
   createChartOutput,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 漏斗图特定输入接口
@@ -81,7 +82,7 @@ export class FunnelChartGenerator extends BaseChartTool {
 
     // 获取主题颜色
     const themeColors =
-      validatedInput.colors ||
+      getColors(validatedInput.colors, dataLength) ||
       getThemeColors(mergedInput.theme || "light", dataLength);
 
     // 构建数据映射

@@ -11,6 +11,7 @@ import {
   generateDefaultLegend,
   getThemeColors,
   createChartOutput,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 条形图特定输入接口
@@ -88,7 +89,8 @@ export class BasicBarChartGenerator extends BaseChartTool {
       dataLength
     );
     const colors =
-      validatedInput.colors || themeColors.map((c: any) => c.color);
+      getColors(validatedInput.colors, dataLength) ||
+      themeColors.map((c: any) => c.color);
 
     // 构建数据映射
     const map = [

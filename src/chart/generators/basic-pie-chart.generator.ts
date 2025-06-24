@@ -11,6 +11,7 @@ import {
   generateDefaultLegend,
   getThemeColors,
   createChartOutput,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 饼图特定输入接口
@@ -96,7 +97,8 @@ export class BasicPieChartGenerator extends BaseChartTool {
       dataLength
     );
     const colors =
-      validatedInput.colors || themeColors.map((c: any) => c.color);
+      getColors(validatedInput.colors, dataLength) ||
+      themeColors.map((c: any) => c.color);
 
     // 构建数据映射 - 饼图固定为两列映射
     const map = [

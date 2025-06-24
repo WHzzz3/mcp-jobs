@@ -10,6 +10,7 @@ import {
   generateDefaultBackground,
   generateDefaultLegend,
   getThemeColors,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 河流面积图特定输入接口
@@ -100,7 +101,8 @@ export class RiverAreaChartGenerator extends BaseChartTool {
       seriesCount
     );
     const colors =
-      validatedInput.colors || themeColors.map((c: any) => c.color);
+      getColors(validatedInput.colors, seriesCount) ||
+      themeColors.map((c: any) => c.color);
 
     // 构建数据映射（X轴时间，多个Y轴数值系列）
     const map = [
@@ -240,7 +242,7 @@ export class RiverAreaChartGenerator extends BaseChartTool {
         map,
         fill,
         display,
-        legend: generateDefaultLegend(),
+        legend: generateDefaultLegend(true),
         label,
         axis,
         numberFormat: {

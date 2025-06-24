@@ -11,6 +11,7 @@ import {
   generateDefaultLegend,
   getThemeColors,
   processChartData,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 折线图特定输入接口
@@ -122,12 +123,13 @@ export class BasicLineChartGenerator extends BaseChartTool {
       valueColumns.length
     );
     const colors =
-      validatedInput.colors || themeColors.map((c: any) => c.color);
+      getColors(validatedInput.colors, valueColumns.length) ||
+      themeColors.map((c: any) => c.color);
 
     // 使用导入的默认配置函数
     const title = generateDefaultTitle(mergedInput.title, mergedInput.subtitle);
     const background = generateDefaultBackground(mergedInput.theme || "light");
-    const legend = generateDefaultLegend();
+    const legend = generateDefaultLegend(true);
 
     // 构建数据映射
     const map = [
@@ -282,10 +284,10 @@ export class BasicLineChartGenerator extends BaseChartTool {
     };
 
     // 处理数据并创建输出
-    const processedData = processChartData(validatedInput.data);
+    // const processedData = processChartData(validatedInput.data);
 
     return {
-      data: processedData,
+      data: validatedInput.data,
       pipe: "cross", // 折线图使用cross管道
       props: {
         type: "basic-line",

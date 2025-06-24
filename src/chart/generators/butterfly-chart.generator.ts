@@ -10,6 +10,7 @@ import {
   generateDefaultBackground,
   generateDefaultLegend,
   getThemeColors,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 蝴蝶图特定输入接口
@@ -95,7 +96,7 @@ export class ButterflyChartGenerator extends BaseChartTool {
     // 获取默认配置
     const themeColors = getThemeColors(mergedInput.theme || "light", 2);
     // 左右两侧默认颜色
-    const colors = validatedInput.colors || [
+    const colors = getColors(validatedInput.colors, 2) || [
       themeColors[0].color,
       themeColors[1].color,
     ];
@@ -301,7 +302,7 @@ export class ButterflyChartGenerator extends BaseChartTool {
         map: map as any,
         fill,
         display,
-        legend: generateDefaultLegend(),
+        legend: generateDefaultLegend(true),
         label,
         axis: axis,
         numberFormat: {

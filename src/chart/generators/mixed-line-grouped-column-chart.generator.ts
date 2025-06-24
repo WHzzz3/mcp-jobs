@@ -13,6 +13,7 @@ import {
   generateDefaultLegend,
   getThemeColors,
   createChartOutput,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 混合线条-分组柱状图特定输入接口
@@ -157,7 +158,8 @@ export class MixedLineGroupedColumnChartGenerator extends BaseChartTool {
       totalSeries
     );
     const colors =
-      validatedInput.colors || themeColors.map((c: any) => c.color);
+      getColors(validatedInput.colors, totalSeries) ||
+      themeColors.map((c: any) => c.color);
 
     // 构建数据映射 - 混合图表的特定映射
     const map: Array<{
@@ -374,7 +376,7 @@ export class MixedLineGroupedColumnChartGenerator extends BaseChartTool {
       fill,
       display,
       axis,
-      legend: generateDefaultLegend(),
+      legend: generateDefaultLegend(true),
       label,
     });
 

@@ -68,12 +68,33 @@ export function generateDefaultBackground(theme: "light" | "dark" = "light") {
   };
 }
 
+/*
+默认显示图例图表类型
+*/
+export const DEFAULT_SHOW_LEGEND_CHART_TYPES = [
+  "stacked-column",
+  "stacked-bar",
+  "stacked-area",
+  "river-area",
+  "mixed-line-stacked-column",
+  "mixed-line-grouped-column",
+  "grouped-column",
+  "grouped-bar",
+  "difference-arrow-column",
+  "difference-arrow-bar",
+  "descartes-heatmap",
+  "cascaded-area",
+  "butterfly",
+  "basic-radar",
+  "basic-line",
+];
+
 /**
  * 生成默认图例配置
  */
-export function generateDefaultLegend() {
+export function generateDefaultLegend(show: boolean = false) {
   return {
-    show: true,
+    show,
     display: "horizontal",
     position: { x: "center", y: "bottom" },
     fontFamily: "Misans 常规",
@@ -137,6 +158,30 @@ export function getThemeColors(
 }
 
 /**
+ * Generates an array of colors with a specified length.
+ * If the input color array is shorter than the desired count, the colors are repeated.
+ * If the input color array is longer, it is truncated.
+ *
+ * @param {string[]} colors - The array of colors to use.
+ * @param {number} [count=1] - The desired length of the final color array.
+ * @returns {string[]} The resulting array of colors.
+ */
+export function getColors(
+  colors: string[] | undefined,
+  count: number = 1
+): string[] {
+  // If the original color array is empty, return an empty array.
+  if (!colors || colors.length === 0) {
+    return [];
+  }
+
+  // Use Array.from to create a new array of the desired length.
+  // The mapping function calculates the correct color index using the modulo operator,
+  // effectively looping through the input colors.
+  return Array.from({ length: count }, (_, i) => colors[i % colors.length]);
+}
+
+/**
  * 生成默认填充配置
  */
 export function generateDefaultFill(
@@ -192,7 +237,7 @@ export function generateDefaultLabel() {
 /**
  * 处理图表数据格式
  */
-export function processChartData(data: any[][]): any[][][] {
+export function processChartData(data: any[][][]): any[][][] {
   if (!data || data.length === 0) {
     throw new Error("Data is required for chart generation");
   }
@@ -234,13 +279,15 @@ export function generateDefaultProps(
   input: BaseChartInput
 ): BaseChartOutput["props"] {
   const theme = input.theme || "light";
-  const dataLength = input.data ? input.data.length - 1 : 1; // 减去header行
+  const dataLength = input.data ? input.data[0].length - 1 : 1; // 减去header行
 
   return {
     type: chartType,
     title: generateDefaultTitle(input.title, input.subtitle),
     background: generateDefaultBackground(theme),
-    legend: generateDefaultLegend(),
+    legend: generateDefaultLegend(
+      DEFAULT_SHOW_LEGEND_CHART_TYPES.includes(chartType)
+    ),
     numberFormat: generateDefaultNumberFormat(),
     animation: generateDefaultAnimation(),
     tooltip: false,
@@ -264,7 +311,7 @@ export function createChartOutput(
 
   validateChartData(input.data);
 
-  const processedData = processChartData(input.data);
+  const processedData = input.data;
   const defaultProps = generateDefaultProps(chartType, input);
 
   return {

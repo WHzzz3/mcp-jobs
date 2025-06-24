@@ -12,6 +12,7 @@ import {
   generateDefaultLegend,
   getThemeColors,
   createChartOutput,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 复合瀑布图特定输入接口
@@ -114,7 +115,9 @@ export class ComposeWaterfallChartGenerator extends BaseChartTool {
 
     // 瀑布图通常使用特定的颜色方案：增长（绿色）、减少（红色）、总计（蓝色）
     const defaultWaterfallColors = ["#52c41a", "#ff4d4f", "#1890ff"]; // 绿、红、蓝
-    const colors = validatedInput.colors || defaultWaterfallColors;
+    const colors =
+      getColors(validatedInput.colors, itemCount) ||
+      themeColors.map((c: any) => c.color);
 
     // 构建数据映射 - 瀑布图的特定映射
     const map: Array<{

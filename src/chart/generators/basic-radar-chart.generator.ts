@@ -11,6 +11,7 @@ import {
   generateDefaultLegend,
   getThemeColors,
   createChartOutput,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 基础雷达图特定输入接口
@@ -87,7 +88,7 @@ export class BasicRadarChartGenerator extends BaseChartTool {
 
     // 获取主题颜色
     const themeColors =
-      validatedInput.colors ||
+      getColors(validatedInput.colors, seriesCount) ||
       getThemeColors(mergedInput.theme || "light", seriesCount);
 
     // 构建数据映射 - 雷达图使用角度轴和径向轴

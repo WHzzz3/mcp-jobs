@@ -13,6 +13,7 @@ import {
   generateDefaultLegend,
   getThemeColors,
   createChartOutput,
+  getColors,
 } from "../utils/chart-helpers";
 
 // Sankey图特定输入接口
@@ -107,7 +108,8 @@ export class SankeyChartGenerator extends BaseChartTool {
     // 获取默认配置
     const themeColors = getThemeColors(mergedInput.theme || "light", nodeCount);
     const colors =
-      validatedInput.colors || themeColors.map((c: any) => c.color);
+      getColors(validatedInput.colors, nodeCount) ||
+      themeColors.map((c: any) => c.color);
 
     // 构建数据映射 - Sankey图的特定映射
     const map: Array<{

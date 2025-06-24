@@ -10,6 +10,7 @@ import {
   generateDefaultBackground,
   generateDefaultLegend,
   getThemeColors,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 玫瑰饼图特定输入接口
@@ -91,7 +92,8 @@ export class RosePieChartGenerator extends BaseChartTool {
       dataLength
     );
     const colors =
-      validatedInput.colors || themeColors.map((c: any) => c.color);
+      getColors(validatedInput.colors, dataLength) ||
+      themeColors.map((c: any) => c.color);
 
     // 构建数据映射 - 玫瑰图使用极坐标系统
     const map = [

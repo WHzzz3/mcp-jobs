@@ -13,6 +13,7 @@ import {
   generateDefaultLegend,
   getThemeColors,
   createChartOutput,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 单层树状图特定输入接口
@@ -104,7 +105,7 @@ export class TreemapChartGenerator extends BaseChartTool {
     // 获取默认配置
     const themeColors = getThemeColors(mergedInput.theme || "light", itemCount);
     const colors =
-      validatedInput.colors || themeColors.map((c: any) => c.color);
+    getColors(validatedInput.colors, itemCount) || themeColors.map((c: any) => c.color);
 
     // 构建数据映射 - 树状图的特定映射
     const map: Array<{

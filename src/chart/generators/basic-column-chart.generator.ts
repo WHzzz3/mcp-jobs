@@ -10,6 +10,7 @@ import {
   generateDefaultBackground,
   generateDefaultLegend,
   getThemeColors,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 柱状图特定输入接口
@@ -89,7 +90,8 @@ export class BasicColumnChartGenerator extends BaseChartTool {
       dataLength
     );
     const colors =
-      validatedInput.colors || themeColors.map((c: any) => c.color);
+      getColors(validatedInput.colors, dataLength) ||
+      themeColors.map((c: any) => c.color);
 
     // 构建数据映射（与条形图相反：X轴分类，Y轴数值）
     const map = [

@@ -10,6 +10,7 @@ import {
   generateDefaultBackground,
   generateDefaultLegend,
   getThemeColors,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 差异箭头柱状图特定输入接口
@@ -108,7 +109,7 @@ export class DifferenceArrowColumnChartGenerator extends BaseChartTool {
 
     // 获取默认配置
     const themeColors = getThemeColors(mergedInput.theme || "light", 2);
-    const colors = validatedInput.colors || [
+    const colors = getColors(validatedInput.colors, 2) || [
       themeColors[0].color,
       themeColors[1].color,
     ];
@@ -284,7 +285,7 @@ export class DifferenceArrowColumnChartGenerator extends BaseChartTool {
         map,
         fill,
         display,
-        legend: generateDefaultLegend(),
+        legend: generateDefaultLegend(true),
         label,
         axis,
         numberFormat: {

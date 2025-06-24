@@ -13,6 +13,7 @@ import {
   generateDefaultLegend,
   getThemeColors,
   createChartOutput,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 堆叠面积图特定输入接口
@@ -100,7 +101,8 @@ export class StackedAreaChartGenerator extends BaseChartTool {
       seriesCount
     );
     const colors =
-      validatedInput.colors || themeColors.map((c: any) => c.color);
+      getColors(validatedInput.colors, seriesCount) ||
+      themeColors.map((c: any) => c.color);
 
     // 构建数据映射
     const map: Array<{
@@ -249,7 +251,7 @@ export class StackedAreaChartGenerator extends BaseChartTool {
       map,
       fill,
       display,
-      legend: generateDefaultLegend(),
+      legend: generateDefaultLegend(true),
       label,
       axis,
     });

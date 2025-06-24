@@ -11,6 +11,7 @@ import {
   generateDefaultLegend,
   getThemeColors,
   createChartOutput,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 分组柱状图特定输入接口
@@ -92,7 +93,8 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
       seriesCount
     );
     const colors =
-      validatedInput.colors || themeColors.map((c: any) => c.color);
+      getColors(validatedInput.colors, seriesCount) ||
+      themeColors.map((c: any) => c.color);
 
     // 构建数据映射 - 第一列是X轴对象，其余列是数值列
     const map = [
@@ -227,7 +229,7 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
     // 生成通用配置
     const title = generateDefaultTitle(mergedInput.title, mergedInput.subtitle);
     const background = generateDefaultBackground();
-    const legend = generateDefaultLegend();
+    const legend = generateDefaultLegend(true);
 
     // 构建最终配置
     const props = {

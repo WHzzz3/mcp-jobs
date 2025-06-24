@@ -10,6 +10,7 @@ import {
   generateDefaultBackground,
   generateDefaultLegend,
   getThemeColors,
+  getColors,
 } from "../utils/chart-helpers";
 
 // 玉玦图特定输入接口
@@ -96,7 +97,8 @@ export class JadeJueChartGenerator extends BaseChartTool {
       dataLength
     );
     const colors =
-      validatedInput.colors || themeColors.map((c: any) => c.color);
+      getColors(validatedInput.colors, dataLength) ||
+      themeColors.map((c: any) => c.color);
 
     // 构建数据映射 - 玉玦图使用极坐标系统
     const map = [
