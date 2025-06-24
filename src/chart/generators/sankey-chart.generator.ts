@@ -88,8 +88,8 @@ export class SankeyChartGenerator extends BaseChartTool {
     const dataRows = validatedInput.data[0].length;
     const dataCols = validatedInput.data[0][0]?.length || 0;
 
-    if (dataCols !== 3) {
-      throw new Error("Sankey图需要恰好3列数据（source、target、value）");
+    if (dataCols < 3) {
+      throw new Error("Sankey图需要3列数据（source、target、value）");
     }
 
     // 获取所有唯一的节点（source和target）用于颜色分配

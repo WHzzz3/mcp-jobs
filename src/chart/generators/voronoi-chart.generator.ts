@@ -111,8 +111,8 @@ export class VoronoiChartGenerator extends BaseChartTool {
     const dataRows = validatedInput.data[0].length;
     const dataCols = validatedInput.data[0][0]?.length || 0;
 
-    if (dataCols !== 3) {
-      throw new Error("Voronoi图需要恰好3列数据（一级分类、二级对象、数值）");
+    if (dataCols < 3) {
+      throw new Error("Voronoi图需要3列数据（一级分类、二级对象、数值）");
     }
 
     // 获取第一列的唯一值作为分类数量（用于颜色）

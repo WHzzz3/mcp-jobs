@@ -2,6 +2,7 @@ import {
   BaseChartInput,
   BaseChartOutput,
 } from "../interfaces/chart-tool.interface";
+import chroma from "chroma-js";
 
 /**
  * 默认颜色主题
@@ -158,27 +159,153 @@ export function getThemeColors(
 }
 
 /**
- * Generates an array of colors with a specified length.
- * If the input color array is shorter than the desired count, the colors are repeated.
- * If the input color array is longer, it is truncated.
- *
- * @param {string[]} colors - The array of colors to use.
- * @param {number} [count=1] - The desired length of the final color array.
- * @returns {string[]} The resulting array of colors.
+ * 为图表生成颜色
+ * 重点关注：区分度、无障碍性、视觉舒适性
+ */
+function generateChartColors(
+  baseColors: string[],
+  totalCount: number
+): string[] {
+  const result = [...baseColors];
+  const remainingCount = totalCount - baseColors.length;
+
+  if (remainingCount <= 0) return result;
+
+  // 为图表优化的色相分布：确保最大区分度
+  const usedHues = baseColors.map((color) => {
+    const [h] = chroma(color).hsl();
+    return h || 0;
+  });
+
+  // 计算所有色相的"禁区"（避免生成太相近的颜色）
+  const minHueDistance = 30; // 最小色相距离
+
+  for (let i = 0; i < remainingCount; i++) {
+    const baseIndex = i % baseColors.length;
+    const baseColor = chroma(baseColors[baseIndex]);
+    const [baseHue, baseSat, baseLit] = baseColor.hsl();
+
+    // 寻找最佳的新色相
+    let bestHue = baseHue || 0;
+    let maxDistance = 0;
+
+    // 尝试多个色相，选择与现有颜色距离最远的
+    for (let testHue = 0; testHue < 360; testHue += 15) {
+      const minDistanceToExisting = Math.min(
+        ...usedHues.map((existingHue) => {
+          const distance = Math.min(
+            Math.abs(testHue - existingHue),
+            360 - Math.abs(testHue - existingHue)
+          );
+          return distance;
+        })
+      );
+
+      if (
+        minDistanceToExisting > maxDistance &&
+        minDistanceToExisting >= minHueDistance
+      ) {
+        maxDistance = minDistanceToExisting;
+        bestHue = testHue;
+      }
+    }
+
+    // 如果找不到足够远的色相，使用均匀分布
+    if (maxDistance < minHueDistance) {
+      bestHue = ((baseHue || 0) + (i + 1) * (360 / remainingCount)) % 360;
+    }
+
+    // 调整饱和度和亮度以适合图表显示
+    const newSaturation = Math.max(
+      0.6,
+      Math.min(0.9, (baseSat || 0.7) + (i % 2 === 0 ? 0.1 : -0.1))
+    );
+    const newLightness = Math.max(
+      0.4,
+      Math.min(
+        0.7,
+        (baseLit || 0.5) + (i % 3 === 0 ? 0.1 : i % 3 === 1 ? -0.1 : 0)
+      )
+    );
+
+    const newColor = chroma.hsl(bestHue, newSaturation, newLightness).hex();
+    result.push(newColor);
+    usedHues.push(bestHue);
+  }
+
+  return result;
+}
+
+/**
+ * 为图表生成颜色（优化版）
+ * 核心策略：使用黄金角算法保证色相最大区分度，同时微调饱和度和亮度。
+ * @param baseColors 基础颜色数组
+ * @param totalCount 总共需要的颜色数量
+ * @returns {string[]} 生成的颜色数组
  */
 export function getColors(
-  colors: string[] | undefined,
-  count: number = 1
+  baseColors: string[] | undefined,
+  totalCount: number
 ): string[] {
-  // If the original color array is empty, return an empty array.
-  if (!colors || colors.length === 0) {
+  if (!baseColors || baseColors.length === 0) {
+    return [];
+  }
+  if (totalCount <= 0) {
     return [];
   }
 
-  // Use Array.from to create a new array of the desired length.
-  // The mapping function calculates the correct color index using the modulo operator,
-  // effectively looping through the input colors.
-  return Array.from({ length: count }, (_, i) => colors[i % colors.length]);
+  if (totalCount <= baseColors.length) {
+    return baseColors.slice(0, totalCount);
+  }
+
+  const result = [...baseColors];
+  const remainingCount = totalCount - baseColors.length;
+
+  // 黄金角，~137.5度。这是在圆上均匀分布点的魔法数字。
+  const GOLDEN_ANGLE = 137.5;
+
+  // 使用最后一个基础颜色作为我们生成新颜色的起点
+  // 如果没有基础颜色，则随机开始一个
+  const lastBaseColor =
+    baseColors.length > 0
+      ? chroma(baseColors[baseColors.length - 1])
+      : chroma.random();
+  let lastHue = lastBaseColor.hsl()[0] || 0;
+
+  for (let i = 0; i < remainingCount; i++) {
+    // 1. 色相 (Hue)：使用黄金角算法高效地找到下一个最分散的色相
+    const newHue = (lastHue + GOLDEN_ANGLE) % 360;
+
+    // 2. 饱和度 (Saturation) 和 3. 亮度 (Lightness)：
+    // 进行周期性微调和范围限制
+    const baseSat = lastBaseColor.hsl()[1] || 0.7;
+    const baseLit = lastBaseColor.hsl()[2] || 0.5;
+
+    // 周期性调整饱和度，使其在 [0.6, 0.8] 范围内波动
+    const newSaturation = Math.max(
+      0.6,
+      Math.min(0.8, baseSat + (i % 2 === 0 ? 0.05 : -0.05))
+    );
+
+    // 周期性调整亮度，使其在 [0.5, 0.75] 范围内波动 (提升亮度以保证对比度)
+    const newLightness = Math.max(
+      0.5,
+      Math.min(0.75, baseLit + (i % 3 === 0 ? 0.08 : i % 3 === 1 ? -0.05 : 0))
+    );
+
+    const newColor = chroma.hsl(newHue, newSaturation, newLightness);
+
+    // （可选的无障碍性检查）确保与白色背景的对比度足够
+    // if (chroma.contrast(newColor, 'white') < 4.5) {
+    //   // 如果对比度不足，可以尝试提高亮度
+    //   newColor = newColor.set('hsl.l', '*1.1');
+    // }
+
+    result.push(newColor.hex());
+    lastHue = newHue; // 更新色相，为下一次迭代做准备
+  }
+
+  return result;
 }
 
 /**

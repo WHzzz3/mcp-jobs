@@ -34,6 +34,7 @@
   "devDependencies": {
     "@mastra/core": "^0.10.3",
     "@rollup/plugin-json": "^6.1.0",
+    "@types/chroma-js": "^3.1.1",
     "@types/node": "^22.15.30",
     "mastra": "^0.10.3",
     "typescript": "^5.8.3",
@@ -41,9 +42,11 @@
   },
   "peerDependencies": {
     "@mastra/core": "^0.10.3",
-    "zod": "^3.23.56"
+    "zod": "^3.23.56",
+    "chroma-js": "^3.1.2"
   },
   "dependencies": {
+    "chroma-js": "^3.1.2",
     "rimraf": "^6.0.1"
   }
 }
