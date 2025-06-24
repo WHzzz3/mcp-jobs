@@ -279,7 +279,7 @@ function generateFallbackColors(count: number): string[] {
   return fallbackColors;
 }
 
-export function getColors(seeds: string[], totalCount: number) {
+export function getColors(seeds: string[] | undefined, totalCount: number) {
   if (!seeds || seeds.length === 0) {
     return [];
   }
