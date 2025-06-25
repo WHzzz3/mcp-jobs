@@ -75,10 +75,10 @@ export const CheckInBubbleChartInputSchema = BaseChartInputSchema.extend({
       max: z.number().positive().optional().default(50),
     })
     .optional(),
-  opacity: z.number().min(0).max(1).optional().default(0.8),
+  opacity: z.number().min(0).max(1).optional().default(0.7),
   borderWidth: z.number().min(0).optional().default(1),
   borderColor: z.string().optional().default("#ffffff"),
-  showLabels: z.boolean().optional().default(false),
+  showLabels: z.boolean().optional().default(true),
 });
 
 export class CheckInBubbleChartGenerator extends BaseChartTool {
@@ -161,10 +161,8 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
         },
         border: {
           type: "solid" as const,
-          width: validatedInput.borderWidth || 1,
-          color: validatedInput.borderColor
-            ? { color: validatedInput.borderColor, opacity: 1 }
-            : null,
+          width: 1,
+          color: null,
         },
       })),
     };
@@ -173,26 +171,32 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
     const bubbleConfig = validatedInput.bubbleSize || { min: 5, max: 50 };
     const display = {
       bubble: {
-        standard: "radius",
-        size: [5, 15],
+        size: [1, 50],
         shape: "circle",
         border: {
           type: "solid",
-          width: 0,
           color: null,
+          width: 0,
         },
+        standard: "area",
         reference: {
           show: false,
           text: "平均值",
-          value: 20,
-          color: { color: "#ffffff", opacity: 0 },
+          color: {
+            color: "#ffffff",
+            opacity: 0,
+          },
+          value: 5,
           border: {
             type: "solid",
+            color: {
+              color: "#000000",
+              opacity: 1,
+            },
             width: 1,
-            color: { color: "#333333", opacity: 1 },
           },
         },
-        fillOpacity: 0.75,
+        fillOpacity: 0.7,
       },
     };
 
@@ -202,9 +206,8 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
       bubbleLabel: {
         show: validatedInput.showLabels || false,
         fontFamily: "Misans 常规",
-        fontSize: 12,
+        fontSize: 14,
         color: { color: "#333333", opacity: 1 },
-        position: "center" as const,
       },
       highlight: false,
       overlap: false,
@@ -216,22 +219,22 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
       xAxis: [
         {
           line: {
-            show: true,
+            show: false,
             width: 1,
-            color: { color: "#000000", opacity: 1 },
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
-            direction: "auto" as const,
+            direction: "horizontal" as const,
             fontFamily: "Misans 常规",
             fontSize: 12,
             color: { color: "#000000", opacity: 1 },
             angle: 0,
           },
           grid: {
-            show: true,
+            show: false,
             width: 1,
-            color: { color: "#cccccc", opacity: 1 },
+            color: { color: "#D9D9D9", opacity: 1 },
             type: "solid" as const,
           },
           position: "bottom" as const,
@@ -241,14 +244,14 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
       yAxis: [
         {
           line: {
-            show: true,
+            show: false,
             width: 1,
-            color: { color: "#000000", opacity: 1 },
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
-            fontSize: 12,
+            fontSize: 14,
             color: { color: "#000000", opacity: 1 },
             angle: 0,
             suffix: "",
@@ -256,7 +259,7 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
           grid: {
             show: true,
             width: 1,
-            color: { color: "#cccccc", opacity: 1 },
+            color: { color: "#D9D9D9", opacity: 1 },
             type: "solid" as const,
           },
           position: "left" as const,

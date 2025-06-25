@@ -71,7 +71,7 @@ export const DonutProgressChartInputSchema = z.object({
   title: z.string().optional().default("圆环进度图"),
   subtitle: z.string().optional().default("副标题"),
   colors: z.array(z.string()).optional(),
-  innerRadiusRatio: z.number().min(0).max(0.99).optional().default(0.65),
+  innerRadiusRatio: z.number().min(0).max(0.99).optional().default(0.75),
   gapPercentage: z.number().min(0).max(100).optional().default(0),
   startAngle: z
     .number()
@@ -85,7 +85,7 @@ export const DonutProgressChartInputSchema = z.object({
     .optional()
     .default("clockwise"),
   customColor: z.string().optional(),
-  showLabels: z.boolean().optional().default(false),
+  showLabels: z.boolean().optional().default(true),
 });
 
 export class DonutProgressChartGenerator extends BaseChartTool {
@@ -171,7 +171,7 @@ export class DonutProgressChartGenerator extends BaseChartTool {
     // 构建显示配置
     const display = {
       pie: {
-        innerRadiusRatio: validatedInput.innerRadiusRatio || 0.65,
+        innerRadiusRatio: validatedInput.innerRadiusRatio || 0.75,
         gapPercentage: validatedInput.gapPercentage || 0,
         rotateDirection: validatedInput.rotateDirection || "clockwise",
         startAngle: validatedInput.startAngle || 0,
@@ -196,8 +196,8 @@ export class DonutProgressChartGenerator extends BaseChartTool {
       },
       numberLabel: {
         show: validatedInput.showLabels || false,
-        fontFamily: "Misans 常规",
-        fontSize: 21,
+        fontFamily: "Misans 特粗",
+        fontSize: 46,
         color: { color: "#333333", opacity: 1 },
       },
       highlight: false,

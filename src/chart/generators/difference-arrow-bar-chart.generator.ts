@@ -74,9 +74,9 @@ export const DifferenceArrowBarChartInputSchema = z.object({
   title: z.string().optional().default("差异箭头条形图"),
   subtitle: z.string().optional().default("副标题"),
   showLabels: z.boolean().optional().default(false),
-  showArrowLabels: z.boolean().optional().default(false),
+  showArrowLabels: z.boolean().optional().default(true),
   colors: z.array(z.string()).optional(),
-  barHeight: z.number().min(0.1).max(1).optional().default(0.7),
+  barHeight: z.number().min(0.1).max(1).optional().default(0.6),
   arrowColors: z
     .object({
       growth: z.string().optional().default("#62D9AD"),
@@ -174,9 +174,9 @@ export class DifferenceArrowBarChartGenerator extends BaseChartTool {
     // 构建显示配置（包含箭头配置）
     const display = {
       bar: {
-        widthPercent: validatedInput.barHeight || 0.7,
+        widthPercent: validatedInput.barHeight || 0.6,
         border: {
-          radius: [0, 0, 0, 0],
+          radius: [2, 2, 2, 2],
           type: "solid" as const,
           width: 0,
           color: null,
@@ -196,19 +196,19 @@ export class DifferenceArrowBarChartGenerator extends BaseChartTool {
 
     // 构建标签配置
     const label = {
-      show: validatedInput.showLabels || false,
+      show: true,
       barLabel: {
         show: validatedInput.showLabels || false,
-        positionChoice: "center" as const,
+        positionChoice: "right" as const,
         fontFamily: "Misans 常规",
-        fontSize: 12,
+        fontSize: 16,
         color: { color: "#333333", opacity: 1 },
         suffix: "",
       },
       arrowLabel: {
         show: validatedInput.showArrowLabels || false,
         fontFamily: "Misans 常规",
-        fontSize: 12,
+        fontSize: 16,
         color: { color: "#333333", opacity: 1 },
       },
       highlight: false,
@@ -221,20 +221,21 @@ export class DifferenceArrowBarChartGenerator extends BaseChartTool {
       xAxis: [
         {
           line: {
-            show: true,
+            show: false,
             width: 1,
             color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
-            fontSize: 14,
+            fontSize: 12,
             color: { color: "#000000", opacity: 1 },
             angle: 0,
+            direction: "auto",
             suffix: "",
           },
           grid: {
-            show: true,
+            show: false,
             width: 1,
             color: { color: "#D9D9D9", opacity: 1 },
             type: "solid" as const,
@@ -248,7 +249,7 @@ export class DifferenceArrowBarChartGenerator extends BaseChartTool {
       yAxis: [
         {
           line: {
-            show: true,
+            show: false,
             width: 1,
             color: { color: "#4D4D4D", opacity: 1 },
           },
@@ -256,7 +257,7 @@ export class DifferenceArrowBarChartGenerator extends BaseChartTool {
             show: true,
             direction: "auto" as const,
             fontFamily: "Misans 常规",
-            fontSize: 14,
+            fontSize: 15,
             color: { color: "#000000", opacity: 1 },
             angle: 0,
           },
@@ -264,7 +265,7 @@ export class DifferenceArrowBarChartGenerator extends BaseChartTool {
             show: true,
             width: 1,
             color: { color: "#D9D9D9", opacity: 1 },
-            type: "solid" as const,
+            type: "dotted" as const,
           },
           position: "left" as const,
           type: "category" as const,

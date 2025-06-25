@@ -69,10 +69,10 @@ export const BasicLineChartInputSchema = z.object({
   title: z.string().optional().default("基础折线图"),
   subtitle: z.string().optional().default("副标题"),
   colors: z.array(z.string()).optional(),
-  lineType: z.enum(["straight", "curve"]).optional().default("straight"),
-  lineWidth: z.number().min(1).max(10).optional().default(3),
-  showPoints: z.boolean().optional().default(true),
-  pointRadius: z.number().min(0).max(10).optional().default(4),
+  lineType: z.enum(["straight", "curve"]).optional().default("curve"),
+  lineWidth: z.number().min(1).max(100).optional().default(5),
+  showPoints: z.boolean().optional().default(false),
+  pointRadius: z.number().min(0).max(100).optional().default(0),
   customColors: z.array(z.string()).optional(),
   showLabels: z.boolean().optional().default(false),
 });
@@ -173,15 +173,15 @@ export class BasicLineChartGenerator extends BaseChartTool {
     // 构建显示配置
     const display = {
       line: {
-        type: validatedInput.lineType || "straight",
-        width: validatedInput.lineWidth || 3,
+        type: validatedInput.lineType || "curve",
+        width: validatedInput.lineWidth || 5,
         endPoint: {
           radius: validatedInput.showPoints
-            ? validatedInput.pointRadius || 4
+            ? validatedInput.pointRadius || 0
             : 0,
-          width: 1,
-          color: { color: "#ffffff", opacity: 1 },
-          fill: null,
+          width: 0,
+          color: null,
+          fill: { color: "#ffffff", opacity: 1 },
         },
       },
     };
@@ -209,21 +209,21 @@ export class BasicLineChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 },
+            color: { color: "#333333", opacity: 1 },
           },
           label: {
             show: true,
             direction: "auto" as const,
             fontFamily: "Misans 常规",
-            fontSize: 12,
-            color: { color: "#000000", opacity: 1 },
+            fontSize: 16,
+            color: { color: "#333333", opacity: 1 },
             angle: 0,
           },
           grid: {
             show: true,
             width: 1,
-            color: { color: "#cccccc", opacity: 0.5 },
-            type: "dashed" as const,
+            color: { color: "#D9D9D9", opacity: 0.5 },
+            type: "solid" as const,
           },
           position: "bottom" as const,
           type: "category" as const,
@@ -232,22 +232,22 @@ export class BasicLineChartGenerator extends BaseChartTool {
       yAxis: [
         {
           line: {
-            show: true,
+            show: false,
             width: 1,
-            color: { color: "#000000", opacity: 1 },
+            color: { color: "#333333", opacity: 1 },
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
             fontSize: 12,
-            color: { color: "#000000", opacity: 1 },
+            color: { color: "#333333", opacity: 1 },
             angle: 0,
             suffix: "",
           },
           grid: {
             show: true,
             width: 1,
-            color: { color: "#cccccc", opacity: 1 },
+            color: { color: "#D9D9D9", opacity: 1 },
             type: "solid" as const,
           },
           position: "left" as const,

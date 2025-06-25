@@ -63,9 +63,9 @@ export const JadeJueChartInputSchema = z.object({
   data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
   title: z.string().optional().default("玉玦图"),
   subtitle: z.string().optional().default("副标题"),
-  showLabels: z.boolean().optional().default(false),
+  showLabels: z.boolean().optional().default(true),
   colors: z.array(z.string()).optional(),
-  innerRadius: z.number().min(0).max(1).optional().default(0),
+  innerRadius: z.number().min(0).max(1).optional().default(0.2),
   gapPercentage: z.number().min(0).max(100).optional().default(70),
   rotateDirection: z
     .enum(["clockwise", "counterclockwise"])
@@ -148,12 +148,12 @@ export class JadeJueChartGenerator extends BaseChartTool {
     const display = {
       pie: {
         gapPercentage: validatedInput.gapPercentage || 70,
-        innerRadiusRatio: validatedInput.innerRadius || 0,
+        innerRadiusRatio: validatedInput.innerRadius || 0.2,
         rotateDirection: validatedInput.rotateDirection || "clockwise",
         startAngle: validatedInput.startAngle || 0,
         drawAngle: validatedInput.drawAngle || 270, // 玉玦图的关键特征
         border: {
-          radius: 0,
+          radius: 4,
           type: "solid" as const,
           width: 0,
           color: null,
@@ -172,13 +172,6 @@ export class JadeJueChartGenerator extends BaseChartTool {
         color: { color: "#333333", opacity: 1 },
         suffix: "",
       },
-      textLabel: {
-        show: validatedInput.showLabels || false,
-        positionChoice: "outside" as const,
-        fontFamily: "Misans 常规",
-        fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
-      },
       highlight: false,
       overlap: false,
     };
@@ -196,7 +189,7 @@ export class JadeJueChartGenerator extends BaseChartTool {
           label: {
             show: false,
             fontFamily: "Misans 常规",
-            fontSize: 14,
+            fontSize: 12,
             color: { color: "#000000", opacity: 1 },
           },
           grid: {

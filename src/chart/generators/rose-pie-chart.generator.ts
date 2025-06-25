@@ -59,10 +59,10 @@ export const RosePieChartInputSchema = z.object({
   data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
   title: z.string().optional().default("玫瑰图"),
   subtitle: z.string().optional().default("副标题"),
-  showLabels: z.boolean().optional().default(false),
+  showLabels: z.boolean().optional().default(true),
   colors: z.array(z.string()).optional(),
-  innerRadius: z.number().min(0).max(1).optional().default(0),
-  gapPercentage: z.number().min(0).max(100).optional().default(1),
+  innerRadius: z.number().min(0).max(1).optional().default(0.22),
+  gapPercentage: z.number().min(0).max(100).optional().default(21),
   rotateDirection: z
     .enum(["clockwise", "counterclockwise"])
     .optional()
@@ -142,8 +142,8 @@ export class RosePieChartGenerator extends BaseChartTool {
     // 构建显示配置
     const display = {
       pie: {
-        innerRadiusRatio: validatedInput.innerRadius || 0,
-        gapPercentage: validatedInput.gapPercentage || 1,
+        innerRadiusRatio: validatedInput.innerRadius || 0.22,
+        gapPercentage: validatedInput.gapPercentage || 21,
         border: {
           radius: 0,
           type: "solid" as const,
@@ -158,17 +158,17 @@ export class RosePieChartGenerator extends BaseChartTool {
       show: validatedInput.showLabels || false,
       textLabel: {
         show: validatedInput.showLabels || false,
-        positionChoice: "inside" as const,
+        positionChoice: "outside" as const,
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        color: { color: "#000000", opacity: 1 },
       },
       numberLabel: {
         show: validatedInput.showLabels || false,
         positionChoice: "inside" as const,
         fontFamily: "Misans 常规",
-        fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        fontSize: 14,
+        color: { color: "#fdfdfd", opacity: 1 },
         suffix: "",
       },
       highlight: false,

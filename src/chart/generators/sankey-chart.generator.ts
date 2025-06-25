@@ -61,12 +61,12 @@ export const SankeyChartInputSchema = BaseChartInputSchema.extend({
   data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
   colors: z.array(z.string()).optional(),
   nodeWidth: z.number().min(1).optional().default(10),
-  gapDistance: z.number().min(0).optional().default(8),
+  gapDistance: z.number().min(0).optional().default(5),
   fillOpacity: z.number().min(0).max(1).optional().default(0.3),
   linkColor: z
     .union([z.literal("auto"), z.literal("gradient"), z.string()])
     .optional()
-    .default("auto"),
+    .default("gradient"),
 });
 
 export class SankeyChartGenerator extends BaseChartTool {
@@ -170,7 +170,7 @@ export class SankeyChartGenerator extends BaseChartTool {
     // 构建显示配置
     const displayConfig: any = {
       sankey: {
-        gapDistance: validatedInput.gapDistance || 8,
+        gapDistance: validatedInput.gapDistance || 5,
         nodeWidth: validatedInput.nodeWidth || 10,
         fillOpacity: validatedInput.fillOpacity || 0.3,
       },
@@ -194,11 +194,11 @@ export class SankeyChartGenerator extends BaseChartTool {
 
     // 构建标签配置
     const label = {
-      show: false,
+      show: true,
       textLabel: {
-        show: false,
+        show: true,
         fontFamily: "Misans 常规",
-        fontSize: 12,
+        fontSize: 14,
         color: { color: "#333333", opacity: 1 },
       },
       numberLabel: {

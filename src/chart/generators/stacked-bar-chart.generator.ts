@@ -60,8 +60,8 @@ export const StackedBarChartInputSchema = BaseChartInputSchema.extend({
   data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
   showLabels: z.boolean().optional().default(false),
   colors: z.array(z.string()).optional(),
-  stackSpacing: z.number().min(0).max(10).optional().default(2),
-  barHeight: z.number().min(0.1).max(1).optional().default(0.8),
+  stackSpacing: z.number().min(0).max(10).optional().default(0),
+  barHeight: z.number().min(0.1).max(1).optional().default(0.6),
   showDataLabels: z.boolean().optional().default(false),
 });
 
@@ -150,7 +150,7 @@ export class StackedBarChartGenerator extends BaseChartTool {
         },
         border: {
           type: "solid" as const,
-          width: validatedInput.stackSpacing || 2,
+          width: validatedInput.stackSpacing || 0,
           color: { color: "#ffffff", opacity: 1 },
         },
       })),
@@ -159,9 +159,9 @@ export class StackedBarChartGenerator extends BaseChartTool {
     // 构建显示配置
     const display = {
       bar: {
-        widthPercent: validatedInput.barHeight || 0.8,
+        widthPercent: validatedInput.barHeight || 0.6,
         border: {
-          radius: [0, 0, 0, 0],
+          radius: [2, 2, 2, 2],
           type: "solid" as const,
           width: 0,
           color: null,
@@ -176,7 +176,7 @@ export class StackedBarChartGenerator extends BaseChartTool {
         show: validatedInput.showDataLabels || false,
         positionChoice: "right" as const,
         fontFamily: "Misans 常规",
-        fontSize: 12,
+        fontSize: 16,
         color: { color: "#333333", opacity: 1 },
         suffix: "",
       },
@@ -192,7 +192,7 @@ export class StackedBarChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 },
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
@@ -206,7 +206,7 @@ export class StackedBarChartGenerator extends BaseChartTool {
           grid: {
             show: true,
             width: 1,
-            color: { color: "#cccccc", opacity: 0.5 },
+            color: { color: "#D9D9D9", opacity: 0.5 },
             type: "dashed" as const,
           },
           position: "bottom" as const,
@@ -216,9 +216,9 @@ export class StackedBarChartGenerator extends BaseChartTool {
       yAxis: [
         {
           line: {
-            show: true,
+            show: false,
             width: 1,
-            color: { color: "#000000", opacity: 1 },
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
@@ -231,7 +231,7 @@ export class StackedBarChartGenerator extends BaseChartTool {
           grid: {
             show: false,
             width: 1,
-            color: { color: "#cccccc", opacity: 0.5 },
+            color: { color: "#D9D9D9", opacity: 0.5 },
             type: "dashed" as const,
           },
           position: "left" as const,

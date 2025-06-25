@@ -63,7 +63,7 @@ export const BasicColumnChartInputSchema = z.object({
   subtitle: z.string().optional().default("副标题"),
   showLabels: z.boolean().optional().default(false),
   colors: z.array(z.string()).optional(),
-  barWidth: z.number().min(0.1).max(1).optional().default(0.7),
+  barWidth: z.number().min(0.1).max(1).optional().default(0.6),
 });
 
 export class BasicColumnChartGenerator extends BaseChartTool {
@@ -140,9 +140,9 @@ export class BasicColumnChartGenerator extends BaseChartTool {
     // 构建显示配置
     const display = {
       bar: {
-        widthPercent: validatedInput.barWidth || 0.7,
+        widthPercent: validatedInput.barWidth || 0.6,
         border: {
-          radius: [0, 0, 0, 0],
+          radius: [4, 4, 0, 0],
           type: "solid" as const,
           width: 0,
           color: null,
@@ -173,20 +173,20 @@ export class BasicColumnChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 },
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
             direction: "auto" as const,
             fontFamily: "Misans 常规",
-            fontSize: 12,
+            fontSize: 14,
             color: { color: "#000000", opacity: 1 },
             angle: 0,
           },
           grid: {
             show: false,
             width: 1,
-            color: { color: "#cccccc", opacity: 1 },
+            color: { color: "#D9D9D9", opacity: 1 },
             type: "solid" as const,
           },
           position: "bottom" as const,
@@ -196,9 +196,9 @@ export class BasicColumnChartGenerator extends BaseChartTool {
       yAxis: [
         {
           line: {
-            show: true,
+            show: false,
             width: 1,
-            color: { color: "#000000", opacity: 1 },
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
@@ -211,8 +211,8 @@ export class BasicColumnChartGenerator extends BaseChartTool {
           grid: {
             show: true,
             width: 1,
-            color: { color: "#cccccc", opacity: 1 },
-            type: "dashed" as const,
+            color: { color: "#D9D9D9", opacity: 1 },
+            type: "dotted" as const,
           },
           position: "left" as const,
           type: "value" as const,

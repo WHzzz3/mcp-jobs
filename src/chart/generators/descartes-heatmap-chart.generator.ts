@@ -60,8 +60,8 @@ export const DescartesHeatmapChartInputSchema = z.object({
   title: z.string().optional().default("笛卡尔热力图"),
   subtitle: z.string().optional().default("副标题"),
   colors: z.array(z.string()).optional(),
-  gapDistance: z.number().min(0).optional().default(0),
-  borderRadius: z.array(z.number()).length(4).optional().default([0, 0, 0, 0]),
+  gapDistance: z.number().min(0).optional().default(2),
+  borderRadius: z.array(z.number()).length(4).optional().default([2, 2, 2, 2]),
   useGradient: z.boolean().optional().default(true),
   showLabels: z.boolean().optional().default(false),
 });
@@ -163,10 +163,10 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
     // 构建显示配置
     const display = {
       bar: {
-        gapDistance: validatedInput.gapDistance || 0,
+        gapDistance: validatedInput.gapDistance || 2,
         fillOpacity: 1,
         border: {
-          radius: validatedInput.borderRadius || [0, 0, 0, 0],
+          radius: validatedInput.borderRadius || [2, 2, 2, 2],
           type: "solid" as const,
           width: 0,
           color: null,
@@ -180,8 +180,8 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
       barLabel: {
         show: validatedInput.showLabels || false,
         fontFamily: "Misans 常规",
-        fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        fontSize: 10,
+        color: { color: "#ffffff", opacity: 1 },
         suffix: "",
       },
       highlight: false,
@@ -201,9 +201,10 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
           label: {
             show: true,
             fontFamily: "Misans 常规",
-            fontSize: 14,
+            fontSize: 12,
+            direction: "horizontal",
+            angle: 0,
             color: { color: "#000000", opacity: 1 },
-            suffix: "",
           },
           grid: {
             show: false,
@@ -212,7 +213,7 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
             type: "solid" as const,
           },
           type: "category" as const,
-          stepOfLabel: 1,
+          position: "bottom" as const
         },
       ],
       yAxis: [
@@ -225,7 +226,7 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
           label: {
             show: true,
             fontFamily: "Misans 常规",
-            fontSize: 14,
+            fontSize: 12,
             color: { color: "#000000", opacity: 1 },
             suffix: "",
           },
@@ -236,7 +237,7 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
             type: "solid" as const,
           },
           type: "category" as const,
-          stepOfLabel: 1,
+          position: "left" as const,
         },
       ],
     };

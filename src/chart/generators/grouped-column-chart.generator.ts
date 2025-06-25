@@ -59,7 +59,7 @@ export const GroupedColumnChartInputSchema = z.object({
   subtitle: z.string().optional().default("副标题"),
   showLabels: z.boolean().optional().default(false),
   colors: z.array(z.string()).optional(),
-  columnWidth: z.number().min(0.1).max(1).optional().default(0.7),
+  columnWidth: z.number().min(0.1).max(1).optional().default(0.6),
   groupSpacing: z.number().min(0).max(1).optional().default(0.1),
 });
 
@@ -144,9 +144,9 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
     // 构建显示配置
     const display = {
       bar: {
-        widthPercent: validatedInput.columnWidth || 0.7,
+        widthPercent: validatedInput.columnWidth || 0.6,
         border: {
-          radius: [0, 0, 0, 0],
+          radius: [4, 4, 0, 0],
           type: "solid" as const,
           width: 0,
           color: null,
@@ -161,7 +161,7 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
         show: validatedInput.showLabels || false,
         positionChoice: "top" as const,
         fontFamily: "Misans 常规",
-        fontSize: 12,
+        fontSize: 16,
         color: { color: "#333333", opacity: 1 },
         suffix: "",
       },
@@ -200,7 +200,7 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
       yAxis: [
         {
           line: {
-            show: true,
+            show: false,
             width: 1,
             color: { color: "#4D4D4D", opacity: 1 },
           },

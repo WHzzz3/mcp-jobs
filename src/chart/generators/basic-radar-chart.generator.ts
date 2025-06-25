@@ -61,9 +61,9 @@ export const BasicRadarChartInputSchema = z.object({
   title: z.string().optional().default("雷达图"),
   subtitle: z.string().optional().default("副标题"),
   colors: z.array(z.string()).optional(),
-  areaType: z.enum(["straight", "curve"]).optional().default("curve"),
-  lineWidth: z.number().min(1).optional().default(3),
-  fillOpacity: z.number().min(0).max(1).optional().default(0.7),
+  areaType: z.enum(["straight", "curve"]).optional().default("straight"),
+  lineWidth: z.number().min(1).optional().default(2),
+  fillOpacity: z.number().min(0).max(1).optional().default(0.2),
   showLabels: z.boolean().optional().default(false),
 });
 
@@ -134,11 +134,11 @@ export class BasicRadarChartGenerator extends BaseChartTool {
     // 构建显示配置
     const display = {
       area: {
-        type: validatedInput.areaType || "curve",
-        width: validatedInput.lineWidth || 3,
-        fillOpacity: validatedInput.fillOpacity || 0.7,
+        type: validatedInput.areaType || "straight",
+        width: validatedInput.lineWidth || 2,
+        fillOpacity: validatedInput.fillOpacity || 0.2,
         endPoint: {
-          radius: 0,
+          radius: 3,
           width: 0,
           color: { color: "#ffffff", opacity: 1 },
           fill: null,
@@ -148,9 +148,9 @@ export class BasicRadarChartGenerator extends BaseChartTool {
 
     // 构建标签配置
     const label = {
-      show: validatedInput.showLabels || false,
+      show: true,
       areaLabel: {
-        show: validatedInput.showLabels || false,
+        show: false,
         fontFamily: "Misans 常规",
         fontSize: 12,
         color: { color: "#333333", opacity: 1 },
@@ -168,20 +168,20 @@ export class BasicRadarChartGenerator extends BaseChartTool {
           line: {
             show: false,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: { color: "#4D4D4D", opacity: 0.5 },
           },
           label: {
             show: true,
-            direction: "circumference" as const,
+            direction: "horizontal" as const,
             fontFamily: "Misans 常规",
-            fontSize: 14,
-            color: { color: "#000000", opacity: 1 },
+            fontSize: 13,
+            color: { color: "#333333", opacity: 1 },
           },
           grid: {
             show: true,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
-            type: "solid" as const,
+            color: { color: "#eeeeee", opacity: 1 },
+            type: "dashed" as const,
           },
           type: "category" as const,
         },
@@ -203,11 +203,25 @@ export class BasicRadarChartGenerator extends BaseChartTool {
           grid: {
             show: true,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: { color: "#eeeeee", opacity: 1 },
             type: "solid" as const,
+            background: {
+              color: [
+                {
+                  color: "#ffffff",
+                  opacity: 1,
+                },
+                {
+                  color: "#ffffff",
+                  opacity: 1,
+                },
+              ],
+              style: "polygon",
+            },
           },
           type: "value" as const,
           stepOfLabel: "auto" as const,
+          position: "inside" as const,
           range: [],
         },
       ],

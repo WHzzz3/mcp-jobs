@@ -62,7 +62,7 @@ export const BasicBarChartInputSchema = z.object({
   subtitle: z.string().optional().default("副标题"),
   showLabels: z.boolean().optional().default(false),
   colors: z.array(z.string()).optional(),
-  barWidth: z.number().min(0.1).max(1).optional().default(0.7),
+  barWidth: z.number().min(0.1).max(1).optional().default(0.72),
 });
 
 export class BasicBarChartGenerator extends BaseChartTool {
@@ -139,9 +139,9 @@ export class BasicBarChartGenerator extends BaseChartTool {
     // 构建显示配置
     const display = {
       bar: {
-        widthPercent: validatedInput.barWidth || 0.7,
+        widthPercent: validatedInput.barWidth || 0.72,
         border: {
-          radius: [0, 0, 0, 0],
+          radius: [4, 4, 4, 4],
           type: "solid" as const,
           width: 0,
           color: null,
@@ -157,7 +157,7 @@ export class BasicBarChartGenerator extends BaseChartTool {
         positionChoice: "right" as const,
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        color: { color: "#ffffff", opacity: 1 },
         suffix: "",
       },
       highlight: false,
@@ -172,7 +172,7 @@ export class BasicBarChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 },
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
@@ -185,7 +185,7 @@ export class BasicBarChartGenerator extends BaseChartTool {
           grid: {
             show: true,
             width: 1,
-            color: { color: "#cccccc", opacity: 1 },
+            color: { color: "#D9D9D9", opacity: 1 },
             type: "solid" as const,
           },
           position: "bottom" as const,
@@ -195,21 +195,21 @@ export class BasicBarChartGenerator extends BaseChartTool {
       yAxis: [
         {
           line: {
-            show: true,
+            show: false,
             width: 1,
-            color: { color: "#000000", opacity: 1 },
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
-            fontSize: 12,
+            fontSize: 14,
             color: { color: "#000000", opacity: 1 },
             angle: 0,
           },
           grid: {
             show: false,
             width: 1,
-            color: { color: "#cccccc", opacity: 1 },
+            color: { color: "#D9D9D9", opacity: 1 },
             type: "solid" as const,
           },
           position: "left" as const,

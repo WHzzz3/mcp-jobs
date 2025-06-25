@@ -75,7 +75,7 @@ export const ComposeWaterfallChartInputSchema = BaseChartInputSchema.extend({
   connectorColor: z.string().optional().default("#cccccc"),
   connectorWidth: z.number().positive().optional().default(1),
   barWidth: z.number().min(0.1).max(1).optional().default(0.6),
-  showLabels: z.boolean().optional().default(true),
+  showLabels: z.boolean().optional().default(false),
   labelPosition: z.enum(["top", "inside", "bottom"]).optional().default("top"),
 });
 
@@ -174,37 +174,30 @@ export class ComposeWaterfallChartGenerator extends BaseChartTool {
     // 构建显示配置
     const display = {
       bar: {
-        width: validatedInput.barWidth || 0.6,
-        showConnectors: validatedInput.showConnectors || true,
-        connectorStyle: {
-          width: validatedInput.connectorWidth || 1,
-          color: {
-            color: validatedInput.connectorColor || "#cccccc",
-            opacity: 1,
-          },
-          type: "dashed" as const,
+        order: "whole-part",
+        border: {
+          type: "solid",
+          color: null,
+          width: 0,
+          radius: [4, 4, 4, 4],
         },
-        labelPosition: validatedInput.labelPosition || "top",
+        widthPercent: 0.6,
       },
     };
 
     // 构建标签配置
     const label = {
-      show: validatedInput.showLabels || true,
-      textLabel: {
-        show: true,
-        fontFamily: "Misans 常规",
-        fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
-        position: validatedInput.labelPosition || "top",
-      },
-      numberLabel: {
-        show: true,
-        fontFamily: "Misans 常规",
-        fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+      show: validatedInput.showLabels || false,
+      barLabel: {
+        show: false,
+        color: {
+          color: "#444444",
+          opacity: 1,
+        },
         suffix: "",
-        position: validatedInput.labelPosition || "top",
+        fontSize: 18,
+        fontFamily: "Misans 中等",
+        positionChoice: "outside",
       },
       highlight: false,
       overlap: false,
@@ -218,20 +211,20 @@ export class ComposeWaterfallChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 },
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
             direction: "auto" as const,
             fontFamily: "Misans 常规",
-            fontSize: 12,
+            fontSize: 14,
             color: { color: "#000000", opacity: 1 },
             angle: 0,
           },
           grid: {
-            show: true,
+            show: false,
             width: 1,
-            color: { color: "#cccccc", opacity: 1 },
+            color: { color: "#D9D9D9", opacity: 1 },
             type: "solid" as const,
           },
           position: "bottom" as const,
@@ -241,9 +234,9 @@ export class ComposeWaterfallChartGenerator extends BaseChartTool {
       yAxis: [
         {
           line: {
-            show: true,
+            show: false,
             width: 1,
-            color: { color: "#000000", opacity: 1 },
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
@@ -256,8 +249,8 @@ export class ComposeWaterfallChartGenerator extends BaseChartTool {
           grid: {
             show: true,
             width: 1,
-            color: { color: "#cccccc", opacity: 1 },
-            type: "solid" as const,
+            color: { color: "#D9D9D9", opacity: 1 },
+            type: "dashed" as const,
           },
           position: "left" as const,
           type: "value" as const,

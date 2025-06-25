@@ -240,9 +240,9 @@ export class MixedLineGroupedColumnChartGenerator extends BaseChartTool {
           radius: validatedInput.showEndPoints
             ? validatedInput.endPointRadius || 4
             : 0,
-          width: 1,
-          color: { color: "#ffffff", opacity: 1 },
-          fill: null,
+          width: 2,
+          color: null,
+          fill: { color: "#ffffff", opacity: 1 },
         },
       },
       bar: {
@@ -265,19 +265,19 @@ export class MixedLineGroupedColumnChartGenerator extends BaseChartTool {
         label: {
           show: true,
           fontFamily: "Misans 常规",
-          fontSize: 12,
+          fontSize: 14,
           color: { color: "#333333", opacity: 1 },
           rotation: 0,
         },
         grid: {
-          show: true,
-          color: { color: "#E6E8EB", opacity: 1 },
+          show: false,
+          color: { color: "#D9D9D9", opacity: 1 },
           width: 1,
           type: "solid",
         },
         line: {
           show: true,
-          color: { color: "#333333", opacity: 1 },
+          color: { color: "#4D4D4D", opacity: 1 },
           width: 1,
         },
       },
@@ -298,13 +298,13 @@ export class MixedLineGroupedColumnChartGenerator extends BaseChartTool {
         },
         grid: {
           show: true,
-          color: { color: "#E6E8EB", opacity: 1 },
+          color: { color: "#D9D9D9", opacity: 1 },
           width: 1,
-          type: "solid",
+          type: "dotted",
         },
         line: {
           show: true,
-          color: { color: "#333333", opacity: 1 },
+          color: { color: "#4D4D4D", opacity: 1 },
           width: 1,
         },
         stepOfLabel: "auto",
@@ -324,13 +324,13 @@ export class MixedLineGroupedColumnChartGenerator extends BaseChartTool {
         },
         grid: {
           show: false, // 右轴通常不显示网格线
-          color: { color: "#E6E8EB", opacity: 1 },
+          color: { color: "#D9D9D9", opacity: 1 },
           width: 1,
           type: "solid",
         },
         line: {
           show: true,
-          color: { color: "#333333", opacity: 1 },
+          color: { color: "#4D4D4D", opacity: 1 },
           width: 1,
         },
         stepOfLabel: "auto",
@@ -352,7 +352,7 @@ export class MixedLineGroupedColumnChartGenerator extends BaseChartTool {
         positionChoice: "center",
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        color: { color: "#ffffff", opacity: 1 },
         suffix: "",
       },
       lineLabel: {

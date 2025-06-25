@@ -47,8 +47,8 @@ export interface CascadedAreaChartOutput extends BaseChartOutput {
       area: {
         type: string;
         width: number;
-        opacity: number;
-        stackMode: string;
+        endPoint: any;
+        fillOpacity: number;
       };
     };
     legend: any;
@@ -68,8 +68,8 @@ export const CascadedAreaChartInputSchema = z.object({
   subtitle: z.string().optional().default("副标题"),
   showLabels: z.boolean().optional().default(false),
   colors: z.array(z.string()).optional(),
-  areaType: z.enum(["straight", "curve"]).optional().default("straight"),
-  areaOpacity: z.number().min(0).max(1).optional().default(0.8),
+  areaType: z.enum(["straight", "curve"]).optional().default("curve"),
+  areaOpacity: z.number().min(0).max(1).optional().default(0.1),
   stackMode: z.enum(["normal", "percent"]).optional().default("normal"),
   chartType: z.literal("cascaded-area"),
 });
@@ -153,10 +153,18 @@ export class CascadedAreaChartGenerator extends BaseChartTool {
     // 构建显示配置
     const display = {
       area: {
-        type: validatedInput.areaType || "straight",
-        width: 2,
-        opacity: validatedInput.areaOpacity || 0.8,
-        stackMode: validatedInput.stackMode || "normal",
+        type: "curve",
+        width: 3,
+        endPoint: {
+          fill: null,
+          color: {
+            color: "#ffffff",
+            opacity: 1,
+          },
+          width: 0,
+          radius: 0,
+        },
+        fillOpacity: 0.1,
       },
     };
 
@@ -194,7 +202,7 @@ export class CascadedAreaChartGenerator extends BaseChartTool {
             angle: 0,
           },
           grid: {
-            show: true,
+            show: false,
             width: 1,
             color: { color: "#D9D9D9", opacity: 1 },
             type: "solid" as const,
@@ -206,7 +214,7 @@ export class CascadedAreaChartGenerator extends BaseChartTool {
       yAxis: [
         {
           line: {
-            show: true,
+            show: false,
             width: 1,
             color: { color: "#4D4D4D", opacity: 1 },
           },

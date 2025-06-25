@@ -84,12 +84,12 @@ export const VoronoiChartInputSchema = BaseChartInputSchema.extend({
     ])
     .optional()
     .default("hexagon"),
-  drawStyle: z.enum(["auto", "fixed"]).optional().default("auto"),
-  cornerRadius: z.number().min(0).optional().default(0),
-  fillOpacity: z.number().min(0).max(1).optional().default(0.85),
+  drawStyle: z.enum(["auto", "fixed"]).optional().default("fixed"),
+  cornerRadius: z.number().min(0).optional().default(4),
+  fillOpacity: z.number().min(0).max(1).optional().default(1),
   showBorder: z.boolean().optional().default(false),
   borderWidth: z.number().min(0).optional().default(0),
-  secondaryBorderWidth: z.number().min(0).optional().default(1),
+  secondaryBorderWidth: z.number().min(0).optional().default(2),
 });
 
 export class VoronoiChartGenerator extends BaseChartTool {
@@ -195,18 +195,18 @@ export class VoronoiChartGenerator extends BaseChartTool {
       voronoi: {
         drawShape: validatedInput.drawShape || "circle",
         drawStyle: validatedInput.drawStyle || "fixed",
-        cornerRadius: validatedInput.cornerRadius || 0,
-        fillOpacity: validatedInput.fillOpacity || 0.85,
+        cornerRadius: validatedInput.cornerRadius || 4,
+        fillOpacity: validatedInput.fillOpacity || 1,
         border: {
           type: "solid" as const,
           width: validatedInput.showBorder
-            ? validatedInput.borderWidth || 1
+            ? validatedInput.borderWidth || 0
             : 0,
           color: null,
         },
         secondaryBorder: {
           type: "solid" as const,
-          width: validatedInput.secondaryBorderWidth || 1,
+          width: validatedInput.secondaryBorderWidth || 2,
           color: { color: "#ffffff", opacity: 1 },
         },
       },
@@ -214,18 +214,18 @@ export class VoronoiChartGenerator extends BaseChartTool {
 
     // 构建标签配置
     const label = {
-      show: false,
+      show: true,
       textLabel: {
-        show: false,
-        fontFamily: "Misans 常规",
-        fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        show: true,
+        fontFamily: "Misans 中等",
+        fontSize: [14, 16],
+        color: { color: "#ffffff", opacity: 1 },
       },
       numberLabel: {
         show: false,
         fontFamily: "Misans 常规",
-        fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        fontSize: 19,
+        color: { color: "#fffefe", opacity: 1 },
         suffix: "",
       },
       highlight: false,

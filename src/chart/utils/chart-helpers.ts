@@ -48,7 +48,7 @@ export function generateDefaultTitle(title?: string, subtitle?: string) {
       show: !!subtitle,
       text: subtitle || "",
       fontSize: 16,
-      color: { color: "#666666", opacity: 1 },
+      color: { color: "#333333", opacity: 1 },
       fontFamily: "Misans 常规",
     },
   };
@@ -99,7 +99,7 @@ export function generateDefaultLegend(show: boolean = false) {
     display: "horizontal",
     position: { x: "center", y: "bottom" },
     fontFamily: "Misans 常规",
-    fontSize: 14,
+    fontSize: 12,
     color: { color: "#333333", opacity: 1 },
   };
 }

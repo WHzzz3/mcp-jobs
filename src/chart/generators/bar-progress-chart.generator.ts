@@ -70,8 +70,8 @@ export const BarProgressChartInputSchema = z.object({
   widthPercent: z.number().min(0.01).max(1).optional().default(1),
   backgroundColor: z.string().nullable().optional().default(null),
   customColor: z.string().optional(),
-  showLabels: z.boolean().optional().default(false),
-  borderRadius: z.array(z.number()).length(4).optional().default([0, 0, 0, 0]),
+  showLabels: z.boolean().optional().default(true),
+  borderRadius: z.array(z.number()).length(4).optional().default([8, 8, 8, 8]),
 });
 
 export class BarProgressChartGenerator extends BaseChartTool {
@@ -157,7 +157,7 @@ export class BarProgressChartGenerator extends BaseChartTool {
         widthPercent: validatedInput.widthPercent || 1,
         backgroundColor: validatedInput.backgroundColor || null,
         border: {
-          radius: validatedInput.borderRadius || [0, 0, 0, 0],
+          radius: validatedInput.borderRadius || [8, 8, 8, 8],
           type: "solid",
           width: 0,
           color: null,
@@ -172,8 +172,8 @@ export class BarProgressChartGenerator extends BaseChartTool {
         show: validatedInput.showLabels || false,
         positionChoice: "right" as const,
         fontFamily: "Misans 常规",
-        fontSize: 21,
-        color: { color: "#333333", opacity: 1 },
+        fontSize: 28,
+        color: { color: "#ffffff", opacity: 1 },
       },
       highlight: false,
       overlap: false,

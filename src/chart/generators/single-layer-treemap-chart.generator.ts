@@ -63,13 +63,13 @@ export interface TreemapChartOutput extends BaseChartOutput {
 export const TreemapChartInputSchema = BaseChartInputSchema.extend({
   data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
   colors: z.array(z.string()).optional(),
-  gapDistance: z.number().min(0).optional().default(2),
+  gapDistance: z.number().min(0).optional().default(0),
   fillOpacity: z.number().min(0).max(1).optional().default(1),
   borderRadius: z
     .union([z.number(), z.array(z.number())])
     .optional()
     .default(0),
-  borderWidth: z.number().min(0).optional().default(1),
+  borderWidth: z.number().min(0).optional().default(0),
   borderColor: z.string().optional().default("#ffffff"),
 });
 
@@ -105,7 +105,8 @@ export class TreemapChartGenerator extends BaseChartTool {
     // 获取默认配置
     const themeColors = getThemeColors(mergedInput.theme || "light", itemCount);
     const colors =
-    getColors(validatedInput.colors, itemCount) || themeColors.map((c: any) => c.color);
+      getColors(validatedInput.colors, itemCount) ||
+      themeColors.map((c: any) => c.color);
 
     // 构建数据映射 - 树状图的特定映射
     const map: Array<{
@@ -190,12 +191,12 @@ export class TreemapChartGenerator extends BaseChartTool {
     // 构建显示配置
     const display = {
       bar: {
-        gapDistance: validatedInput.gapDistance || 2,
+        gapDistance: validatedInput.gapDistance || 0,
         fillOpacity: validatedInput.fillOpacity || 1,
         border: {
           radius: borderRadius,
           type: "solid" as const,
-          width: validatedInput.borderWidth || 1,
+          width: validatedInput.borderWidth || 0,
           color: validatedInput.borderColor
             ? { color: validatedInput.borderColor, opacity: 1 }
             : null,
@@ -205,19 +206,31 @@ export class TreemapChartGenerator extends BaseChartTool {
 
     // 构建标签配置
     const label = {
-      show: false,
+      show: true,
       textLabel: {
-        show: false,
+        show: true,
+        positionChoice: "inside-center",
         fontFamily: "Misans 常规",
-        fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        fontSize: 15,
+        color: { color: "#ffffff", opacity: 1 },
       },
       numberLabel: {
         show: false,
+        positionChoice: "inside-center",
         fontFamily: "Misans 常规",
-        fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        fontSize: [14, 32],
+        color: { color: "#ffffff", opacity: 1 },
         suffix: "",
+      },
+      percentLabel: {
+        show: true,
+        color: {
+          color: "#ffffff",
+          opacity: 1,
+        },
+        fontSize: [18, 32],
+        fontFamily: "Misans 常规",
+        positionChoice: "inside-center",
       },
       highlight: false,
       overlap: false,

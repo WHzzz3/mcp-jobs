@@ -63,9 +63,9 @@ export const BasicPieChartInputSchema = z.object({
   gapPercentage: z.number().min(0).max(100).optional().default(0),
   showLabels: z.boolean().optional().default(false),
   labelPosition: z
-    .enum(["inside", "outside-ellipse", "outside-circle"])
+    .enum(["inside-horizontal", "outside-ellipse", "outside-edge"])
     .optional()
-    .default("outside-ellipse"),
+    .default("outside-edge"),
   customColors: z.array(z.string()).optional(),
 });
 
@@ -163,24 +163,24 @@ export class BasicPieChartGenerator extends BaseChartTool {
       show: validatedInput.showLabels || false,
       textLabel: {
         show: validatedInput.showLabels || false,
-        positionChoice: validatedInput.labelPosition || "outside-ellipse",
+        positionChoice: validatedInput.labelPosition || "outside-edge",
         fontFamily: "Misans 常规",
-        fontSize: 12,
+        fontSize: 16,
         color: { color: "#333333", opacity: 1 },
       },
       numberLabel: {
         show: validatedInput.showLabels || false,
-        positionChoice: validatedInput.labelPosition || "outside-ellipse",
+        positionChoice: validatedInput.labelPosition || "outside-edge",
         fontFamily: "Misans 常规",
-        fontSize: 12,
+        fontSize: 16,
         color: { color: "#333333", opacity: 1 },
         suffix: "",
       },
       percentLabel: {
         show: false,
-        positionChoice: validatedInput.labelPosition || "outside-ellipse",
+        positionChoice: validatedInput.labelPosition || "outside-edge",
         fontFamily: "Misans 常规",
-        fontSize: 12,
+        fontSize: 16,
         color: { color: "#333333", opacity: 1 },
         suffix: "%",
       },

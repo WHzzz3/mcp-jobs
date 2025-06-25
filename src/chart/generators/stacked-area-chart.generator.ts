@@ -65,8 +65,8 @@ export const StackedAreaChartInputSchema = BaseChartInputSchema.extend({
   colors: z.array(z.string()).optional(),
   lineType: z.enum(["straight", "curve"]).optional().default("straight"),
   fillOpacity: z.number().min(0).max(1).optional().default(0.7),
-  showPoints: z.boolean().optional().default(true),
-  pointRadius: z.number().min(0).max(10).optional().default(3),
+  showPoints: z.boolean().optional().default(false),
+  pointRadius: z.number().min(0).max(10).optional().default(0),
 });
 
 export class StackedAreaChartGenerator extends BaseChartTool {
@@ -159,11 +159,11 @@ export class StackedAreaChartGenerator extends BaseChartTool {
     const display = {
       area: {
         type: validatedInput.lineType || "straight",
-        width: 2,
+        width: 3,
         fillOpacity: validatedInput.fillOpacity || 0.7,
         endPoint: {
           radius: validatedInput.showPoints
-            ? validatedInput.pointRadius || 3
+            ? validatedInput.pointRadius || 0
             : 0,
           width: 1,
           color: null, // 自动颜色
@@ -195,7 +195,7 @@ export class StackedAreaChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#000000", opacity: 1 },
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
@@ -206,9 +206,9 @@ export class StackedAreaChartGenerator extends BaseChartTool {
             angle: 0,
           },
           grid: {
-            show: true,
+            show: false,
             width: 1,
-            color: { color: "#cccccc", opacity: 0.5 },
+            color: { color: "#D9D9D9", opacity: 0.5 },
             type: "dashed" as const,
           },
           position: "bottom" as const,
@@ -218,9 +218,9 @@ export class StackedAreaChartGenerator extends BaseChartTool {
       yAxis: [
         {
           line: {
-            show: true,
+            show: false,
             width: 1,
-            color: { color: "#000000", opacity: 1 },
+            color: { color: "#4D4D4D", opacity: 1 },
           },
           label: {
             show: true,
@@ -234,7 +234,7 @@ export class StackedAreaChartGenerator extends BaseChartTool {
           grid: {
             show: true,
             width: 1,
-            color: { color: "#cccccc", opacity: 0.5 },
+            color: { color: "#D9D9D9", opacity: 0.5 },
             type: "dashed" as const,
           },
           position: "left" as const,

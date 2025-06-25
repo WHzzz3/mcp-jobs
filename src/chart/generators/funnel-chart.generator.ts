@@ -57,9 +57,9 @@ export const FunnelChartInputSchema = z.object({
   title: z.string().optional().default("漏斗图"),
   subtitle: z.string().optional().default("副标题"),
   colors: z.array(z.string()).optional(),
-  gapDistance: z.number().min(0).optional().default(0),
+  gapDistance: z.number().min(0).optional().default(3),
   fillOpacity: z.number().min(0).max(1).optional().default(1),
-  showLabels: z.boolean().optional().default(false),
+  showLabels: z.boolean().optional().default(true),
 });
 
 export class FunnelChartGenerator extends BaseChartTool {
@@ -132,7 +132,7 @@ export class FunnelChartGenerator extends BaseChartTool {
     // 构建显示配置
     const display = {
       bar: {
-        gapDistance: validatedInput.gapDistance || 0,
+        gapDistance: validatedInput.gapDistance || 3,
         fillOpacity: validatedInput.fillOpacity || 1,
         border: {
           type: "solid" as const,
@@ -149,19 +149,19 @@ export class FunnelChartGenerator extends BaseChartTool {
         show: validatedInput.showLabels || false,
         positionChoice: "outside-follow" as const,
         fontFamily: "Misans 常规",
-        fontSize: 12,
+        fontSize: 14,
         color: { color: "#333333", opacity: 1 },
       },
       numberLabel: {
         show: validatedInput.showLabels || false,
-        positionChoice: "outside-follow" as const,
+        positionChoice: "inside-horizontal" as const,
         fontFamily: "Misans 常规",
-        fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        fontSize: 18,
+        color: { color: "#ffffff", opacity: 1 },
         suffix: "",
       },
       percentLabel: {
-        show: validatedInput.showLabels || false,
+        show:  false,
         positionChoice: "outside-follow",
         fontFamily: "Misans 常规" as const,
         fontSize: 12,

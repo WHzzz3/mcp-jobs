@@ -48,10 +48,6 @@ export interface ButterflyChartOutput extends BaseChartOutput {
         widthPercent: number;
         border: any;
       };
-      butterfly: {
-        centerGap: number;
-        symmetrical: boolean;
-      };
     };
     legend: any;
     label: any;
@@ -177,15 +173,11 @@ export class ButterflyChartGenerator extends BaseChartTool {
       bar: {
         widthPercent: validatedInput.barHeight || 0.7,
         border: {
-          radius: [0, 0, 0, 0],
+          radius: [4, 4, 4, 4],
           type: "solid" as const,
           width: 0,
           color: null,
         },
-      },
-      butterfly: {
-        centerGap: validatedInput.centerGap || 10,
-        symmetrical: validatedInput.symmetrical !== false,
       },
     };
 
@@ -194,10 +186,10 @@ export class ButterflyChartGenerator extends BaseChartTool {
       show: validatedInput.showLabels || false,
       barLabel: {
         show: validatedInput.showLabels || false,
-        positionChoice: "center" as const,
+        positionChoice: "outside" as const,
         fontFamily: "Misans 常规",
-        fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        fontSize: 16,
+        color: { color: "#000000", opacity: 1 },
         suffix: "",
       },
       highlight: false,
@@ -208,83 +200,107 @@ export class ButterflyChartGenerator extends BaseChartTool {
     const axis = {
       show: true,
       xAxis: [
-        // 左侧X轴
         {
-          line: {
-            show: true,
-            width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
-          },
-          label: {
-            show: true,
-            fontFamily: "Misans 常规",
-            fontSize: 14,
-            color: { color: "#000000", opacity: 1 },
-            angle: 0,
-            suffix: "",
-          },
           grid: {
             show: true,
+            type: "dotted",
+            color: {
+              color: "#D9D9D9",
+              opacity: 1,
+            },
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
-            type: "solid" as const,
           },
-          position: "bottom" as const,
-          type: "value" as const,
-          max: "auto" as const,
-          min: "auto" as const,
-          inverse: true, // 左侧数值反向显示
+          line: {
+            show: true,
+            color: {
+              color: "#4D4D4D",
+              opacity: 1,
+            },
+            width: 1,
+          },
+          type: "value",
+          label: {
+            show: true,
+            angle: 0,
+            color: {
+              color: "#000000",
+              opacity: 1,
+            },
+            suffix: "",
+            fontSize: 12,
+            direction: "horizontal",
+            fontFamily: "Misans 常规",
+          },
+          range: [],
+          position: "bottom",
+          stepOfLabel: "auto",
         },
-        // 右侧X轴
         {
-          line: {
-            show: true,
-            width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
-          },
-          label: {
-            show: true,
-            fontFamily: "Misans 常规",
-            fontSize: 14,
-            color: { color: "#000000", opacity: 1 },
-            angle: 0,
-            suffix: "",
-          },
           grid: {
             show: true,
+            type: "dotted",
+            color: {
+              color: "#D9D9D9",
+              opacity: 1,
+            },
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
-            type: "solid" as const,
           },
-          position: "bottom" as const,
-          type: "value" as const,
-          max: "auto" as const,
-          min: "auto" as const,
+          line: {
+            show: true,
+            color: {
+              color: "#616161",
+              opacity: 1,
+            },
+            width: 1,
+          },
+          type: "value",
+          label: {
+            show: true,
+            angle: 0,
+            color: {
+              color: "#000000",
+              opacity: 1,
+            },
+            suffix: "",
+            fontSize: 12,
+            direction: "horizontal",
+            fontFamily: "Misans 常规",
+          },
+          range: [],
+          position: "bottom",
+          stepOfLabel: "auto",
         },
       ],
       yAxis: [
         {
-          line: {
-            show: true,
+          grid: {
+            show: false,
+            type: "solid",
+            color: {
+              color: "#D9D9D9",
+              opacity: 1,
+            },
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
           },
+          line: {
+            show: false,
+            color: {
+              color: "#4D4D4D",
+              opacity: 1,
+            },
+            width: 0,
+          },
+          type: "category",
           label: {
             show: true,
-            direction: "auto" as const,
-            fontFamily: "Misans 常规",
-            fontSize: 14,
-            color: { color: "#000000", opacity: 1 },
             angle: 0,
+            color: {
+              color: "#000000",
+              opacity: 1,
+            },
+            fontSize: 14,
+            fontFamily: "Misans 中等",
           },
-          grid: {
-            show: true,
-            width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
-            type: "solid" as const,
-          },
-          position: "center" as const, // 居中位置
-          type: "category" as const,
         },
       ],
     };

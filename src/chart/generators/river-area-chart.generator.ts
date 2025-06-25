@@ -48,7 +48,6 @@ export interface RiverAreaChartOutput extends BaseChartOutput {
         type: string;
         width: number;
         opacity: number;
-        centerBaseline: boolean;
       };
     };
     legend: any;
@@ -70,7 +69,6 @@ export const RiverAreaChartInputSchema = z.object({
   colors: z.array(z.string()).optional(),
   areaType: z.enum(["straight", "curve"]).optional().default("curve"),
   areaOpacity: z.number().min(0).max(1).optional().default(0.7),
-  centerBaseline: z.boolean().optional().default(true),
   chartType: z.literal("river-area"),
 });
 
@@ -151,18 +149,16 @@ export class RiverAreaChartGenerator extends BaseChartTool {
     const display = {
       area: {
         type: validatedInput.areaType || "curve",
-        width: 1,
-        opacity: validatedInput.areaOpacity || 0.7,
-        centerBaseline: validatedInput.centerBaseline !== false,
+        width: 3,
+        opacity: validatedInput.areaOpacity || 0.7
       },
     };
 
     // 构建标签配置
     const label = {
-      show: validatedInput.showLabels || false,
+      show: true,
       areaLabel: {
         show: validatedInput.showLabels || false,
-        positionChoice: "top" as const,
         fontFamily: "Misans 常规",
         fontSize: 12,
         color: { color: "#333333", opacity: 1 },
@@ -186,7 +182,7 @@ export class RiverAreaChartGenerator extends BaseChartTool {
             show: true,
             direction: "auto" as const,
             fontFamily: "Misans 常规",
-            fontSize: 14,
+            fontSize: 16,
             color: { color: "#000000", opacity: 1 },
             angle: 0,
           },
@@ -194,39 +190,12 @@ export class RiverAreaChartGenerator extends BaseChartTool {
             show: true,
             width: 1,
             color: { color: "#D9D9D9", opacity: 1 },
-            type: "solid" as const,
+            type: "dotted" as const,
           },
           position: "bottom" as const,
           type: "category" as const,
         },
-      ],
-      yAxis: [
-        {
-          line: {
-            show: true,
-            width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
-          },
-          label: {
-            show: true,
-            fontFamily: "Misans 常规",
-            fontSize: 14,
-            color: { color: "#000000", opacity: 1 },
-            angle: 0,
-            suffix: "",
-          },
-          grid: {
-            show: true,
-            width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
-            type: "solid" as const,
-          },
-          position: "left" as const,
-          type: "value" as const,
-          max: "auto" as const,
-          min: "auto" as const,
-        },
-      ],
+      ]
     };
 
     return {
