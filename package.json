@@ -1,6 +1,6 @@
 {
   "name": "@editorup/jobs-chart",
-  "version": "1.0.2",
+  "version": "1.0.6",
   "description": "A dedicated package for chart generation tools.",
   "main": "dist/chart/index.js",
   "module": "dist/chart/index.mjs",

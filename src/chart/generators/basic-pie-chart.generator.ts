@@ -61,7 +61,7 @@ export const BasicPieChartInputSchema = z.object({
   colors: z.array(z.string()).optional(),
   innerRadiusRatio: z.number().min(0).max(0.99).optional().default(0),
   gapPercentage: z.number().min(0).max(100).optional().default(0),
-  showLabels: z.boolean().optional().default(false),
+  showLabels: z.boolean().optional().default(true),
   labelPosition: z
     .enum(["inside-horizontal", "outside-ellipse", "outside-edge"])
     .optional()
