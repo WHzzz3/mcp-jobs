@@ -191,6 +191,8 @@ export class JadeJueChartGenerator extends BaseChartTool {
             fontFamily: "Misans 常规",
             fontSize: 12,
             color: { color: "#000000", opacity: 1 },
+            direction: "horizontal",
+            suffix: "",
           },
           grid: {
             show: false,
@@ -216,6 +218,7 @@ export class JadeJueChartGenerator extends BaseChartTool {
             fontFamily: "Misans 常规",
             fontSize: 14,
             color: { color: "#000000", opacity: 1 },
+            angle: 0,
           },
           grid: {
             show: false,

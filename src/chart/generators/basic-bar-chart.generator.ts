@@ -179,6 +179,7 @@ export class BasicBarChartGenerator extends BaseChartTool {
             fontFamily: "Misans 常规",
             fontSize: 12,
             color: { color: "#000000", opacity: 1 },
+            direction: "auto",
             angle: 0,
             suffix: "",
           },
