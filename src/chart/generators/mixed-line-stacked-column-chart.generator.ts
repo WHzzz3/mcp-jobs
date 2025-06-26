@@ -128,15 +128,25 @@ export class MixedLineStackedColumnChartGenerator extends BaseChartTool {
     }
 
     // 确定默认的列索引分配
+    // const totalValueCols = dataCols - 1; // 减去X轴列
+    // const defaultColumnCount = Math.ceil(totalValueCols * 0.6); // 60%作为柱状图
+    // const defaultColumnIndices = Array.from(
+    //   { length: defaultColumnCount },
+    //   (_, i) => i + 1
+    // );
+    // const defaultLineIndices = Array.from(
+    //   { length: totalValueCols - defaultColumnCount },
+    //   (_, i) => i + 1 + defaultColumnCount
+    // );
+
+    // 确定默认的列索引分配 - 分组柱状图模式
     const totalValueCols = dataCols - 1; // 减去X轴列
-    const defaultColumnCount = Math.ceil(totalValueCols * 0.6); // 60%作为柱状图
+
+    // 对于分组柱状图，默认策略：最后1列作为线条，其余作为分组柱状图
+    const defaultLineIndices = [totalValueCols]; // 最后一个数值列作为线条
     const defaultColumnIndices = Array.from(
-      { length: defaultColumnCount },
+      { length: totalValueCols - 1 },
       (_, i) => i + 1
-    );
-    const defaultLineIndices = Array.from(
-      { length: totalValueCols - defaultColumnCount },
-      (_, i) => i + 1 + defaultColumnCount
     );
 
     const columnIndices = validatedInput.columnIndices || defaultColumnIndices;

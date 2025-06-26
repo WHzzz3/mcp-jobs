@@ -39,16 +39,16 @@ export function generateDefaultTitle(title?: string, subtitle?: string) {
     mainTitle: {
       show: !!title,
       text: title || "图表标题",
-      fontFamily: "Misans 常规",
-      fontSize: 24,
+      fontFamily: "Misans 中等",
+      fontSize: 28,
       color: { color: "#333333", opacity: 1 },
       position: { x: "center", y: "top" },
     },
     subTitle: {
       show: !!subtitle,
       text: subtitle || "",
-      fontSize: 16,
-      color: { color: "#333333", opacity: 1 },
+      fontSize: 18,
+      color: { color: "#616161", opacity: 1 },
       fontFamily: "Misans 常规",
     },
   };

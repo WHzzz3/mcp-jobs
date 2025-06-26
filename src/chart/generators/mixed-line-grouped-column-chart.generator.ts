@@ -130,11 +130,11 @@ export class MixedLineGroupedColumnChartGenerator extends BaseChartTool {
     // 确定默认的列索引分配 - 分组柱状图模式
     const totalValueCols = dataCols - 1; // 减去X轴列
 
-    // 对于分组柱状图，默认策略：第1列作为线条，其余作为分组柱状图
-    const defaultLineIndices = [1]; // 第一个数值列作为线条
+    // 对于分组柱状图，默认策略：最后1列作为线条，其余作为分组柱状图
+    const defaultLineIndices = [totalValueCols]; // 最后一个数值列作为线条
     const defaultColumnIndices = Array.from(
       { length: totalValueCols - 1 },
-      (_, i) => i + 2
+      (_, i) => i + 1
     );
 
     const columnIndices = validatedInput.columnIndices || defaultColumnIndices;
@@ -184,19 +184,6 @@ export class MixedLineGroupedColumnChartGenerator extends BaseChartTool {
       },
     ];
 
-    // 添加线条图列
-    lineIndices.forEach((colIdx) => {
-      map.push({
-        name: "数值列",
-        index: colIdx,
-        isLegend: false,
-        function: "vCol",
-        configurable: true,
-        yAxisIndex: 1, // 右Y轴
-        type: "line",
-      });
-    });
-
     // 添加柱状图列
     columnIndices.forEach((colIdx) => {
       map.push({
@@ -207,6 +194,19 @@ export class MixedLineGroupedColumnChartGenerator extends BaseChartTool {
         configurable: true,
         yAxisIndex: 0, // 左Y轴
         type: "bar",
+      });
+    });
+
+    // 添加线条图列
+    lineIndices.forEach((colIdx) => {
+      map.push({
+        name: "数值列",
+        index: colIdx,
+        isLegend: false,
+        function: "vCol",
+        configurable: true,
+        yAxisIndex: 1, // 右Y轴
+        type: "line",
       });
     });
 

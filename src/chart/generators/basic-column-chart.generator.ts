@@ -117,24 +117,26 @@ export class BasicColumnChartGenerator extends BaseChartTool {
 
     // 构建填充配置
     const fill = {
-      controlType: "multiple" as const,
-      props: colors.map((color: string) => ({
-        color: { color: color, opacity: 1 },
-        texture: { url: "" },
-        shadow: {
-          show: false,
-          type: "outer" as const,
-          angle: 45,
-          blur: 0,
-          color: { color: "#000000", opacity: 0.5 },
-          radius: 0,
+      controlType: "single" as const,
+      props: [
+        {
+          color: { color: colors[0], opacity: 1 },
+          texture: { url: "" },
+          shadow: {
+            show: false,
+            type: "outer" as const,
+            angle: 45,
+            blur: 0,
+            color: { color: "#000000", opacity: 0.5 },
+            radius: 0,
+          },
+          border: {
+            type: "solid" as const,
+            width: 0,
+            color: null,
+          },
         },
-        border: {
-          type: "solid" as const,
-          width: 0,
-          color: null,
-        },
-      })),
+      ],
     };
 
     // 构建显示配置
