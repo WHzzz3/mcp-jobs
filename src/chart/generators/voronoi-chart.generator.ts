@@ -83,7 +83,7 @@ export const VoronoiChartInputSchema = BaseChartInputSchema.extend({
       "octagon",
     ])
     .optional()
-    .default("hexagon"),
+    .default("circle"),
   drawStyle: z.enum(["auto", "fixed"]).optional().default("fixed"),
   cornerRadius: z.number().min(0).optional().default(4),
   fillOpacity: z.number().min(0).max(1).optional().default(1),
@@ -240,7 +240,7 @@ export class VoronoiChartGenerator extends BaseChartTool {
       map,
       fill,
       display,
-      legend: generateDefaultLegend(),
+      legend: generateDefaultLegend(true),
       label,
     });
 
