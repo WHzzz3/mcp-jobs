@@ -14,7 +14,7 @@ export default {
   input: 'src/chart/index.ts', // 你的库入口文件
   output: [
     {
-      file: 'dist/chart/index.js', // CommonJS 输出
+      file: 'dist/chart/index.cjs', // CommonJS 输出
       format: 'cjs',
       sourcemap: true,
     },

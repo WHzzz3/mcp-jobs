@@ -1,8 +1,8 @@
 {
   "name": "@editorup/jobs-chart",
-  "version": "1.0.9",
+  "version": "1.0.11",
   "description": "A dedicated package for chart generation tools.",
-  "main": "dist/chart/index.js",
+  "main": "dist/chart/index.cjs",
   "module": "dist/chart/index.mjs",
   "types": "dist/chart/index.d.ts",
   "files": [
@@ -11,7 +11,7 @@
   "exports": {
     ".": {
       "import": "./dist/chart/index.mjs",
-      "require": "./dist/chart/index.js",
+      "require": "./dist/chart/index.cjs",
       "types": "./dist/chart/index.d.ts"
     }
   },
