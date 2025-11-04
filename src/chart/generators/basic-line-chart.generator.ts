@@ -12,6 +12,11 @@ import {
   getThemeColors,
   processChartData,
   getColors,
+  generateDefaultAnimation,
+  getLabelColorByTheme,
+  getAxisLineColorByTheme,
+  getAxisLabelColorByTheme,
+  getGridColorByTheme,
 } from "../utils/chart-helpers";
 
 // 折线图特定输入接口
@@ -69,6 +74,9 @@ export const BasicLineChartInputSchema = z.object({
   title: z.string().optional().default("基础折线图"),
   subtitle: z.string().optional().default("副标题"),
   colors: z.array(z.string()).optional(),
+  theme: z.enum(["light", "dark"]).optional().default("light"),
+  width: z.number().optional().default(700),
+  height: z.number().optional().default(400),
   lineType: z.enum(["straight", "curve"]).optional().default("curve"),
   lineWidth: z.number().min(1).max(100).optional().default(5),
   showPoints: z.boolean().optional().default(false),
@@ -127,9 +135,13 @@ export class BasicLineChartGenerator extends BaseChartTool {
       themeColors.map((c: any) => c.color);
 
     // 使用导入的默认配置函数
-    const title = generateDefaultTitle(mergedInput.title, mergedInput.subtitle);
+    const title = generateDefaultTitle(
+      mergedInput.title,
+      mergedInput.subtitle,
+      mergedInput.theme || "light"
+    );
     const background = generateDefaultBackground(mergedInput.theme || "light");
-    const legend = generateDefaultLegend(true);
+    const legend = generateDefaultLegend(true, mergedInput.theme || "light");
 
     // 构建数据映射
     const map = [
@@ -194,7 +206,7 @@ export class BasicLineChartGenerator extends BaseChartTool {
         positionChoice: "top" as const,
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
         suffix: "",
       },
       highlight: false,
@@ -209,20 +221,20 @@ export class BasicLineChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#333333", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             direction: "auto" as const,
             fontFamily: "Misans 常规",
             fontSize: 16,
-            color: { color: "#333333", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             angle: 0,
           },
           grid: {
             show: true,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 0.5 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
           },
           position: "bottom" as const,
@@ -234,20 +246,20 @@ export class BasicLineChartGenerator extends BaseChartTool {
           line: {
             show: false,
             width: 1,
-            color: { color: "#333333", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
             fontSize: 12,
-            color: { color: "#333333", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             angle: 0,
             suffix: "",
           },
           grid: {
             show: true,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
           },
           position: "left" as const,
@@ -265,15 +277,7 @@ export class BasicLineChartGenerator extends BaseChartTool {
     };
 
     // 构建动画配置
-    const animation = {
-      show: false,
-      transition: false,
-      moveStyle: null,
-      duration: 2,
-      startDelay: 0,
-      endPause: 1,
-      loop: false,
-    };
+    const animation = generateDefaultAnimation("basic-line");
 
     // 构建内边距配置
     const padding = {

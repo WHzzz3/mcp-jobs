@@ -11,6 +11,11 @@ import {
   generateDefaultLegend,
   getThemeColors,
   getColors,
+  generateDefaultAnimation,
+  getLabelColorByTheme,
+  getAxisLineColorByTheme,
+  getAxisLabelColorByTheme,
+  getGridColorByTheme,
 } from "../utils/chart-helpers";
 
 // 玫瑰饼图特定输入接口
@@ -61,6 +66,9 @@ export const RosePieChartInputSchema = z.object({
   subtitle: z.string().optional().default("副标题"),
   showLabels: z.boolean().optional().default(true),
   colors: z.array(z.string()).optional(),
+  theme: z.enum(["light", "dark"]).optional().default("light"),
+  width: z.number().optional().default(700),
+  height: z.number().optional().default(400),
   innerRadius: z.number().min(0).max(1).optional().default(0.22),
   gapPercentage: z.number().min(0).max(100).optional().default(21),
   rotateDirection: z
@@ -161,14 +169,14 @@ export class RosePieChartGenerator extends BaseChartTool {
         positionChoice: "outside" as const,
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#000000", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
       },
       numberLabel: {
         show: validatedInput.showLabels || false,
         positionChoice: "inside" as const,
         fontFamily: "Misans 常规",
         fontSize: 14,
-        color: { color: "#fdfdfd", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
         suffix: "",
       },
       highlight: false,
@@ -183,19 +191,19 @@ export class RosePieChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             direction: "circumference" as const,
             fontFamily: "Misans 常规",
             fontSize: 14,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
           },
           grid: {
             show: true,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
           },
           position: "outside" as const,
@@ -207,20 +215,20 @@ export class RosePieChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
             fontSize: 14,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             angle: 0,
             suffix: "",
           },
           grid: {
             show: true,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
           },
           type: "value" as const,
@@ -232,9 +240,13 @@ export class RosePieChartGenerator extends BaseChartTool {
     };
 
     // 生成通用配置
-    const title = generateDefaultTitle(mergedInput.title, mergedInput.subtitle);
+    const title = generateDefaultTitle(
+      mergedInput.title,
+      mergedInput.subtitle,
+      mergedInput.theme || "light"
+    );
     const background = generateDefaultBackground();
-    const legend = generateDefaultLegend();
+    const legend = generateDefaultLegend(false, mergedInput.theme || "light");
 
     // 构建最终配置
     const props = {
@@ -251,15 +263,7 @@ export class RosePieChartGenerator extends BaseChartTool {
         separatorType: "1000.00" as const,
         decimalPlaces: null,
       },
-      animation: {
-        show: false,
-        transition: false,
-        moveStyle: null,
-        duration: 2,
-        startDelay: 0,
-        endPause: 1,
-        loop: false,
-      },
+      animation: generateDefaultAnimation("rose-pie"),
       tooltip: false,
       padding: {
         top: 20,

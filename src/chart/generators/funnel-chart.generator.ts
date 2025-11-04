@@ -6,12 +6,10 @@ import {
 } from "../interfaces/chart-tool.interface";
 // import { SchemaMerger } from "../utils/schema-merger";
 import {
-  generateDefaultTitle,
-  generateDefaultBackground,
-  generateDefaultLegend,
   getThemeColors,
   createChartOutput,
   getColors,
+  getLabelColorByTheme,
 } from "../utils/chart-helpers";
 
 // 漏斗图特定输入接口
@@ -60,6 +58,9 @@ export const FunnelChartInputSchema = z.object({
   gapDistance: z.number().min(0).optional().default(3),
   fillOpacity: z.number().min(0).max(1).optional().default(1),
   showLabels: z.boolean().optional().default(true),
+  theme: z.enum(["light", "dark"]).optional().default("light"),
+  width: z.number().optional().default(700),
+  height: z.number().optional().default(400),
 });
 
 export class FunnelChartGenerator extends BaseChartTool {
@@ -150,22 +151,22 @@ export class FunnelChartGenerator extends BaseChartTool {
         positionChoice: "outside-follow" as const,
         fontFamily: "Misans 常规",
         fontSize: 14,
-        color: { color: "#333333", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
       },
       numberLabel: {
         show: validatedInput.showLabels || false,
         positionChoice: "inside-horizontal" as const,
         fontFamily: "Misans 常规",
         fontSize: 18,
-        color: { color: "#ffffff", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
         suffix: "",
       },
       percentLabel: {
-        show:  false,
+        show: false,
         positionChoice: "outside-follow",
         fontFamily: "Misans 常规" as const,
         fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
       },
       highlight: false,
       overlap: false,

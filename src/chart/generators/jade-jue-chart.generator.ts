@@ -11,6 +11,11 @@ import {
   generateDefaultLegend,
   getThemeColors,
   getColors,
+  generateDefaultAnimation,
+  getLabelColorByTheme,
+  getAxisLineColorByTheme,
+  getAxisLabelColorByTheme,
+  getGridColorByTheme,
 } from "../utils/chart-helpers";
 
 // 玉玦图特定输入接口
@@ -65,6 +70,9 @@ export const JadeJueChartInputSchema = z.object({
   subtitle: z.string().optional().default("副标题"),
   showLabels: z.boolean().optional().default(true),
   colors: z.array(z.string()).optional(),
+  theme: z.enum(["light", "dark"]).optional().default("light"),
+  width: z.number().optional().default(700),
+  height: z.number().optional().default(400),
   innerRadius: z.number().min(0).max(1).optional().default(0.2),
   gapPercentage: z.number().min(0).max(100).optional().default(70),
   rotateDirection: z
@@ -169,7 +177,7 @@ export class JadeJueChartGenerator extends BaseChartTool {
         positionChoice: "outside" as const,
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
         suffix: "",
       },
       highlight: false,
@@ -184,20 +192,20 @@ export class JadeJueChartGenerator extends BaseChartTool {
           line: {
             show: false,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: false,
             fontFamily: "Misans 常规",
             fontSize: 12,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             direction: "horizontal",
             suffix: "",
           },
           grid: {
             show: false,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
           },
           position: "outside" as const,
@@ -211,19 +219,19 @@ export class JadeJueChartGenerator extends BaseChartTool {
           line: {
             show: false,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: false,
             fontFamily: "Misans 常规",
             fontSize: 14,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             angle: 0,
           },
           grid: {
             show: false,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
           },
           type: "category" as const,
@@ -233,9 +241,13 @@ export class JadeJueChartGenerator extends BaseChartTool {
     };
 
     // 生成通用配置
-    const title = generateDefaultTitle(mergedInput.title, mergedInput.subtitle);
+    const title = generateDefaultTitle(
+      mergedInput.title,
+      mergedInput.subtitle,
+      mergedInput.theme || "light"
+    );
     const background = generateDefaultBackground();
-    const legend = generateDefaultLegend();
+    const legend = generateDefaultLegend(false, mergedInput.theme || "light");
 
     // 构建最终配置
     const props = {
@@ -252,15 +264,7 @@ export class JadeJueChartGenerator extends BaseChartTool {
         separatorType: "1000.00" as const,
         decimalPlaces: null,
       },
-      animation: {
-        show: false,
-        transition: false,
-        moveStyle: null,
-        duration: 2,
-        startDelay: 0,
-        endPause: 1,
-        loop: false,
-      },
+      animation: generateDefaultAnimation("jade-jue"),
       tooltip: false,
       padding: {
         top: 20,

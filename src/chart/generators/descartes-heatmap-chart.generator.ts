@@ -6,12 +6,11 @@ import {
 } from "../interfaces/chart-tool.interface";
 // import { SchemaMerger } from "../utils/schema-merger";
 import {
-  generateDefaultTitle,
-  generateDefaultBackground,
-  generateDefaultLegend,
-  getThemeColors,
   createChartOutput,
+  getAxisLabelColorByTheme,
+  getAxisLineColorByTheme,
   getColors,
+  getGridColorByTheme,
 } from "../utils/chart-helpers";
 
 // 笛卡尔热力图特定输入接口
@@ -60,6 +59,9 @@ export const DescartesHeatmapChartInputSchema = z.object({
   title: z.string().optional().default("笛卡尔热力图"),
   subtitle: z.string().optional().default("副标题"),
   colors: z.array(z.string()).optional(),
+  theme: z.enum(["light", "dark"]).optional().default("light"),
+  width: z.number().optional().default(700),
+  height: z.number().optional().default(400),
   gapDistance: z.number().min(0).optional().default(2),
   borderRadius: z.array(z.number()).length(4).optional().default([2, 2, 2, 2]),
   useGradient: z.boolean().optional().default(true),
@@ -196,7 +198,7 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
           line: {
             show: false,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
@@ -204,16 +206,16 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
             fontSize: 12,
             direction: "horizontal",
             angle: 0,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
           },
           grid: {
             show: false,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
           },
           type: "category" as const,
-          position: "bottom" as const
+          position: "bottom" as const,
         },
       ],
       yAxis: [
@@ -221,19 +223,19 @@ export class DescartesHeatmapChartGenerator extends BaseChartTool {
           line: {
             show: false,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
             fontSize: 12,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             suffix: "",
           },
           grid: {
             show: false,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
           },
           type: "category" as const,

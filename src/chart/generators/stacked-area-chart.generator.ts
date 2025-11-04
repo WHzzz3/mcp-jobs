@@ -14,6 +14,10 @@ import {
   getThemeColors,
   createChartOutput,
   getColors,
+  getLabelColorByTheme,
+  getAxisLineColorByTheme,
+  getAxisLabelColorByTheme,
+  getGridColorByTheme,
 } from "../utils/chart-helpers";
 
 // 堆叠面积图特定输入接口
@@ -180,7 +184,7 @@ export class StackedAreaChartGenerator extends BaseChartTool {
         positionChoice: "top" as const,
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
         suffix: "",
       },
       highlight: false,
@@ -195,20 +199,20 @@ export class StackedAreaChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             direction: "horizontal" as const,
             fontFamily: "Misans 常规",
             fontSize: 12,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             angle: 0,
           },
           grid: {
             show: false,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 0.5 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "dashed" as const,
           },
           position: "bottom" as const,
@@ -220,21 +224,21 @@ export class StackedAreaChartGenerator extends BaseChartTool {
           line: {
             show: false,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             direction: "auto" as const,
             fontFamily: "Misans 常规",
             fontSize: 12,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             angle: 0,
             suffix: "",
           },
           grid: {
             show: true,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 0.5 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "dashed" as const,
           },
           position: "left" as const,
@@ -246,12 +250,16 @@ export class StackedAreaChartGenerator extends BaseChartTool {
     // 生成图表配置
     const result = createChartOutput("stacked-area", mergedInput, {
       type: "stacked-area",
-      title: generateDefaultTitle(mergedInput.title, mergedInput.subtitle),
+      title: generateDefaultTitle(
+        mergedInput.title,
+        mergedInput.subtitle,
+        mergedInput.theme || "light"
+      ),
       background: generateDefaultBackground(mergedInput.theme),
       map,
       fill,
       display,
-      legend: generateDefaultLegend(true),
+      legend: generateDefaultLegend(true, mergedInput.theme || "light"),
       label,
       axis,
     });

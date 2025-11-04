@@ -11,6 +11,11 @@ import {
   generateDefaultLegend,
   getThemeColors,
   getColors,
+  generateDefaultAnimation,
+  getLabelColorByTheme,
+  getAxisLineColorByTheme,
+  getAxisLabelColorByTheme,
+  getGridColorByTheme,
 } from "../utils/chart-helpers";
 
 // 层叠面积图特定输入接口
@@ -68,6 +73,9 @@ export const CascadedAreaChartInputSchema = z.object({
   subtitle: z.string().optional().default("副标题"),
   showLabels: z.boolean().optional().default(false),
   colors: z.array(z.string()).optional(),
+  theme: z.enum(["light", "dark"]).optional().default("light"),
+  width: z.number().optional().default(700),
+  height: z.number().optional().default(400),
   areaType: z.enum(["straight", "curve"]).optional().default("curve"),
   areaOpacity: z.number().min(0).max(1).optional().default(0.1),
   stackMode: z.enum(["normal", "percent"]).optional().default("normal"),
@@ -176,7 +184,7 @@ export class CascadedAreaChartGenerator extends BaseChartTool {
         positionChoice: "top" as const,
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
         suffix: "",
       },
       highlight: false,
@@ -191,20 +199,20 @@ export class CascadedAreaChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             direction: "auto" as const,
             fontFamily: "Misans 常规",
             fontSize: 14,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             angle: 0,
           },
           grid: {
             show: false,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
           },
           position: "bottom" as const,
@@ -216,20 +224,20 @@ export class CascadedAreaChartGenerator extends BaseChartTool {
           line: {
             show: false,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
             fontSize: 14,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             angle: 0,
             suffix: validatedInput.stackMode === "percent" ? "%" : "",
           },
           grid: {
             show: true,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
           },
           position: "left" as const,
@@ -247,15 +255,7 @@ export class CascadedAreaChartGenerator extends BaseChartTool {
     };
 
     // 构建动画配置
-    const animation = {
-      show: false,
-      transition: false,
-      moveStyle: null,
-      duration: 2,
-      startDelay: 0,
-      endPause: 1,
-      loop: false,
-    };
+    const animation = generateDefaultAnimation("cascaded-area");
 
     // 构建内边距配置
     const padding = {
@@ -272,13 +272,14 @@ export class CascadedAreaChartGenerator extends BaseChartTool {
         type: "cascaded-area",
         title: generateDefaultTitle(
           validatedInput.title,
-          validatedInput.subtitle
+          validatedInput.subtitle,
+          mergedInput.theme || "light"
         ),
         background: generateDefaultBackground(),
         map,
         fill,
         display,
-        legend: generateDefaultLegend(true),
+        legend: generateDefaultLegend(true, mergedInput.theme || "light"),
         label,
         axis,
         numberFormat,

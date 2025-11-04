@@ -239,12 +239,16 @@ export class TreemapChartGenerator extends BaseChartTool {
     // 生成图表配置
     const result = createChartOutput("single-layer-treemap", mergedInput, {
       type: "single-layer-treemap",
-      title: generateDefaultTitle(mergedInput.title, mergedInput.subtitle),
+      title: generateDefaultTitle(
+        mergedInput.title,
+        mergedInput.subtitle,
+        mergedInput.theme || "light"
+      ),
       background: generateDefaultBackground(mergedInput.theme),
       map,
       fill,
       display,
-      legend: generateDefaultLegend(),
+      legend: generateDefaultLegend(false, mergedInput.theme || "light"),
       label,
     });
 

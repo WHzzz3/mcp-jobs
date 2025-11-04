@@ -225,7 +225,7 @@ export class VoronoiChartGenerator extends BaseChartTool {
         show: false,
         fontFamily: "Misans 常规",
         fontSize: 19,
-        color: { color: "#fffefe", opacity: 1 },
+        color: { color: "#ffffff", opacity: 1 },
         suffix: "",
       },
       highlight: false,
@@ -235,12 +235,16 @@ export class VoronoiChartGenerator extends BaseChartTool {
     // 生成图表配置
     const result = createChartOutput("voronoi", mergedInput, {
       type: "voronoi",
-      title: generateDefaultTitle(mergedInput.title, mergedInput.subtitle),
+      title: generateDefaultTitle(
+        mergedInput.title,
+        mergedInput.subtitle,
+        mergedInput.theme || "light"
+      ),
       background: generateDefaultBackground(mergedInput.theme),
       map,
       fill,
       display,
-      legend: generateDefaultLegend(true),
+      legend: generateDefaultLegend(true, mergedInput.theme || "light"),
       label,
     });
 

@@ -7,12 +7,13 @@ import {
 } from "../interfaces/chart-tool.interface";
 // import { SchemaMerger } from "../utils/schema-merger";
 import {
-  generateDefaultTitle,
-  generateDefaultBackground,
-  generateDefaultLegend,
   getThemeColors,
   createChartOutput,
   getColors,
+  getLabelColorByTheme,
+  getAxisLineColorByTheme,
+  getAxisLabelColorByTheme,
+  getGridColorByTheme,
 } from "../utils/chart-helpers";
 
 // 签到气泡图特定输入接口
@@ -207,7 +208,7 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
         show: validatedInput.showLabels || false,
         fontFamily: "Misans 常规",
         fontSize: 14,
-        color: { color: "#333333", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
       },
       highlight: false,
       overlap: false,
@@ -221,20 +222,20 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
           line: {
             show: false,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             direction: "horizontal" as const,
             fontFamily: "Misans 常规",
             fontSize: 12,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             angle: 0,
           },
           grid: {
             show: false,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
           },
           position: "bottom" as const,
@@ -246,20 +247,20 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
           line: {
             show: false,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
             fontSize: 14,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             angle: 0,
             suffix: "",
           },
           grid: {
             show: true,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
           },
           position: "left" as const,

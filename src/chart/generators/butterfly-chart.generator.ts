@@ -11,6 +11,11 @@ import {
   generateDefaultLegend,
   getThemeColors,
   getColors,
+  generateDefaultAnimation,
+  getLabelColorByTheme,
+  getGridColorByTheme,
+  getAxisLineColorByTheme,
+  getAxisLabelColorByTheme,
 } from "../utils/chart-helpers";
 
 // 蝴蝶图特定输入接口
@@ -66,6 +71,9 @@ export const ButterflyChartInputSchema = z.object({
   subtitle: z.string().optional().default("副标题"),
   showLabels: z.boolean().optional().default(false),
   colors: z.array(z.string()).optional(),
+  theme: z.enum(["light", "dark"]).optional().default("light"),
+  width: z.number().optional().default(700),
+  height: z.number().optional().default(400),
   barHeight: z.number().min(0.1).max(1).optional().default(0.7),
   centerGap: z.number().min(0).max(50).optional().default(10),
   symmetrical: z.boolean().optional().default(true),
@@ -189,7 +197,7 @@ export class ButterflyChartGenerator extends BaseChartTool {
         positionChoice: "outside" as const,
         fontFamily: "Misans 常规",
         fontSize: 16,
-        color: { color: "#000000", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
         suffix: "",
       },
       highlight: false,
@@ -204,28 +212,19 @@ export class ButterflyChartGenerator extends BaseChartTool {
           grid: {
             show: true,
             type: "dotted",
-            color: {
-              color: "#D9D9D9",
-              opacity: 1,
-            },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             width: 1,
           },
           line: {
             show: true,
-            color: {
-              color: "#4D4D4D",
-              opacity: 1,
-            },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
             width: 1,
           },
           type: "value",
           label: {
             show: true,
             angle: 0,
-            color: {
-              color: "#000000",
-              opacity: 1,
-            },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             suffix: "",
             fontSize: 12,
             direction: "horizontal",
@@ -239,28 +238,19 @@ export class ButterflyChartGenerator extends BaseChartTool {
           grid: {
             show: true,
             type: "dotted",
-            color: {
-              color: "#D9D9D9",
-              opacity: 1,
-            },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             width: 1,
           },
           line: {
             show: true,
-            color: {
-              color: "#616161",
-              opacity: 1,
-            },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
             width: 1,
           },
           type: "value",
           label: {
             show: true,
             angle: 0,
-            color: {
-              color: "#000000",
-              opacity: 1,
-            },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             suffix: "",
             fontSize: 12,
             direction: "horizontal",
@@ -276,28 +266,19 @@ export class ButterflyChartGenerator extends BaseChartTool {
           grid: {
             show: false,
             type: "solid",
-            color: {
-              color: "#D9D9D9",
-              opacity: 1,
-            },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             width: 1,
           },
           line: {
             show: false,
-            color: {
-              color: "#4D4D4D",
-              opacity: 1,
-            },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
             width: 0,
           },
           type: "category",
           label: {
             show: true,
             angle: 0,
-            color: {
-              color: "#000000",
-              opacity: 1,
-            },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             fontSize: 14,
             fontFamily: "Misans 中等",
           },
@@ -312,28 +293,21 @@ export class ButterflyChartGenerator extends BaseChartTool {
         type: "butterfly",
         title: generateDefaultTitle(
           validatedInput.title,
-          validatedInput.subtitle
+          validatedInput.subtitle,
+          mergedInput.theme || "light"
         ),
         background: generateDefaultBackground(),
         map: map as any,
         fill,
         display,
-        legend: generateDefaultLegend(true),
+        legend: generateDefaultLegend(true, mergedInput.theme || "light"),
         label,
         axis: axis,
         numberFormat: {
           separatorType: "1000.00" as const,
           decimalPlaces: null,
         },
-        animation: {
-          show: false,
-          transition: false,
-          moveStyle: null,
-          duration: 2,
-          startDelay: 0,
-          endPause: 1,
-          loop: false,
-        },
+        animation: generateDefaultAnimation("butterfly"),
         tooltip: false,
         padding: {
           top: 20,

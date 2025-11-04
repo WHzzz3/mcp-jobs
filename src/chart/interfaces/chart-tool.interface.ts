@@ -97,6 +97,46 @@ export const BaseChartOutputSchema = z.object({
     .describe("图表属性配置"),
 });
 
+export type ChartType =
+  | "grouped-column" //分组柱状图
+  | "grouped-bar" //分组条形图
+  | "stacked-bar" //堆叠条形图
+  | "stacked-column" //堆叠柱状图
+  | "basic-line" //折线图
+  | "cascaded-area" //级联面积图
+  | "stacked-area" //堆叠面积图
+  | "river-area" //河流图
+  | "mixed-line-grouped-column" // 折线+分组柱状图
+  | "mixed-line-stacked-column" // 折线+堆叠柱状图
+  | "difference-arrow-column" //差值箭头柱状图
+  | "difference-arrow-bar" //差值箭头条形图
+  | "basic-pie" //饼图
+  | "basic-column" //柱状图
+  | "rose-pie" //玫瑰图
+  | "descartes-heatmap" //笛卡尔热力图
+  | "check-in-bubble" //打卡气泡图
+  | "basic-radar" //雷达图
+  | "single-layer-treemap" //单层树图
+  | "sankey" //桑基图
+  | "jade-jue" // 玉玦图
+  | "donut-progress" // 环形进度图
+  | "funnel" // 漏斗图
+  | "bar-progress" // 条形进度图
+  | "basic-bar" //基础条形图
+  | "compose-waterfall" //组成瀑布图
+  | "butterfly" //蝴蝶图
+  | "word-cloud" //词云图
+  | "voronoi" //维诺图`
+  | "symbol-column" //符号柱状图
+  | "symbol-bar" //符号条形图
+  | "symbol-pie" //符号饼图
+  | "liquid" //水波图
+  | "percent-bar" //百分比条形图
+  | "percent-column" //百分比柱状图
+  | "percent-stacked-bar" //百分比堆叠条形图
+  | "percent-stacked-column" //百分比堆叠柱状图
+  | "dynamic-bar"; //动态条形图
+
 /**
  * 图表工具的抽象基类
  */

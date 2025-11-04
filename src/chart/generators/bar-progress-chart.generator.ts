@@ -11,6 +11,8 @@ import {
   generateDefaultLegend,
   getThemeColors,
   processChartData,
+  generateDefaultAnimation,
+  getLabelColorByTheme,
 } from "../utils/chart-helpers";
 
 // 条形进度图特定输入接口
@@ -67,6 +69,9 @@ export const BarProgressChartInputSchema = z.object({
   title: z.string().optional().default("条形进度图"),
   subtitle: z.string().optional().default("副标题"),
   colors: z.array(z.string()).optional(),
+  theme: z.enum(["light", "dark"]).optional().default("light"),
+  width: z.number().optional().default(700),
+  height: z.number().optional().default(400),
   widthPercent: z.number().min(0.01).max(1).optional().default(1),
   backgroundColor: z.string().nullable().optional().default(null),
   customColor: z.string().optional(),
@@ -97,9 +102,13 @@ export class BarProgressChartGenerator extends BaseChartTool {
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
 
     // 使用导入的默认配置函数
-    const title = generateDefaultTitle(mergedInput.title, mergedInput.subtitle);
+    const title = generateDefaultTitle(
+      mergedInput.title,
+      mergedInput.subtitle,
+      mergedInput.theme || "light"
+    );
     const background = generateDefaultBackground(mergedInput.theme || "light");
-    const legend = generateDefaultLegend();
+    const legend = generateDefaultLegend(false, mergedInput.theme || "light");
 
     // 获取主题颜色
     const themeColors = getThemeColors(mergedInput.theme || "light", 1);
@@ -165,6 +174,9 @@ export class BarProgressChartGenerator extends BaseChartTool {
       },
     };
 
+    const width = mergedInput.width ?? 700;
+    const height = mergedInput.height ?? 400;
+
     // 构建标签配置
     const label = {
       show: validatedInput.showLabels || false,
@@ -172,8 +184,8 @@ export class BarProgressChartGenerator extends BaseChartTool {
         show: validatedInput.showLabels || false,
         positionChoice: "right" as const,
         fontFamily: "Misans 常规",
-        fontSize: 28,
-        color: { color: "#ffffff", opacity: 1 },
+        fontSize: Math.round(28 * Math.min(width / 700, height / 400)),
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
       },
       highlight: false,
       overlap: false,
@@ -186,15 +198,7 @@ export class BarProgressChartGenerator extends BaseChartTool {
     };
 
     // 构建动画配置
-    const animation = {
-      show: false,
-      transition: false,
-      moveStyle: null,
-      duration: 2,
-      startDelay: 0,
-      endPause: 1,
-      loop: false,
-    };
+    const animation = generateDefaultAnimation("bar-progress");
 
     // 构建内边距配置
     const padding = {

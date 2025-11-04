@@ -6,12 +6,13 @@ import {
 } from "../interfaces/chart-tool.interface";
 // import { SchemaMerger } from "../utils/schema-merger";
 import {
-  generateDefaultTitle,
-  generateDefaultBackground,
-  generateDefaultLegend,
   getThemeColors,
   createChartOutput,
   getColors,
+  getLabelColorByTheme,
+  getAxisLineColorByTheme,
+  getAxisLabelColorByTheme,
+  getGridColorByTheme,
 } from "../utils/chart-helpers";
 
 // 基础雷达图特定输入接口
@@ -61,6 +62,9 @@ export const BasicRadarChartInputSchema = z.object({
   title: z.string().optional().default("雷达图"),
   subtitle: z.string().optional().default("副标题"),
   colors: z.array(z.string()).optional(),
+  theme: z.enum(["light", "dark"]).optional().default("light"),
+  width: z.number().optional().default(700),
+  height: z.number().optional().default(400),
   areaType: z.enum(["straight", "curve"]).optional().default("straight"),
   lineWidth: z.number().min(1).optional().default(2),
   fillOpacity: z.number().min(0).max(1).optional().default(0.2),
@@ -153,7 +157,7 @@ export class BasicRadarChartGenerator extends BaseChartTool {
         show: false,
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
         suffix: "",
       },
       highlight: false,
@@ -168,19 +172,19 @@ export class BasicRadarChartGenerator extends BaseChartTool {
           line: {
             show: false,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 0.5 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             direction: "horizontal" as const,
             fontFamily: "Misans 常规",
             fontSize: 13,
-            color: { color: "#333333", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
           },
           grid: {
             show: true,
             width: 1,
-            color: { color: "#eeeeee", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "dashed" as const,
           },
           type: "category" as const,
@@ -191,29 +195,29 @@ export class BasicRadarChartGenerator extends BaseChartTool {
           line: {
             show: false,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: false,
             fontFamily: "Misans 常规",
             fontSize: 14,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             suffix: "",
           },
           grid: {
             show: true,
             width: 1,
-            color: { color: "#eeeeee", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
             background: {
               color: [
                 {
                   color: "#ffffff",
-                  opacity: 1,
+                  opacity: 0,
                 },
                 {
                   color: "#ffffff",
-                  opacity: 1,
+                  opacity: 0,
                 },
               ],
               style: "polygon",

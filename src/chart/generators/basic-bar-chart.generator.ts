@@ -12,6 +12,11 @@ import {
   getThemeColors,
   createChartOutput,
   getColors,
+  generateDefaultAnimation,
+  getLabelColorByTheme,
+  getAxisLineColorByTheme,
+  getAxisLabelColorByTheme,
+  getGridColorByTheme,
 } from "../utils/chart-helpers";
 
 // 条形图特定输入接口
@@ -62,6 +67,9 @@ export const BasicBarChartInputSchema = z.object({
   subtitle: z.string().optional().default("副标题"),
   showLabels: z.boolean().optional().default(false),
   colors: z.array(z.string()).optional(),
+  theme: z.enum(["light", "dark"]).optional().default("light"),
+  width: z.number().optional().default(700),
+  height: z.number().optional().default(400),
   barWidth: z.number().min(0.1).max(1).optional().default(0.72),
 });
 
@@ -159,7 +167,7 @@ export class BasicBarChartGenerator extends BaseChartTool {
         positionChoice: "right" as const,
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#ffffff", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
         suffix: "",
       },
       highlight: false,
@@ -174,13 +182,13 @@ export class BasicBarChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
             fontSize: 12,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             direction: "auto",
             angle: 0,
             suffix: "",
@@ -188,7 +196,7 @@ export class BasicBarChartGenerator extends BaseChartTool {
           grid: {
             show: true,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
           },
           position: "bottom" as const,
@@ -200,19 +208,19 @@ export class BasicBarChartGenerator extends BaseChartTool {
           line: {
             show: false,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
             fontSize: 14,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             angle: 0,
           },
           grid: {
             show: false,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
           },
           position: "left" as const,
@@ -228,15 +236,7 @@ export class BasicBarChartGenerator extends BaseChartTool {
     };
 
     // 构建动画配置
-    const animation = {
-      show: false,
-      transition: false,
-      moveStyle: null,
-      duration: 2,
-      startDelay: 0,
-      endPause: 1,
-      loop: false,
-    };
+    const animation = generateDefaultAnimation("basic-bar");
 
     // 构建内边距配置
     const padding = {
@@ -253,13 +253,14 @@ export class BasicBarChartGenerator extends BaseChartTool {
         type: "basic-bar",
         title: generateDefaultTitle(
           validatedInput.title,
-          validatedInput.subtitle
+          validatedInput.subtitle,
+          mergedInput.theme || "light"
         ),
         background: generateDefaultBackground(),
         map,
         fill,
         display,
-        legend: generateDefaultLegend(),
+        legend: generateDefaultLegend(false, mergedInput.theme || "light"),
         label,
         axis,
         numberFormat,

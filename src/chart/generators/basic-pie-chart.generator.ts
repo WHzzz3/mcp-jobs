@@ -6,12 +6,10 @@ import {
 } from "../interfaces/chart-tool.interface";
 // import { SchemaMerger } from "../utils/schema-merger";
 import {
-  generateDefaultTitle,
-  generateDefaultBackground,
-  generateDefaultLegend,
   getThemeColors,
   createChartOutput,
   getColors,
+  getLabelColorByTheme,
 } from "../utils/chart-helpers";
 
 // 饼图特定输入接口
@@ -59,6 +57,9 @@ export const BasicPieChartInputSchema = z.object({
   title: z.string().optional().default("基础饼图"),
   subtitle: z.string().optional().default("副标题"),
   colors: z.array(z.string()).optional(),
+  theme: z.enum(["light", "dark"]).optional().default("light"),
+  width: z.number().optional().default(700),
+  height: z.number().optional().default(400),
   innerRadiusRatio: z.number().min(0).max(0.99).optional().default(0.15),
   gapPercentage: z.number().min(0).max(100).optional().default(15),
   showLabels: z.boolean().optional().default(true),
@@ -166,14 +167,14 @@ export class BasicPieChartGenerator extends BaseChartTool {
         positionChoice: validatedInput.labelPosition || "outside-edge",
         fontFamily: "Misans 常规",
         fontSize: 16,
-        color: { color: "#333333", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
       },
       numberLabel: {
         show: false,
         positionChoice: validatedInput.labelPosition || "outside-edge",
         fontFamily: "Misans 中等",
         fontSize: [20, 32],
-        color: { color: "#333333", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
         suffix: "",
       },
       percentLabel: {
@@ -181,7 +182,7 @@ export class BasicPieChartGenerator extends BaseChartTool {
         positionChoice: validatedInput.labelPosition || "outside-edge",
         fontFamily: "Misans 中等",
         fontSize: [20, 32],
-        color: { color: "#333333", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
       },
       highlight: false,
       overlap: false,

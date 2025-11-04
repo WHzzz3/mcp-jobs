@@ -11,6 +11,11 @@ import {
   generateDefaultLegend,
   getThemeColors,
   getColors,
+  generateDefaultAnimation,
+  getLabelColorByTheme,
+  getAxisLineColorByTheme,
+  getAxisLabelColorByTheme,
+  getGridColorByTheme,
 } from "../utils/chart-helpers";
 
 // 分组条形图特定输入接口
@@ -60,6 +65,9 @@ export const GroupedBarChartInputSchema = z.object({
   colors: z.array(z.string()).optional(),
   barHeight: z.number().min(0.1).max(1).optional().default(0.6),
   groupSpacing: z.number().min(0).max(1).optional().default(0.1),
+  theme: z.enum(["light", "dark"]).optional().default("light"),
+  width: z.number().optional().default(700),
+  height: z.number().optional().default(400),
 });
 
 export class GroupedBarChartGenerator extends BaseChartTool {
@@ -158,7 +166,7 @@ export class GroupedBarChartGenerator extends BaseChartTool {
         positionChoice: "right" as const,
         fontFamily: "Misans 常规",
         fontSize: 16,
-        color: { color: "#333333", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
         suffix: "",
       },
       highlight: false,
@@ -173,21 +181,21 @@ export class GroupedBarChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             direction: "auto" as const,
             fontFamily: "Misans 常规",
             fontSize: 12,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             angle: 0,
             suffix: "",
           },
           grid: {
             show: true,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
           },
           position: "bottom" as const,
@@ -201,19 +209,19 @@ export class GroupedBarChartGenerator extends BaseChartTool {
           line: {
             show: false,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
             fontSize: 15,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             angle: 0,
           },
           grid: {
             show: false,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
           },
           position: "left" as const,
@@ -223,9 +231,13 @@ export class GroupedBarChartGenerator extends BaseChartTool {
     };
 
     // 生成通用配置
-    const title = generateDefaultTitle(mergedInput.title, mergedInput.subtitle);
+    const title = generateDefaultTitle(
+      mergedInput.title,
+      mergedInput.subtitle,
+      mergedInput.theme || "light"
+    );
     const background = generateDefaultBackground();
-    const legend = generateDefaultLegend(true);
+    const legend = generateDefaultLegend(true, mergedInput.theme || "light");
 
     // 构建最终配置
     const props = {
@@ -242,15 +254,7 @@ export class GroupedBarChartGenerator extends BaseChartTool {
         separatorType: "1000.00" as const,
         decimalPlaces: null,
       },
-      animation: {
-        show: false,
-        transition: false,
-        moveStyle: null,
-        duration: 2,
-        startDelay: 0,
-        endPause: 1,
-        loop: false,
-      },
+      animation: generateDefaultAnimation("grouped-bar"),
       tooltip: false,
       padding: {
         top: 20,

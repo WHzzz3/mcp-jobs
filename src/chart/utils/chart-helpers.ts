@@ -1,6 +1,7 @@
 import {
   BaseChartInput,
   BaseChartOutput,
+  ChartType,
 } from "../interfaces/chart-tool.interface";
 import chroma from "chroma-js";
 
@@ -33,7 +34,11 @@ export const DEFAULT_COLORS = {
 /**
  * 生成默认标题配置
  */
-export function generateDefaultTitle(title?: string, subtitle?: string) {
+export function generateDefaultTitle(
+  title?: string,
+  subtitle?: string,
+  theme: "light" | "dark" = "light"
+) {
   return {
     show: !!title,
     mainTitle: {
@@ -41,14 +46,14 @@ export function generateDefaultTitle(title?: string, subtitle?: string) {
       text: title || "图表标题",
       fontFamily: "Misans 中等",
       fontSize: 28,
-      color: { color: "#333333", opacity: 1 },
+      color: getMainTitltColorByTheme(theme),
       position: { x: "center", y: "top" },
     },
     subTitle: {
       show: !!subtitle,
       text: subtitle || "",
       fontSize: 18,
-      color: { color: "#616161", opacity: 1 },
+      color: getSubTitltColorByTheme(theme),
       fontFamily: "Misans 常规",
     },
   };
@@ -93,14 +98,17 @@ export const DEFAULT_SHOW_LEGEND_CHART_TYPES = [
 /**
  * 生成默认图例配置
  */
-export function generateDefaultLegend(show: boolean = false) {
+export function generateDefaultLegend(
+  show: boolean = false,
+  theme: "light" | "dark" = "light"
+) {
   return {
     show,
     display: "horizontal",
     position: { x: "center", y: "bottom" },
     fontFamily: "Misans 常规",
     fontSize: 12,
-    color: { color: "#333333", opacity: 1 },
+    color: getLegendColorByTheme(theme),
   };
 }
 
@@ -117,11 +125,11 @@ export function generateDefaultNumberFormat() {
 /**
  * 生成默认动画配置
  */
-export function generateDefaultAnimation() {
+export function generateDefaultAnimation(chartType: ChartType) {
   return {
-    show: false,
-    transition: false,
-    moveStyle: null,
+    show: true,
+    transition: true,
+    moveStyle: getAnimationOption(chartType)[1].en_name || null,
     duration: 2,
     startDelay: 0,
     endPause: 1,
@@ -377,7 +385,7 @@ export function generateDefaultFill(
 /**
  * 生成默认标签配置
  */
-export function generateDefaultLabel() {
+export function generateDefaultLabel(theme: "light" | "dark" = "light") {
   return {
     show: false,
     numberLabel: {
@@ -385,7 +393,7 @@ export function generateDefaultLabel() {
       positionChoice: "right",
       fontFamily: "Misans 常规",
       fontSize: 21,
-      color: { color: "#333333", opacity: 1 },
+      color: getLabelColorByTheme(theme),
     },
     highlight: false,
     overlap: false,
@@ -433,7 +441,7 @@ export function validateChartData(data: any[][][]): void {
  * 生成图表的默认 props 配置
  */
 export function generateDefaultProps(
-  chartType: string,
+  chartType: ChartType,
   input: BaseChartInput
 ): BaseChartOutput["props"] {
   const theme = input.theme || "light";
@@ -441,17 +449,18 @@ export function generateDefaultProps(
 
   return {
     type: chartType,
-    title: generateDefaultTitle(input.title, input.subtitle),
+    title: generateDefaultTitle(input.title, input.subtitle, theme),
     background: generateDefaultBackground(theme),
     legend: generateDefaultLegend(
-      DEFAULT_SHOW_LEGEND_CHART_TYPES.includes(chartType)
+      DEFAULT_SHOW_LEGEND_CHART_TYPES.includes(chartType),
+      theme
     ),
     numberFormat: generateDefaultNumberFormat(),
-    animation: generateDefaultAnimation(),
+    animation: generateDefaultAnimation(chartType),
     tooltip: false,
     padding: generateDefaultPadding(),
     fill: generateDefaultFill(chartType, theme, dataLength),
-    label: generateDefaultLabel(),
+    label: generateDefaultLabel(theme),
   };
 }
 
@@ -459,7 +468,7 @@ export function generateDefaultProps(
  * 创建完整的图表配置输出
  */
 export function createChartOutput(
-  chartType: string,
+  chartType: ChartType,
   input: BaseChartInput,
   customProps: Partial<BaseChartOutput["props"]> = {}
 ): BaseChartOutput {
@@ -506,4 +515,956 @@ export function deepMerge<T>(target: T, source: Partial<T>): T {
   }
 
   return result;
+}
+
+export function getMainTitltColorByTheme(theme: "light" | "dark") {
+  return theme === "light"
+    ? { color: "#333333", opacity: 1 }
+    : { color: "#FFFFFF", opacity: 1 };
+}
+
+export function getSubTitltColorByTheme(theme: "light" | "dark") {
+  return theme === "light"
+    ? { color: "#616161", opacity: 1 }
+    : { color: "#FFFFFF", opacity: 0.9 };
+}
+
+export function getLabelColorByTheme(theme: "light" | "dark") {
+  return theme === "light"
+    ? { color: "#333333", opacity: 1 }
+    : { color: "#FFFFFF", opacity: 1 };
+}
+
+export function getLegendColorByTheme(theme: "light" | "dark") {
+  return theme === "light"
+    ? { color: "#333333", opacity: 1 }
+    : { color: "#FFFFFF", opacity: 1 };
+}
+
+export function getGridColorByTheme(theme: "light" | "dark") {
+  return theme === "light"
+    ? { color: "#D9D9D9", opacity: 0.5 }
+    : { color: "#FFFFFF", opacity: 0.2 };
+}
+
+export function getAxisLineColorByTheme(theme: "light" | "dark") {
+  return theme === "light"
+    ? { color: "#4D4D4D", opacity: 1 }
+    : { color: "#FFFFFF", opacity: 0.4 };
+}
+
+export function getAxisLabelColorByTheme(theme: "light" | "dark") {
+  return theme === "light"
+    ? { color: "#000000", opacity: 1 }
+    : { color: "#FFFFFF", opacity: 1 };
+}
+
+export function getAnimationOption(type: ChartType) {
+  const barOption = [
+    {
+      gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+      cn_name: "无动画",
+      en_name: null,
+    },
+    {
+      gif: "https://cdn.aitubiao.com/static/images/gifs/basic_column/vertical_synchronous_stretching.gif",
+      cn_name: "纵向同步拉伸",
+      en_name: "vertical-sync-stretch",
+    },
+    {
+      gif: "https://cdn.aitubiao.com/static/images/gifs/basic_column/horizontal_classified_expansion.gif",
+      cn_name: "纵向依次拉伸",
+      en_name: "vertical-staggered-stretch",
+    },
+    {
+      gif: "https://cdn.aitubiao.com/static/images/gifs/basic_column/horizontal_synchronous_expansion.gif",
+      cn_name: "横向同步展开",
+      en_name: "horizontal-sync-expand",
+    },
+    {
+      gif: "https://cdn.aitubiao.com/static/images/gifs/basic_column/horizontal_sequential_expansion.gif",
+      cn_name: "横向依次展开",
+      en_name: "horizontal-staggered-expand",
+    },
+  ];
+
+  switch (type) {
+    case "basic-pie":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_pie/wheel.gif",
+          cn_name: "轮子",
+          en_name: "wheel",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_pie/blinds.gif",
+          cn_name: "百叶窗",
+          en_name: "louver",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_pie/folding_fan.gif",
+          cn_name: "折扇",
+          en_name: "folding-fan",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_pie/radial_expansion.gif",
+          cn_name: "径向展开",
+          en_name: "radial-expand",
+        },
+      ];
+    case "grouped-bar":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/grouped_bar/vertical_synchronous_stretching.gif",
+          cn_name: "纵向同步拉伸",
+          en_name: "vertical-sync-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/grouped_bar/vertical_sequential_stretching.gif",
+          cn_name: "纵向依次拉伸",
+          en_name: "vertical-staggered-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/grouped_bar/horizontal_synchronous_expansion.gif",
+          cn_name: "横向同步展开",
+          en_name: "horizontal-sync-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/grouped_bar/horizontal_sequential_expansion.gif",
+          cn_name: "横向依次展开",
+          en_name: "horizontal-staggered-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/grouped_bar/vertical_classified_expansion.gif",
+          cn_name: "纵向分类拉伸",
+          en_name: "horizontal-categorical-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/grouped_bar/horizontal_classified_expansion.gif",
+          cn_name: "横向分类展开",
+          en_name: "vertical-categorical-expand",
+        },
+      ];
+    case "grouped-column":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/grouped_column/vertical_synchronous_stretching.gif",
+          cn_name: "纵向同步拉伸",
+          en_name: "vertical-sync-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/grouped_column/vertical_sequential_stretching.gif",
+          cn_name: "纵向依次拉伸",
+          en_name: "vertical-staggered-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/grouped_column/horizontal_synchronous_expansion.gif",
+          cn_name: "横向同步展开",
+          en_name: "horizontal-sync-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/grouped_column/horizontal_sequential_expansion.gif",
+          cn_name: "横向依次展开",
+          en_name: "horizontal-staggered-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/grouped_column/horizontal_classified_expansion.gif",
+          cn_name: "纵向分类拉伸",
+          en_name: "vertical-categorical-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/grouped_column/vertical_classified_expansion.gif",
+          cn_name: "横向分类展开",
+          en_name: "horizontal-categorical-expand",
+        },
+      ];
+    case "stacked-bar":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_bar/vertical_synchronous_stretching.gif",
+          cn_name: "横向同步拉伸",
+          en_name: "horizontal-sync-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_bar/vertical_sequential_stretching.gif",
+          cn_name: "横向依次拉伸",
+          en_name: "horizontal-staggered-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_bar/horizontal_synchronous_expansion.gif",
+          cn_name: "纵向同步展开",
+          en_name: "vertical-sync-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_bar/horizontal_sequential_expansion.gif",
+          cn_name: "纵向依次展开",
+          en_name: "vertical-staggered-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_bar/vertical_classified_stretching.gif",
+          cn_name: "横向分类拉伸",
+          en_name: "horizontal-categorical-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_bar/horizontal_classified_expansion.gif",
+          cn_name: "横向整体拉伸",
+          en_name: "horizontal-unified-expand",
+        },
+      ];
+    case "stacked-column":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_column/vertical_synchronous_stretching.gif",
+          cn_name: "纵向同步拉伸",
+          en_name: "vertical-sync-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_column/vertical_sequential_stretching.gif",
+          cn_name: "纵向依次拉伸",
+          en_name: "vertical-staggered-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_column/horizontal_synchronous_expansion.gif",
+          cn_name: "横向同步展开",
+          en_name: "horizontal-sync-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_column/horizontal_sequential_expansion.gif",
+          cn_name: "横向依次展开",
+          en_name: "horizontal-staggered-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_column/vertical_classified_stretching.gif",
+          cn_name: "纵向分类拉伸",
+          en_name: "vertical-categorical-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_column/horizontal_classified_expansion.gif",
+          cn_name: "纵向整体拉伸",
+          en_name: "vertical-unified-stretch",
+        },
+      ];
+    case "basic-line":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_line/sequential_drawing.gif",
+          cn_name: "依次绘制",
+          en_name: "sequential-draw",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_line/simultaneous_drawing.gif",
+          cn_name: "同时绘制",
+          en_name: "simultaneous-draw",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_line/thread_a_needle.gif",
+          cn_name: "穿针引线",
+          en_name: "threading",
+        },
+      ];
+    case "cascaded-area":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/cascaded_area/horizontal_expansion.gif",
+          cn_name: "横向展开",
+          en_name: "horizontal-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/cascaded_area/vertical_sequential_stretching.gif",
+          cn_name: "纵向依次拉伸",
+          en_name: "vertical-sequential-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/cascaded_area/vertical_synchronous_stretching.gif",
+          cn_name: "纵向同步拉伸",
+          en_name: "vertical-synchronous-expand",
+        },
+      ];
+    case "stacked-area":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_area/horizontal_expansion.gif",
+          cn_name: "横向展开",
+          en_name: "horizontal-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_area/synchronized_display.gif",
+          cn_name: "同步展示面",
+          en_name: "synchronous-display",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_area/vertical_synchronous_stretching.gif",
+          cn_name: "纵向同步拉伸",
+          en_name: "vertical-synchronous-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_area/distributed_display.gif",
+          cn_name: "分步展示面",
+          en_name: "distributed-display",
+        },
+      ];
+    case "river-area":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/river/horizontal_expansion.gif",
+          cn_name: "横向展开",
+          en_name: "horizontal-expand",
+        },
+      ];
+    case "mixed-line-grouped-column":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/mixed_line_and_grouped_column/vertical_synchronous_stretching.gif",
+          cn_name: "纵向同步拉伸",
+          en_name: "vertical-sync-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/mixed_line_and_grouped_column/vertical_sequential_stretching.gif",
+          cn_name: "纵向依次拉伸",
+          en_name: "vertical-staggered-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/mixed_line_and_grouped_column/horizontal_synchronous_expansion.gif",
+          cn_name: "横向同步展开",
+          en_name: "horizontal-sync-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/mixed_line_and_grouped_column/horizontal_sequential_expansion.gif",
+          cn_name: "横向依次展开",
+          en_name: "horizontal-staggered-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/mixed_line_and_grouped_column/horizontal_classified_expansion.gif",
+          cn_name: "纵向分类拉伸",
+          en_name: "vertical-categorical-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/mixed_line_and_grouped_column/vertical_classified_expansion.gif",
+          cn_name: "横向分类展开",
+          en_name: "horizontal-categorical-expand",
+        },
+      ];
+    case "mixed-line-stacked-column":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/mixed_line_and_stacked_column/vertical_synchronous_stretching.gif",
+          cn_name: "纵向同步拉伸",
+          en_name: "vertical-sync-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/mixed_line_and_stacked_column/vertical_sequential_stretching.gif",
+          cn_name: "纵向依次拉伸",
+          en_name: "vertical-staggered-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/mixed_line_and_stacked_column/horizontal_synchronous_expansion.gif",
+          cn_name: "横向同步展开",
+          en_name: "horizontal-sync-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/mixed_line_and_stacked_column/horizontal_sequential_expansion.gif",
+          cn_name: "横向依次展开",
+          en_name: "horizontal-staggered-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/mixed_line_and_stacked_column/vertical_classified_expansion.gif",
+          cn_name: "纵向分类拉伸",
+          en_name: "vertical-categorical-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/mixed_line_and_stacked_column/horizontal_classified_expansion.gif",
+          cn_name: "纵向整体拉伸",
+          en_name: "vertical-unified-stretch",
+        },
+      ];
+    case "difference-arrow-column":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/difference_arrow_column/vertical_synchronous_stretching.gif",
+          cn_name: "纵向同步拉伸",
+          en_name: "vertical-sync-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/difference_arrow_column/vertical_sequential_stretching.gif",
+          cn_name: "纵向依次拉伸",
+          en_name: "vertical-staggered-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/difference_arrow_column/horizontal_synchronous_expansion.gif",
+          cn_name: "横向同步展开",
+          en_name: "horizontal-sync-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/difference_arrow_column/horizontal_sequential_expansion.gif",
+          cn_name: "横向依次展开",
+          en_name: "horizontal-staggered-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/difference_arrow_column/horizontal_classified_expansion.gif",
+          cn_name: "纵向分类拉伸",
+          en_name: "vertical-categorical-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/difference_arrow_column/vertical_classified_expansion.gif",
+          cn_name: "横向分类展开",
+          en_name: "horizontal-categorical-expand",
+        },
+      ];
+    case "difference-arrow-bar":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/difference_arrow_bar/vertical_synchronous_stretching.gif",
+          cn_name: "纵向同步拉伸",
+          en_name: "vertical-sync-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/difference_arrow_bar/vertical_sequential_stretching.gif",
+          cn_name: "纵向依次拉伸",
+          en_name: "vertical-staggered-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/difference_arrow_bar/horizontal_synchronous_expansion.gif",
+          cn_name: "横向同步展开",
+          en_name: "horizontal-sync-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/difference_arrow_bar/horizontal_sequential_expansion.gif",
+          cn_name: "横向依次展开",
+          en_name: "horizontal-staggered-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/difference_arrow_bar/horizontal_classified__stretching.gif",
+          cn_name: "纵向分类拉伸",
+          en_name: "horizontal-categorical-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/difference_arrow_bar/horizontal_classified_expansion.gif",
+          cn_name: "横向分类展开",
+          en_name: "vertical-categorical-expand",
+        },
+      ];
+    case "basic-column":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_column/vertical_synchronous_stretching.gif",
+          cn_name: "纵向同步拉伸",
+          en_name: "vertical-sync-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_column/vertical_sequential_stretching.gif",
+          cn_name: "纵向依次拉伸",
+          en_name: "vertical-staggered-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_column/horizontal_synchronous_expansion.gif",
+          cn_name: "横向同步展开",
+          en_name: "horizontal-sync-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_column/horizontal_sequential_expansion.gif",
+          cn_name: "横向依次展开",
+          en_name: "horizontal-staggered-expand",
+        },
+      ];
+    case "rose-pie":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/rose/radial_expansion.gif",
+          cn_name: "径向展开",
+          en_name: "radial-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/rose/clockwise_expansion.gif",
+          cn_name: "顺时针展开",
+          en_name: "clockwise-expand",
+        },
+      ];
+    case "descartes-heatmap":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/cartesian_heat_map/fade_in.gif",
+          cn_name: "淡入",
+          en_name: "fade-in",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/cartesian_heat_map/horizontal_appearance.gif",
+          cn_name: "横向出现",
+          en_name: "horizontal-appear",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/cartesian_heat_map/sequential_appearance.gif",
+          cn_name: "依次出现",
+          en_name: "sequential-appear",
+        },
+      ];
+    case "check-in-bubble":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/check_in_bubble/fade_in.gif",
+          cn_name: "淡入",
+          en_name: "fade-in",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/check_in_bubble/slide_in_horizontally.gif",
+          cn_name: "横向出现",
+          en_name: "horizontal-appear",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/check_in_bubble/sequential_appearance.gif",
+          cn_name: "依次出现",
+          en_name: "sequential-appear",
+        },
+      ];
+    case "basic-radar":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/radar/synchronous_expansion.gif",
+          cn_name: "同步展开",
+          en_name: "synchronous-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/radar/sequential_expansion.gif",
+          cn_name: "依次展开",
+          en_name: "sequential-expand",
+        },
+      ];
+    case "single-layer-treemap":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/single_layer_ treemap/diagonal_stretch.gif",
+          cn_name: "对角拉伸",
+          en_name: "diagonal-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/single_layer_ treemap/sequential_diagonal_stretch.gif",
+          cn_name: "对角逐次拉伸",
+          en_name: "diagonal-sequential-stretch",
+        },
+      ];
+    case "sankey":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/sankey/horizontal_expansion.gif",
+          cn_name: "横向展开",
+          en_name: "horizontal-expand",
+        },
+      ];
+    case "funnel":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/funnel/vertical_expansion.gif",
+          cn_name: "纵向展开",
+          en_name: "vertical-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/funnel/horizontal_synchronous_expansion.gif",
+          cn_name: "横向同步展开",
+          en_name: "horizontal-sync-expand",
+        },
+      ];
+    case "donut-progress":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/donut_progress/wheel.gif",
+          cn_name: "轮子",
+          en_name: "wheel",
+        },
+      ];
+    case "jade-jue":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/jade_jue/clockwise_expansion.gif",
+          cn_name: "顺时针展开",
+          en_name: "clockwise-expand",
+        },
+      ];
+    case "bar-progress":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/image/clzb5c3sn0000j5yc61l9fc97/cm23c9yux0000otruh972f6yi/1728578870279",
+          cn_name: "横向展开",
+          en_name: "horizontal-expand",
+        },
+      ];
+    case "basic-bar":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_bar/vertical_synchronous_stretching.gif",
+          cn_name: "纵向同步拉伸",
+          en_name: "vertical-sync-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_bar/vertical_sequential_stretching.gif",
+          cn_name: "纵向依次拉伸",
+          en_name: "vertical-staggered-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_bar/horizontal_synchronous_expansion.gif",
+          cn_name: "横向同步展开",
+          en_name: "horizontal-sync-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_bar/horizontal_sequential_expansion.gif",
+          cn_name: "横向依次展开",
+          en_name: "horizontal-staggered-expand",
+        },
+      ];
+    case "compose-waterfall":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/compose_waterfall/vertical_synchronous_stretching.gif",
+          cn_name: "纵向同步拉伸",
+          en_name: "vertical-sync-stretch",
+        },
+      ];
+    case "butterfly":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/butterfly/left_to_right_stretch.gif",
+          cn_name: "左右拉伸",
+          en_name: "left-right-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/butterfly/top_to_bottom.gif",
+          cn_name: "从上至下",
+          en_name: "top-to-bottom",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/butterfly/bottom_to_top.gif",
+          cn_name: "从下至上",
+          en_name: "bottom-to-top",
+        },
+      ];
+    case "voronoi":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/voronoi/sequential_appearance.gif",
+          cn_name: "依次出现",
+          en_name: "sequential-appear",
+        },
+      ];
+    case "word-cloud":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/word_cloud/sequential_appearance.gif",
+          cn_name: "依次出现",
+          en_name: "sequential-appear",
+        },
+      ];
+    case "liquid":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/liquid/simultaneous_rise.gif",
+          cn_name: "同时上涨",
+          en_name: "sync-rise",
+        },
+      ];
+    case "symbol-pie":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/symbol_pie/horizontal_expansion.gif",
+          cn_name: "横向展开",
+          en_name: "horizontal-expand",
+        },
+      ];
+    case "symbol-column":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/symbol_column/vertical_synchronous_stretching.gif",
+          cn_name: "纵向同步拉伸",
+          en_name: "vertical-sync-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/symbol_column/horizontal_classified_expansion.gif",
+          cn_name: "纵向依次拉伸",
+          en_name: "vertical-staggered-stretch",
+        },
+      ];
+    case "symbol-bar":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/symbol_bar/vertical_synchronous_stretching.gif",
+          cn_name: "横向同步拉伸",
+          en_name: "horizontal-sync-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/symbol_bar/vertical_sequential_stretching.gif",
+          cn_name: "横向依次拉伸",
+          en_name: "horizontal-staggered-stretch",
+        },
+      ];
+    case "percent-bar":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_bar/vertical_synchronous_stretching.gif",
+          cn_name: "纵向同步拉伸",
+          en_name: "vertical-sync-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_bar/vertical_sequential_stretching.gif",
+          cn_name: "纵向依次拉伸",
+          en_name: "vertical-staggered-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_bar/horizontal_synchronous_expansion.gif",
+          cn_name: "横向同步展开",
+          en_name: "horizontal-sync-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/basic_bar/horizontal_sequential_expansion.gif",
+          cn_name: "横向依次展开",
+          en_name: "horizontal-staggered-expand",
+        },
+      ];
+    case "percent-column":
+      return barOption;
+    case "percent-stacked-bar":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_bar/vertical_synchronous_stretching.gif",
+          cn_name: "横向同步拉伸",
+          en_name: "horizontal-sync-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_bar/vertical_sequential_stretching.gif",
+          cn_name: "横向依次拉伸",
+          en_name: "horizontal-staggered-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_bar/horizontal_synchronous_expansion.gif",
+          cn_name: "纵向同步展开",
+          en_name: "vertical-sync-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_bar/horizontal_sequential_expansion.gif",
+          cn_name: "纵向依次展开",
+          en_name: "vertical-staggered-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_bar/vertical_classified_stretching.gif",
+          cn_name: "横向分类拉伸",
+          en_name: "horizontal-categorical-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_bar/horizontal_classified_expansion.gif",
+          cn_name: "横向整体拉伸",
+          en_name: "horizontal-unified-expand",
+        },
+      ];
+    case "percent-stacked-column":
+      return [
+        {
+          gif: "https://i.postimg.cc/brFqGbS2/20240705140319.png",
+          cn_name: "无动画",
+          en_name: null,
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_column/vertical_synchronous_stretching.gif",
+          cn_name: "纵向同步拉伸",
+          en_name: "vertical-sync-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_column/vertical_sequential_stretching.gif",
+          cn_name: "纵向依次拉伸",
+          en_name: "vertical-staggered-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_column/horizontal_synchronous_expansion.gif",
+          cn_name: "横向同步展开",
+          en_name: "horizontal-sync-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_column/horizontal_sequential_expansion.gif",
+          cn_name: "横向依次展开",
+          en_name: "horizontal-staggered-expand",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_column/vertical_classified_stretching.gif",
+          cn_name: "纵向分类拉伸",
+          en_name: "vertical-categorical-stretch",
+        },
+        {
+          gif: "https://cdn.aitubiao.com/static/images/gifs/stacked_column/horizontal_classified_expansion.gif",
+          cn_name: "纵向整体拉伸",
+          en_name: "vertical-unified-stretch",
+        },
+      ];
+    default:
+      return barOption;
+  }
 }

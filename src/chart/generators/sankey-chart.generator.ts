@@ -14,6 +14,7 @@ import {
   getThemeColors,
   createChartOutput,
   getColors,
+  getLabelColorByTheme,
 } from "../utils/chart-helpers";
 
 // Sankey图特定输入接口
@@ -199,14 +200,14 @@ export class SankeyChartGenerator extends BaseChartTool {
         show: true,
         fontFamily: "Misans 常规",
         fontSize: 14,
-        color: { color: "#333333", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
         positionChoice: "inside",
       },
       numberLabel: {
         show: false,
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
         positionChoice: "inside",
         suffix: "",
       },
@@ -217,12 +218,16 @@ export class SankeyChartGenerator extends BaseChartTool {
     // 生成图表配置
     const result = createChartOutput("sankey", mergedInput, {
       type: "sankey",
-      title: generateDefaultTitle(mergedInput.title, mergedInput.subtitle),
+      title: generateDefaultTitle(
+        mergedInput.title,
+        mergedInput.subtitle,
+        mergedInput.theme || "light"
+      ),
       background: generateDefaultBackground(mergedInput.theme),
       map,
       fill,
       display: displayConfig,
-      legend: generateDefaultLegend(),
+      legend: generateDefaultLegend(false, mergedInput.theme || "light"),
       label,
     });
 

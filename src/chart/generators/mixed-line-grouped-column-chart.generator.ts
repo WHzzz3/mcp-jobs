@@ -14,6 +14,10 @@ import {
   getThemeColors,
   createChartOutput,
   getColors,
+  getLabelColorByTheme,
+  getAxisLabelColorByTheme,
+  getGridColorByTheme,
+  getAxisLineColorByTheme,
 } from "../utils/chart-helpers";
 
 // 混合线条-分组柱状图特定输入接口
@@ -266,18 +270,18 @@ export class MixedLineGroupedColumnChartGenerator extends BaseChartTool {
           show: true,
           fontFamily: "Misans 常规",
           fontSize: 14,
-          color: { color: "#333333", opacity: 1 },
+          color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
           rotation: 0,
         },
         grid: {
           show: false,
-          color: { color: "#D9D9D9", opacity: 1 },
+          color: getGridColorByTheme(mergedInput.theme || "light"),
           width: 1,
           type: "solid",
         },
         line: {
           show: true,
-          color: { color: "#4D4D4D", opacity: 1 },
+          color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           width: 1,
         },
       },
@@ -293,18 +297,18 @@ export class MixedLineGroupedColumnChartGenerator extends BaseChartTool {
           show: true,
           fontFamily: "Misans 常规",
           fontSize: 12,
-          color: { color: "#333333", opacity: 1 },
+          color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
           suffix: validatedInput.leftYAxisConfig?.unit || "",
         },
         grid: {
           show: true,
-          color: { color: "#D9D9D9", opacity: 1 },
+          color: getGridColorByTheme(mergedInput.theme || "light"),
           width: 1,
           type: "dotted",
         },
         line: {
           show: true,
-          color: { color: "#4D4D4D", opacity: 1 },
+          color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           width: 1,
         },
         stepOfLabel: "auto",
@@ -319,18 +323,18 @@ export class MixedLineGroupedColumnChartGenerator extends BaseChartTool {
           show: true,
           fontFamily: "Misans 常规",
           fontSize: 12,
-          color: { color: "#333333", opacity: 1 },
+          color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
           suffix: validatedInput.rightYAxisConfig?.unit || "",
         },
         grid: {
           show: false, // 右轴通常不显示网格线
-          color: { color: "#D9D9D9", opacity: 1 },
+          color: getGridColorByTheme(mergedInput.theme || "light"),
           width: 1,
           type: "solid",
         },
         line: {
           show: true,
-          color: { color: "#4D4D4D", opacity: 1 },
+          color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           width: 1,
         },
         stepOfLabel: "auto",
@@ -352,7 +356,7 @@ export class MixedLineGroupedColumnChartGenerator extends BaseChartTool {
         positionChoice: "center",
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#ffffff", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
         suffix: "",
       },
       lineLabel: {
@@ -360,7 +364,7 @@ export class MixedLineGroupedColumnChartGenerator extends BaseChartTool {
         positionChoice: "top",
         fontFamily: "Misans 常规",
         fontSize: 12,
-        color: { color: "#333333", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
         suffix: "",
       },
       highlight: false,
@@ -370,13 +374,17 @@ export class MixedLineGroupedColumnChartGenerator extends BaseChartTool {
     // 生成图表配置
     const result = createChartOutput("mixed-line-grouped-column", mergedInput, {
       type: "mixed-line-grouped-column",
-      title: generateDefaultTitle(mergedInput.title, mergedInput.subtitle),
+      title: generateDefaultTitle(
+        mergedInput.title,
+        mergedInput.subtitle,
+        mergedInput.theme || "light"
+      ),
       background: generateDefaultBackground(mergedInput.theme),
       map,
       fill,
       display,
       axis,
-      legend: generateDefaultLegend(true),
+      legend: generateDefaultLegend(true, mergedInput.theme || "light"),
       label,
     });
 

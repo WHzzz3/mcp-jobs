@@ -11,6 +11,11 @@ import {
   generateDefaultLegend,
   getThemeColors,
   getColors,
+  generateDefaultAnimation,
+  getLabelColorByTheme,
+  getAxisLineColorByTheme,
+  getAxisLabelColorByTheme,
+  getGridColorByTheme,
 } from "../utils/chart-helpers";
 
 // 差异箭头柱状图特定输入接口
@@ -85,6 +90,9 @@ export const DifferenceArrowColumnChartInputSchema = z.object({
     .optional()
     .default({}),
   chartType: z.literal("difference-arrow-column"),
+  theme: z.enum(["light", "dark"]).optional().default("light"),
+  width: z.number().optional().default(700),
+  height: z.number().optional().default(400),
 });
 
 export class DifferenceArrowColumnChartGenerator extends BaseChartTool {
@@ -202,14 +210,14 @@ export class DifferenceArrowColumnChartGenerator extends BaseChartTool {
         positionChoice: "top" as const,
         fontFamily: "Misans 常规",
         fontSize: 16,
-        color: { color: "#333333", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
         suffix: "",
       },
       arrowLabel: {
         show: validatedInput.showArrowLabels || false,
         fontFamily: "Misans 常规",
         fontSize: 16,
-        color: { color: "#333333", opacity: 1 },
+        color: getLabelColorByTheme(mergedInput.theme || "light"),
       },
       highlight: false,
       overlap: false,
@@ -223,20 +231,20 @@ export class DifferenceArrowColumnChartGenerator extends BaseChartTool {
           line: {
             show: true,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             direction: "auto" as const,
             fontFamily: "Misans 常规",
             fontSize: 14,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             angle: 0,
           },
           grid: {
             show: false,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "solid" as const,
           },
           position: "bottom" as const,
@@ -248,20 +256,20 @@ export class DifferenceArrowColumnChartGenerator extends BaseChartTool {
           line: {
             show: false,
             width: 1,
-            color: { color: "#4D4D4D", opacity: 1 },
+            color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
             show: true,
             fontFamily: "Misans 常规",
             fontSize: 12,
-            color: { color: "#000000", opacity: 1 },
+            color: getAxisLabelColorByTheme(mergedInput.theme || "light"),
             angle: 0,
             suffix: "",
           },
           grid: {
             show: true,
             width: 1,
-            color: { color: "#D9D9D9", opacity: 1 },
+            color: getGridColorByTheme(mergedInput.theme || "light"),
             type: "dotted" as const,
           },
           position: "left" as const,
@@ -279,28 +287,21 @@ export class DifferenceArrowColumnChartGenerator extends BaseChartTool {
         type: "difference-arrow-column",
         title: generateDefaultTitle(
           validatedInput.title,
-          validatedInput.subtitle
+          validatedInput.subtitle,
+          mergedInput.theme || "light"
         ),
         background: generateDefaultBackground(),
         map,
         fill,
         display,
-        legend: generateDefaultLegend(true),
+        legend: generateDefaultLegend(true, mergedInput.theme || "light"),
         label,
         axis,
         numberFormat: {
           separatorType: "1000.00" as const,
           decimalPlaces: null,
         },
-        animation: {
-          show: false,
-          transition: false,
-          moveStyle: null,
-          duration: 2,
-          startDelay: 0,
-          endPause: 1,
-          loop: false,
-        },
+        animation: generateDefaultAnimation("difference-arrow-column"),
         tooltip: false,
         padding: {
           top: 20,
