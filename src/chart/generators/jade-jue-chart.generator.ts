@@ -265,7 +265,7 @@ export class JadeJueChartGenerator extends BaseChartTool {
         decimalPlaces: null,
       },
       animation: generateDefaultAnimation("jade-jue"),
-      tooltip: false,
+      tooltip: true,
       padding: {
         top: 20,
         bottom: 23,

@@ -226,7 +226,7 @@ export class BarProgressChartGenerator extends BaseChartTool {
         label,
         numberFormat,
         animation,
-        tooltip: false,
+        tooltip: true,
         padding,
       },
     } as BarProgressChartOutput;

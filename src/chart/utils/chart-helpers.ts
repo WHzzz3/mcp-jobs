@@ -457,7 +457,7 @@ export function generateDefaultProps(
     ),
     numberFormat: generateDefaultNumberFormat(),
     animation: generateDefaultAnimation(chartType),
-    tooltip: false,
+    tooltip: true,
     padding: generateDefaultPadding(),
     fill: generateDefaultFill(chartType, theme, dataLength),
     label: generateDefaultLabel(theme),

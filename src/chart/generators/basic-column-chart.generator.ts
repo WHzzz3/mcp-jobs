@@ -266,7 +266,7 @@ export class BasicColumnChartGenerator extends BaseChartTool {
         axis,
         numberFormat,
         animation,
-        tooltip: false,
+        tooltip: true,
         padding,
       },
     };

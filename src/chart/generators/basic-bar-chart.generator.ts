@@ -265,7 +265,7 @@ export class BasicBarChartGenerator extends BaseChartTool {
         axis,
         numberFormat,
         animation,
-        tooltip: false,
+        tooltip: true,
         padding,
       },
     };

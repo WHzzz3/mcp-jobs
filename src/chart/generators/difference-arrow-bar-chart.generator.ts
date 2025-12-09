@@ -303,7 +303,7 @@ export class DifferenceArrowBarChartGenerator extends BaseChartTool {
           decimalPlaces: null,
         },
         animation: generateDefaultAnimation("difference-arrow-bar"),
-        tooltip: false,
+        tooltip: true,
         padding: {
           top: 20,
           bottom: 23,

@@ -228,7 +228,7 @@ export class RiverAreaChartGenerator extends BaseChartTool {
           decimalPlaces: null,
         },
         animation: generateDefaultAnimation("river-area"),
-        tooltip: false,
+        tooltip: true,
         padding: {
           top: 20,
           bottom: 23,

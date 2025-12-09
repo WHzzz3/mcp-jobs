@@ -112,7 +112,7 @@ export class FunnelChartGenerator extends BaseChartTool {
     const fill = {
       controlType: "multiple" as const,
       props: themeColors.map((color: any) => ({
-        color: color,
+        color: { color: color, opacity: 1 },
         texture: { url: "" },
         shadow: {
           show: false,

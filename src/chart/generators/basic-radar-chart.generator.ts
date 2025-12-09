@@ -122,7 +122,7 @@ export class BasicRadarChartGenerator extends BaseChartTool {
     const fill = {
       controlType: "multiple" as const,
       props: themeColors.slice(0, seriesCount).map((color: any) => ({
-        color: color,
+        color: { color: color, opacity: 1 },
         texture: { url: "" },
         shadow: {
           show: false,

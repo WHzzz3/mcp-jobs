@@ -305,7 +305,7 @@ export class BasicLineChartGenerator extends BaseChartTool {
         axis,
         numberFormat,
         animation,
-        tooltip: false,
+        tooltip: true,
         padding,
       },
     } as BasicLineChartOutput;

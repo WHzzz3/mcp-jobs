@@ -259,7 +259,7 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
         decimalPlaces: null,
       },
       animation: generateDefaultAnimation("grouped-column"),
-      tooltip: false,
+      tooltip: true,
       padding: {
         top: 20,
         bottom: 23,

@@ -204,11 +204,12 @@ export class CheckInBubbleChartGenerator extends BaseChartTool {
     // 构建标签配置
     const label = {
       show: validatedInput.showLabels || false,
-      bubbleLabel: {
+      numberLabel: {
         show: validatedInput.showLabels || false,
         fontFamily: "Misans 常规",
         fontSize: 14,
         color: getLabelColorByTheme(mergedInput.theme || "light"),
+        suffix: "",
       },
       highlight: false,
       overlap: false,

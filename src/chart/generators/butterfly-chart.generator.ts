@@ -308,7 +308,7 @@ export class ButterflyChartGenerator extends BaseChartTool {
           decimalPlaces: null,
         },
         animation: generateDefaultAnimation("butterfly"),
-        tooltip: false,
+        tooltip: true,
         padding: {
           top: 20,
           bottom: 23,

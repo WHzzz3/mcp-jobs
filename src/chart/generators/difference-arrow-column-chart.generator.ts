@@ -302,7 +302,7 @@ export class DifferenceArrowColumnChartGenerator extends BaseChartTool {
           decimalPlaces: null,
         },
         animation: generateDefaultAnimation("difference-arrow-column"),
-        tooltip: false,
+        tooltip: true,
         padding: {
           top: 20,
           bottom: 23,

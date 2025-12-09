@@ -251,7 +251,7 @@ export class DonutProgressChartGenerator extends BaseChartTool {
         label,
         numberFormat,
         animation,
-        tooltip: false,
+        tooltip: true,
         padding,
       },
     } as DonutProgressChartOutput;

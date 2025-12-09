@@ -284,7 +284,7 @@ export class CascadedAreaChartGenerator extends BaseChartTool {
         axis,
         numberFormat,
         animation,
-        tooltip: false,
+        tooltip: true,
         padding,
       },
     };

@@ -264,7 +264,7 @@ export class RosePieChartGenerator extends BaseChartTool {
         decimalPlaces: null,
       },
       animation: generateDefaultAnimation("rose-pie"),
-      tooltip: false,
+      tooltip: true,
       padding: {
         top: 20,
         bottom: 23,
