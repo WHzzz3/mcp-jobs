@@ -135,8 +135,9 @@ export type ChartType =
   | "percent-column" //百分比柱状图
   | "percent-stacked-bar" //百分比堆叠条形图
   | "percent-stacked-column" //百分比堆叠柱状图
-  | "dynamic-bar"; //动态条形图
-
+  | "dynamic-bar" //动态条形图
+  | 'dynamic-ranking' //动态排名图
+  | 'chord' //弦图
 /**
  * 图表工具的抽象基类
  */

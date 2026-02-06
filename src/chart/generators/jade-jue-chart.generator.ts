@@ -222,7 +222,7 @@ export class JadeJueChartGenerator extends BaseChartTool {
             color: getAxisLineColorByTheme(mergedInput.theme || "light"),
           },
           label: {
-            show: false,
+            show: true,
             fontFamily: "Misans 常规",
             fontSize: 14,
             color: getAxisLabelColorByTheme(mergedInput.theme || "light"),

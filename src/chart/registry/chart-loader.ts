@@ -30,6 +30,17 @@ import { CascadedAreaChartGenerator } from '../generators/cascaded-area-chart.ge
 import { ButterflyChartGenerator } from '../generators/butterfly-chart.generator';
 import { CheckInBubbleChartGenerator } from '../generators/check-in-bubble-chart.generator';
 import { ComposeWaterfallChartGenerator } from '../generators/compose-waterfall-chart.generator';
+import { SymbolColumnChartGenerator } from '../generators/symbol-column-chart.generator';
+import { SymbolBarChartGenerator } from '../generators/symbol-bar-chart.generator';
+import { SymbolPieChartGenerator } from '../generators/symbol-pie-chart.generator';
+import { LiquidChartGenerator } from '../generators/liquid-chart.generator';
+import { PercentColumnChartGenerator } from '../generators/percent-column-chart.generator';
+import { PercentBarChartGenerator } from '../generators/percent-bar-chart.generator';
+import { PercentStackedColumnChartGenerator } from '../generators/percent-stacked-column-chart.generator';
+import { PercentStackedBarChartGenerator } from '../generators/percent-stacked-bar-chart.generator';
+import { DynamicBarChartGenerator } from '../generators/dynamic-bar-chart.generator';
+import { DynamicRankingChartGenerator } from '../generators/dynamic-ranking-chart.generator';
+import { ChordChartGenerator } from '../generators/chord-chart.generator';
 
 /**
  * 图表加载器配置
@@ -139,6 +150,27 @@ export class ChartLoader {
       // 新增图表
       new CheckInBubbleChartGenerator(),
       new ComposeWaterfallChartGenerator(),
+      
+      // 符号图表
+      new SymbolColumnChartGenerator(),
+      new SymbolBarChartGenerator(),
+      new SymbolPieChartGenerator(),
+      
+      // 水波图
+      new LiquidChartGenerator(),
+      
+      // 百分比图表
+      new PercentColumnChartGenerator(),
+      new PercentBarChartGenerator(),
+      new PercentStackedColumnChartGenerator(),
+      new PercentStackedBarChartGenerator(),
+      
+      // 动态图表
+      new DynamicBarChartGenerator(),
+      new DynamicRankingChartGenerator(),
+      
+      // 弦图
+      new ChordChartGenerator(),
     ];
 
     // 应用包含/排除过滤
@@ -260,8 +292,17 @@ export class ChartLoader {
     if (chartType.includes('basic')) {
       return ChartCategory.BASIC;
     }
-    if (['voronoi', 'sankey', 'treemap'].some(type => chartType.includes(type))) {
+    if (['voronoi', 'sankey', 'treemap', 'chord'].some(type => chartType.includes(type))) {
       return ChartCategory.COMPLEX;
+    }
+    if (chartType.includes('symbol') || chartType.includes('liquid')) {
+      return ChartCategory.COMPLEX;
+    }
+    if (chartType.includes('percent')) {
+      return ChartCategory.STATISTICAL;
+    }
+    if (chartType.includes('dynamic')) {
+      return ChartCategory.STATISTICAL;
     }
 
     // 默认分类
@@ -300,6 +341,15 @@ export class ChartLoader {
       return ['key_value'];
     }
     if (chartType.includes('difference-arrow')) {
+      return ['key_value'];
+    }
+    if (chartType.includes('dynamic-bar')) {
+      return ['cross'];
+    }
+    if (chartType.includes('percent-stacked') || chartType.includes('percent-bar') || chartType.includes('percent-column')) {
+      return ['key_value'];
+    }
+    if (chartType.includes('chord') || chartType.includes('sankey')) {
       return ['key_value'];
     }
     
