@@ -89,7 +89,7 @@ export class DynamicBarChartGenerator extends BaseChartTool {
   }
 
   async generateConfig(
-    input: DynamicBarChartInput
+    input: DynamicBarChartInput,
   ): Promise<DynamicBarChartOutput> {
     // 验证输入
     const validatedInput = DynamicBarChartInputSchema.parse(input);
@@ -106,7 +106,7 @@ export class DynamicBarChartGenerator extends BaseChartTool {
     const seriesCount = dataCols - 1; // 减去分类列
     const themeColors = getThemeColors(
       mergedInput.theme || "light",
-      seriesCount
+      seriesCount,
     );
     const colors =
       getColors(validatedInput.colors, seriesCount) ||
@@ -151,28 +151,30 @@ export class DynamicBarChartGenerator extends BaseChartTool {
     const fill = {
       symbolType: "multiple" as const,
       controlType: "multiple" as const,
-      props: colors.slice(0, seriesCount).map((color: string, index: number) => ({
-        color: { color: color, opacity: 1 },
-        border: {
-          type: "solid" as const,
-          color: null,
-          width: 0,
-        },
-        shadow: {
-          show: false,
-          type: "outer" as const,
-          angle: 45,
-          blur: 0,
-          color: { color: color, opacity: 0.5 },
-          radius: 0,
-        },
-        symbol: {
-          url: `https://cdn.aitubiao.com/static/images/dynamic/flag${index + 1}.svg`,
-        },
-        texture: {
-          url: "",
-        },
-      })),
+      props: colors
+        .slice(0, seriesCount)
+        .map((color: string, index: number) => ({
+          color: { color: color, opacity: 1 },
+          border: {
+            type: "solid" as const,
+            color: null,
+            width: 0,
+          },
+          shadow: {
+            show: false,
+            type: "outer" as const,
+            angle: 45,
+            blur: 0,
+            color: { color: color, opacity: 0.5 },
+            radius: 0,
+          },
+          symbol: {
+            url: `https://cdn.aitubiao.com/static/images/dynamic/flag${index + 1}.svg`,
+          },
+          texture: {
+            url: "",
+          },
+        })),
     };
 
     // 构建显示配置
@@ -189,7 +191,7 @@ export class DynamicBarChartGenerator extends BaseChartTool {
         widthPercent: validatedInput.barWidth || 0.88,
       },
       symbol: {
-        show: true,
+        show: false,
         border: {
           color: null,
           width: 0,
@@ -203,7 +205,10 @@ export class DynamicBarChartGenerator extends BaseChartTool {
 
     // 构建标签配置
     const label = {
-      show: validatedInput.showLabels !== undefined ? validatedInput.showLabels : true,
+      show:
+        validatedInput.showLabels !== undefined
+          ? validatedInput.showLabels
+          : true,
       overlap: false,
       highlight: false,
       textLabel: {
@@ -329,7 +334,7 @@ export class DynamicBarChartGenerator extends BaseChartTool {
       title: generateDefaultTitle(
         mergedInput.title,
         mergedInput.subtitle,
-        mergedInput.theme || "light"
+        mergedInput.theme || "light",
       ),
       background: generateDefaultBackground(mergedInput.theme),
       map,

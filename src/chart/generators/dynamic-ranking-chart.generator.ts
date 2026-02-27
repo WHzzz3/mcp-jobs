@@ -91,7 +91,7 @@ export class DynamicRankingChartGenerator extends BaseChartTool {
   }
 
   async generateConfig(
-    input: DynamicRankingChartInput
+    input: DynamicRankingChartInput,
   ): Promise<DynamicRankingChartOutput> {
     // 验证输入
     const validatedInput = DynamicRankingChartInputSchema.parse(input);
@@ -108,7 +108,7 @@ export class DynamicRankingChartGenerator extends BaseChartTool {
     const seriesCount = dataCols - 1; // 减去分类列
     const themeColors = getThemeColors(
       mergedInput.theme || "light",
-      seriesCount
+      seriesCount,
     );
     const colors =
       getColors(validatedInput.colors, seriesCount) ||
@@ -149,28 +149,32 @@ export class DynamicRankingChartGenerator extends BaseChartTool {
     const fill = {
       symbolType: "multiple" as const,
       controlType: "multiple" as const,
-      props: colors.slice(0, seriesCount).map((color: string, index: number) => ({
-        color: { color: color, opacity: 1 },
-        border: {
-          type: "solid" as const,
-          color: null,
-          width: 0,
-        },
-        shadow: {
-          show: false,
-          type: "outer" as const,
-          angle: index === 0 ? 45 : 0,
-          blur: 0,
-          color: { color: color, opacity: index === 0 ? 0.5 : 1 },
-          radius: 0,
-        },
-        symbol: {
-          url: validatedInput.symbolUrl || `https://cdn.core.editorup.com/image/clzb5ewqk0003j5yc55w8zbuk/1762843729945.png?x-oss-process=image/interlace,1/resize,m_pad,w_96,h_96/quality,Q_60`,
-        },
-        texture: {
-          url: "",
-        },
-      })),
+      props: colors
+        .slice(0, seriesCount)
+        .map((color: string, index: number) => ({
+          color: { color: color, opacity: 1 },
+          border: {
+            type: "solid" as const,
+            color: null,
+            width: 0,
+          },
+          shadow: {
+            show: false,
+            type: "outer" as const,
+            angle: index === 0 ? 45 : 0,
+            blur: 0,
+            color: { color: color, opacity: index === 0 ? 0.5 : 1 },
+            radius: 0,
+          },
+          symbol: {
+            url:
+              validatedInput.symbolUrl ||
+              `https://cdn.core.editorup.com/image/clzb5ewqk0003j5yc55w8zbuk/1762843729945.png?x-oss-process=image/interlace,1/resize,m_pad,w_96,h_96/quality,Q_60`,
+          },
+          texture: {
+            url: "",
+          },
+        })),
     };
 
     // 构建显示配置
@@ -187,7 +191,7 @@ export class DynamicRankingChartGenerator extends BaseChartTool {
         widthPercent: validatedInput.barWidth || 0.7,
       },
       symbol: {
-        show: true,
+        show: false,
         border: {
           color: null,
           width: 1,
@@ -201,7 +205,10 @@ export class DynamicRankingChartGenerator extends BaseChartTool {
 
     // 构建标签配置
     const label = {
-      show: validatedInput.showLabels !== undefined ? validatedInput.showLabels : true,
+      show:
+        validatedInput.showLabels !== undefined
+          ? validatedInput.showLabels
+          : true,
       overlap: false,
       highlight: false,
       rankLabel: {
@@ -319,7 +326,7 @@ export class DynamicRankingChartGenerator extends BaseChartTool {
       title: generateDefaultTitle(
         mergedInput.title,
         mergedInput.subtitle,
-        mergedInput.theme || "light"
+        mergedInput.theme || "light",
       ),
       background: generateDefaultBackground(mergedInput.theme),
       map,
