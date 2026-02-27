@@ -84,7 +84,7 @@ export class BasicColumnChartGenerator extends BaseChartTool {
   }
 
   async generateConfig(
-    input: BasicColumnChartInput
+    input: BasicColumnChartInput,
   ): Promise<BasicColumnChartOutput> {
     // 验证输入
     const validatedInput = BasicColumnChartInputSchema.parse(input);
@@ -95,7 +95,7 @@ export class BasicColumnChartGenerator extends BaseChartTool {
     const dataLength = validatedInput.data[0]?.length - 1 || 5;
     const themeColors = getThemeColors(
       mergedInput.theme || "light",
-      dataLength
+      dataLength,
     );
     const colors =
       getColors(validatedInput.colors, dataLength) ||
@@ -255,9 +255,9 @@ export class BasicColumnChartGenerator extends BaseChartTool {
         title: generateDefaultTitle(
           validatedInput.title,
           validatedInput.subtitle,
-          mergedInput.theme || "light"
+          mergedInput.theme || "light",
         ),
-        background: generateDefaultBackground(),
+        background: generateDefaultBackground(mergedInput.theme || "light"),
         map,
         fill,
         display,

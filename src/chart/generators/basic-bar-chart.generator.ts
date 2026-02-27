@@ -83,7 +83,7 @@ export class BasicBarChartGenerator extends BaseChartTool {
   }
 
   async generateConfig(
-    input: BasicBarChartInput
+    input: BasicBarChartInput,
   ): Promise<BasicBarChartOutput> {
     // 验证输入
     const validatedInput = BasicBarChartInputSchema.parse(input);
@@ -94,7 +94,7 @@ export class BasicBarChartGenerator extends BaseChartTool {
     const dataLength = validatedInput.data[0]?.length - 1 || 5;
     const themeColors = getThemeColors(
       mergedInput.theme || "light",
-      dataLength
+      dataLength,
     );
     const colors =
       getColors(validatedInput.colors, dataLength) ||
@@ -254,9 +254,9 @@ export class BasicBarChartGenerator extends BaseChartTool {
         title: generateDefaultTitle(
           validatedInput.title,
           validatedInput.subtitle,
-          mergedInput.theme || "light"
+          mergedInput.theme || "light",
         ),
-        background: generateDefaultBackground(),
+        background: generateDefaultBackground(mergedInput.theme || "light"),
         map,
         fill,
         display,

@@ -67,7 +67,12 @@ export const LiquidChartInputSchema = z.object({
   theme: z.enum(["light", "dark"]).optional().default("light"),
   width: z.number().optional().default(700),
   height: z.number().optional().default(400),
-  symbolUrl: z.string().optional().default("https://cdn.core.editorup.com/resource/vector/icon/basic/circle-fill.svg"),
+  symbolUrl: z
+    .string()
+    .optional()
+    .default(
+      "https://cdn.core.editorup.com/resource/vector/icon/basic/circle-fill.svg",
+    ),
   iconPerRow: z.number().min(1).optional().default(4),
   showTextLabel: z.boolean().optional().default(true),
   showNumberLabel: z.boolean().optional().default(true),
@@ -83,9 +88,7 @@ export class LiquidChartGenerator extends BaseChartTool {
     return "symbol";
   }
 
-  async generateConfig(
-    input: LiquidChartInput
-  ): Promise<LiquidChartOutput> {
+  async generateConfig(input: LiquidChartInput): Promise<LiquidChartOutput> {
     // 验证输入
     const validatedInput = LiquidChartInputSchema.parse(input);
     const inputWithChartType = { ...validatedInput, chartType: "liquid" };
@@ -99,7 +102,7 @@ export class LiquidChartGenerator extends BaseChartTool {
     const dataLength = validatedInput.data[0].length - 1;
     const themeColors = getThemeColors(
       mergedInput.theme || "light",
-      dataLength
+      dataLength,
     );
     const colors =
       getColors(validatedInput.colors, dataLength) ||
@@ -143,7 +146,9 @@ export class LiquidChartGenerator extends BaseChartTool {
           radius: 0,
         },
         symbol: {
-          url: validatedInput.symbolUrl || "https://cdn.core.editorup.com/resource/vector/icon/basic/circle-fill.svg",
+          url:
+            validatedInput.symbolUrl ||
+            "https://cdn.core.editorup.com/resource/vector/icon/basic/circle-fill.svg",
         },
       })),
     };
@@ -202,9 +207,9 @@ export class LiquidChartGenerator extends BaseChartTool {
         title: generateDefaultTitle(
           validatedInput.title,
           validatedInput.subtitle,
-          mergedInput.theme || "light"
+          mergedInput.theme || "light",
         ),
-        background: generateDefaultBackground(),
+        background: generateDefaultBackground(mergedInput.theme || "light"),
         map,
         fill,
         display,

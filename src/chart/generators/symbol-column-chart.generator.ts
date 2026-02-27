@@ -75,7 +75,12 @@ export const SymbolColumnChartInputSchema = z.object({
   theme: z.enum(["light", "dark"]).optional().default("light"),
   width: z.number().optional().default(700),
   height: z.number().optional().default(400),
-  symbolUrl: z.string().optional().default("https://cdn.core.editorup.com/resource/vector/icon/basic/square-fill.svg"),
+  symbolUrl: z
+    .string()
+    .optional()
+    .default(
+      "https://cdn.core.editorup.com/resource/vector/icon/basic/square-fill.svg",
+    ),
   symbolType: z.enum(["single", "multiple"]).optional().default("single"),
   scaleRatio: z.number().min(0.1).max(1).optional().default(0.76),
   widthPercent: z.number().min(0.1).max(1).optional().default(0.9),
@@ -91,18 +96,21 @@ export class SymbolColumnChartGenerator extends BaseChartTool {
   }
 
   async generateConfig(
-    input: SymbolColumnChartInput
+    input: SymbolColumnChartInput,
   ): Promise<SymbolColumnChartOutput> {
     // 验证输入
     const validatedInput = SymbolColumnChartInputSchema.parse(input);
-    const inputWithChartType = { ...validatedInput, chartType: "symbol-column" };
+    const inputWithChartType = {
+      ...validatedInput,
+      chartType: "symbol-column",
+    };
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
 
     // 获取默认配置
     const dataLength = validatedInput.data[0]?.length - 1 || 5;
     const themeColors = getThemeColors(
       mergedInput.theme || "light",
-      dataLength
+      dataLength,
     );
     const colors =
       getColors(validatedInput.colors, dataLength) ||
@@ -147,7 +155,9 @@ export class SymbolColumnChartGenerator extends BaseChartTool {
             radius: 0,
           },
           symbol: {
-            url: validatedInput.symbolUrl || "https://cdn.core.editorup.com/resource/vector/icon/basic/square-fill.svg",
+            url:
+              validatedInput.symbolUrl ||
+              "https://cdn.core.editorup.com/resource/vector/icon/basic/square-fill.svg",
           },
         },
       ],
@@ -233,9 +243,9 @@ export class SymbolColumnChartGenerator extends BaseChartTool {
         title: generateDefaultTitle(
           validatedInput.title,
           validatedInput.subtitle,
-          mergedInput.theme || "light"
+          mergedInput.theme || "light",
         ),
-        background: generateDefaultBackground(),
+        background: generateDefaultBackground(mergedInput.theme || "light"),
         map,
         fill,
         display,

@@ -105,7 +105,7 @@ export class DifferenceArrowColumnChartGenerator extends BaseChartTool {
   }
 
   async generateConfig(
-    input: DifferenceArrowColumnChartInput
+    input: DifferenceArrowColumnChartInput,
   ): Promise<DifferenceArrowColumnChartOutput> {
     // 验证输入
     const validatedInput = DifferenceArrowColumnChartInputSchema.parse(input);
@@ -288,9 +288,9 @@ export class DifferenceArrowColumnChartGenerator extends BaseChartTool {
         title: generateDefaultTitle(
           validatedInput.title,
           validatedInput.subtitle,
-          mergedInput.theme || "light"
+          mergedInput.theme || "light",
         ),
-        background: generateDefaultBackground(),
+        background: generateDefaultBackground(mergedInput.theme || "light"),
         map,
         fill,
         display,

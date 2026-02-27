@@ -75,7 +75,12 @@ export const SymbolBarChartInputSchema = z.object({
   theme: z.enum(["light", "dark"]).optional().default("light"),
   width: z.number().optional().default(700),
   height: z.number().optional().default(400),
-  symbolUrl: z.string().optional().default("https://cdn.core.editorup.com/resource/vector/icon/basic/square-fill.svg"),
+  symbolUrl: z
+    .string()
+    .optional()
+    .default(
+      "https://cdn.core.editorup.com/resource/vector/icon/basic/square-fill.svg",
+    ),
   symbolType: z.enum(["single", "multiple"]).optional().default("multiple"),
   scaleRatio: z.number().min(0.1).max(1).optional().default(0.82),
   widthPercent: z.number().min(0.1).max(1).optional().default(0.8),
@@ -91,7 +96,7 @@ export class SymbolBarChartGenerator extends BaseChartTool {
   }
 
   async generateConfig(
-    input: SymbolBarChartInput
+    input: SymbolBarChartInput,
   ): Promise<SymbolBarChartOutput> {
     // 验证输入
     const validatedInput = SymbolBarChartInputSchema.parse(input);
@@ -102,7 +107,7 @@ export class SymbolBarChartGenerator extends BaseChartTool {
     const dataLength = validatedInput.data[0]?.length - 1 || 5;
     const themeColors = getThemeColors(
       mergedInput.theme || "light",
-      dataLength
+      dataLength,
     );
     const colors =
       getColors(validatedInput.colors, dataLength) ||
@@ -147,7 +152,9 @@ export class SymbolBarChartGenerator extends BaseChartTool {
             radius: 0,
           },
           symbol: {
-            url: validatedInput.symbolUrl || "https://cdn.core.editorup.com/resource/vector/icon/basic/square-fill.svg",
+            url:
+              validatedInput.symbolUrl ||
+              "https://cdn.core.editorup.com/resource/vector/icon/basic/square-fill.svg",
           },
         },
       ],
@@ -233,9 +240,9 @@ export class SymbolBarChartGenerator extends BaseChartTool {
         title: generateDefaultTitle(
           validatedInput.title,
           validatedInput.subtitle,
-          mergedInput.theme || "light"
+          mergedInput.theme || "light",
         ),
-        background: generateDefaultBackground(),
+        background: generateDefaultBackground(mergedInput.theme || "light"),
         map,
         fill,
         display,

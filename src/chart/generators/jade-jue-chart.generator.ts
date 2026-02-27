@@ -102,7 +102,7 @@ export class JadeJueChartGenerator extends BaseChartTool {
     const dataLength = validatedInput.data[0].length - 1;
     const themeColors = getThemeColors(
       mergedInput.theme || "light",
-      dataLength
+      dataLength,
     );
     const colors =
       getColors(validatedInput.colors, dataLength) ||
@@ -186,7 +186,7 @@ export class JadeJueChartGenerator extends BaseChartTool {
 
     // 构建极坐标轴配置（玉玦图一般不显示轴）
     const axis = {
-      show: false,
+      show: true,
       angleAxis: [
         {
           line: {
@@ -244,9 +244,9 @@ export class JadeJueChartGenerator extends BaseChartTool {
     const title = generateDefaultTitle(
       mergedInput.title,
       mergedInput.subtitle,
-      mergedInput.theme || "light"
+      mergedInput.theme || "light",
     );
-    const background = generateDefaultBackground();
+    const background = generateDefaultBackground(mergedInput.theme || "light");
     const legend = generateDefaultLegend(false, mergedInput.theme || "light");
 
     // 构建最终配置

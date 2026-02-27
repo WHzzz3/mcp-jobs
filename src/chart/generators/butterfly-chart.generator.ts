@@ -90,7 +90,7 @@ export class ButterflyChartGenerator extends BaseChartTool {
   }
 
   async generateConfig(
-    input: ButterflyChartInput
+    input: ButterflyChartInput,
   ): Promise<ButterflyChartOutput> {
     // 验证输入
     const validatedInput = ButterflyChartInputSchema.parse(input);
@@ -294,9 +294,9 @@ export class ButterflyChartGenerator extends BaseChartTool {
         title: generateDefaultTitle(
           validatedInput.title,
           validatedInput.subtitle,
-          mergedInput.theme || "light"
+          mergedInput.theme || "light",
         ),
-        background: generateDefaultBackground(),
+        background: generateDefaultBackground(mergedInput.theme || "light"),
         map: map as any,
         fill,
         display,

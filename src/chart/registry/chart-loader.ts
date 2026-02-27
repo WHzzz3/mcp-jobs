@@ -41,6 +41,7 @@ import { PercentStackedBarChartGenerator } from '../generators/percent-stacked-b
 import { DynamicBarChartGenerator } from '../generators/dynamic-bar-chart.generator';
 import { DynamicRankingChartGenerator } from '../generators/dynamic-ranking-chart.generator';
 import { ChordChartGenerator } from '../generators/chord-chart.generator';
+import { WordCloudChartGenerator } from '../generators/word-cloud-chart.generator';
 
 /**
  * 图表加载器配置
@@ -171,6 +172,9 @@ export class ChartLoader {
       
       // 弦图
       new ChordChartGenerator(),
+      
+      // 词云图
+      new WordCloudChartGenerator(),
     ];
 
     // 应用包含/排除过滤
@@ -292,7 +296,7 @@ export class ChartLoader {
     if (chartType.includes('basic')) {
       return ChartCategory.BASIC;
     }
-    if (['voronoi', 'sankey', 'treemap', 'chord'].some(type => chartType.includes(type))) {
+    if (['voronoi', 'sankey', 'treemap', 'chord', 'word-cloud'].some(type => chartType.includes(type))) {
       return ChartCategory.COMPLEX;
     }
     if (chartType.includes('symbol') || chartType.includes('liquid')) {
@@ -349,7 +353,7 @@ export class ChartLoader {
     if (chartType.includes('percent-stacked') || chartType.includes('percent-bar') || chartType.includes('percent-column')) {
       return ['key_value'];
     }
-    if (chartType.includes('chord') || chartType.includes('sankey')) {
+    if (chartType.includes('chord') || chartType.includes('sankey') || chartType.includes('word-cloud')) {
       return ['key_value'];
     }
     

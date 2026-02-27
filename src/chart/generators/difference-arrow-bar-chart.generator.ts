@@ -105,7 +105,7 @@ export class DifferenceArrowBarChartGenerator extends BaseChartTool {
   }
 
   async generateConfig(
-    input: DifferenceArrowBarChartInput
+    input: DifferenceArrowBarChartInput,
   ): Promise<DifferenceArrowBarChartOutput> {
     // 验证输入
     const validatedInput = DifferenceArrowBarChartInputSchema.parse(input);
@@ -289,9 +289,9 @@ export class DifferenceArrowBarChartGenerator extends BaseChartTool {
         title: generateDefaultTitle(
           validatedInput.title,
           validatedInput.subtitle,
-          mergedInput.theme || "light"
+          mergedInput.theme || "light",
         ),
-        background: generateDefaultBackground(),
+        background: generateDefaultBackground(mergedInput.theme || "light"),
         map,
         fill,
         display,

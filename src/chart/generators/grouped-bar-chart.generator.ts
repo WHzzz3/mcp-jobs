@@ -80,7 +80,7 @@ export class GroupedBarChartGenerator extends BaseChartTool {
   }
 
   async generateConfig(
-    input: GroupedBarChartInput
+    input: GroupedBarChartInput,
   ): Promise<GroupedBarChartOutput> {
     // 验证输入
     const validatedInput = GroupedBarChartInputSchema.parse(input);
@@ -94,7 +94,7 @@ export class GroupedBarChartGenerator extends BaseChartTool {
     // 获取默认配置和颜色
     const themeColors = getThemeColors(
       mergedInput.theme || "light",
-      seriesCount
+      seriesCount,
     );
     const colors =
       getColors(validatedInput.colors, seriesCount) ||
@@ -234,9 +234,9 @@ export class GroupedBarChartGenerator extends BaseChartTool {
     const title = generateDefaultTitle(
       mergedInput.title,
       mergedInput.subtitle,
-      mergedInput.theme || "light"
+      mergedInput.theme || "light",
     );
-    const background = generateDefaultBackground();
+    const background = generateDefaultBackground(mergedInput.theme || "light");
     const legend = generateDefaultLegend(true, mergedInput.theme || "light");
 
     // 构建最终配置

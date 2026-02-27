@@ -84,18 +84,21 @@ export class PercentColumnChartGenerator extends BaseChartTool {
   }
 
   async generateConfig(
-    input: PercentColumnChartInput
+    input: PercentColumnChartInput,
   ): Promise<PercentColumnChartOutput> {
     // 验证输入
     const validatedInput = PercentColumnChartInputSchema.parse(input);
-    const inputWithChartType = { ...validatedInput, chartType: "percent-column" };
+    const inputWithChartType = {
+      ...validatedInput,
+      chartType: "percent-column",
+    };
     const mergedInput = this.mergeWithDefaults(inputWithChartType);
 
     // 获取默认配置
     const dataLength = validatedInput.data[0]?.length - 1 || 5;
     const themeColors = getThemeColors(
       mergedInput.theme || "light",
-      dataLength
+      dataLength,
     );
     const colors =
       getColors(validatedInput.colors, dataLength) ||
@@ -259,9 +262,9 @@ export class PercentColumnChartGenerator extends BaseChartTool {
         title: generateDefaultTitle(
           validatedInput.title,
           validatedInput.subtitle,
-          mergedInput.theme || "light"
+          mergedInput.theme || "light",
         ),
-        background: generateDefaultBackground(),
+        background: generateDefaultBackground(mergedInput.theme || "light"),
         map,
         fill,
         display,

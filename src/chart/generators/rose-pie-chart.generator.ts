@@ -97,7 +97,7 @@ export class RosePieChartGenerator extends BaseChartTool {
     const dataLength = validatedInput.data[0].length - 1;
     const themeColors = getThemeColors(
       mergedInput.theme || "light",
-      dataLength
+      dataLength,
     );
     const colors =
       getColors(validatedInput.colors, dataLength) ||
@@ -243,9 +243,9 @@ export class RosePieChartGenerator extends BaseChartTool {
     const title = generateDefaultTitle(
       mergedInput.title,
       mergedInput.subtitle,
-      mergedInput.theme || "light"
+      mergedInput.theme || "light",
     );
-    const background = generateDefaultBackground();
+    const background = generateDefaultBackground(mergedInput.theme || "light");
     const legend = generateDefaultLegend(false, mergedInput.theme || "light");
 
     // 构建最终配置

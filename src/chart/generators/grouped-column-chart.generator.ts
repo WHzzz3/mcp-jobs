@@ -81,7 +81,7 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
   }
 
   async generateConfig(
-    input: GroupedColumnChartInput
+    input: GroupedColumnChartInput,
   ): Promise<GroupedColumnChartOutput> {
     // 验证输入
     const validatedInput = GroupedColumnChartInputSchema.parse(input);
@@ -98,7 +98,7 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
     // 获取默认配置和颜色
     const themeColors = getThemeColors(
       mergedInput.theme || "light",
-      seriesCount
+      seriesCount,
     );
     const colors =
       getColors(validatedInput.colors, seriesCount) ||
@@ -238,9 +238,9 @@ export class GroupedColumnChartGenerator extends BaseChartTool {
     const title = generateDefaultTitle(
       mergedInput.title,
       mergedInput.subtitle,
-      mergedInput.theme || "light"
+      mergedInput.theme || "light",
     );
-    const background = generateDefaultBackground();
+    const background = generateDefaultBackground(mergedInput.theme || "light");
     const legend = generateDefaultLegend(true, mergedInput.theme || "light");
 
     // 构建最终配置

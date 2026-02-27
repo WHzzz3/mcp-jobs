@@ -92,7 +92,7 @@ export class CascadedAreaChartGenerator extends BaseChartTool {
   }
 
   async generateConfig(
-    input: CascadedAreaChartInput
+    input: CascadedAreaChartInput,
   ): Promise<CascadedAreaChartOutput> {
     // 验证输入
     const validatedInput = CascadedAreaChartInputSchema.parse(input);
@@ -109,7 +109,7 @@ export class CascadedAreaChartGenerator extends BaseChartTool {
     // 获取默认配置
     const themeColors = getThemeColors(
       mergedInput.theme || "light",
-      seriesCount
+      seriesCount,
     );
     const colors =
       getColors(validatedInput.colors, seriesCount) ||
@@ -273,9 +273,9 @@ export class CascadedAreaChartGenerator extends BaseChartTool {
         title: generateDefaultTitle(
           validatedInput.title,
           validatedInput.subtitle,
-          mergedInput.theme || "light"
+          mergedInput.theme || "light",
         ),
-        background: generateDefaultBackground(),
+        background: generateDefaultBackground(mergedInput.theme || "light"),
         map,
         fill,
         display,
