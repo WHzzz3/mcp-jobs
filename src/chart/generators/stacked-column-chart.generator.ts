@@ -79,7 +79,7 @@ export class StackedColumnChartGenerator extends BaseChartTool {
   }
 
   async generateConfig(
-    input: StackedColumnChartInput
+    input: StackedColumnChartInput,
   ): Promise<StackedColumnChartOutput> {
     // 验证输入
     const validatedInput = StackedColumnChartInputSchema.parse(input);
@@ -101,7 +101,7 @@ export class StackedColumnChartGenerator extends BaseChartTool {
     const seriesCount = dataCols - 1; // 减去分类列
     const themeColors = getThemeColors(
       mergedInput.theme || "light",
-      seriesCount
+      seriesCount,
     );
     const colors =
       getColors(validatedInput.colors, seriesCount) ||
@@ -179,7 +179,7 @@ export class StackedColumnChartGenerator extends BaseChartTool {
     // 构建标签配置
     const label = {
       show: validatedInput.showLabels || false,
-      columnLabel: {
+      barLabel: {
         show: validatedInput.showDataLabels || false,
         positionChoice: "center" as const,
         fontFamily: "Misans 常规",
@@ -253,7 +253,7 @@ export class StackedColumnChartGenerator extends BaseChartTool {
       title: generateDefaultTitle(
         mergedInput.title,
         mergedInput.subtitle,
-        mergedInput.theme || "light"
+        mergedInput.theme || "light",
       ),
       background: generateDefaultBackground(mergedInput.theme),
       map,
