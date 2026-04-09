@@ -62,7 +62,7 @@ export const SankeyChartInputSchema = BaseChartInputSchema.extend({
   data: z.array(z.array(z.array(z.union([z.string(), z.number()])))),
   colors: z.array(z.string()).optional(),
   nodeWidth: z.number().min(1).optional().default(10),
-  gapDistance: z.number().min(0).optional().default(5),
+  gapDistance: z.number().min(0).optional().default(8),
   fillOpacity: z.number().min(0).max(1).optional().default(0.3),
   linkColor: z
     .union([z.literal("auto"), z.literal("gradient"), z.string()])
@@ -171,7 +171,7 @@ export class SankeyChartGenerator extends BaseChartTool {
     // 构建显示配置
     const displayConfig: any = {
       sankey: {
-        gapDistance: validatedInput.gapDistance || 5,
+        gapDistance: validatedInput.gapDistance || 8,
         nodeWidth: validatedInput.nodeWidth || 10,
         fillOpacity: validatedInput.fillOpacity || 0.3,
       },
@@ -199,16 +199,16 @@ export class SankeyChartGenerator extends BaseChartTool {
       textLabel: {
         show: true,
         fontFamily: "Misans 常规",
-        fontSize: 14,
+        fontSize: 16,
         color: getLabelColorByTheme(mergedInput.theme || "light"),
         positionChoice: "inside",
       },
       numberLabel: {
-        show: false,
+        show: true,
         fontFamily: "Misans 常规",
-        fontSize: 12,
+        fontSize: 16,
         color: getLabelColorByTheme(mergedInput.theme || "light"),
-        positionChoice: "inside",
+        positionChoice: "outside",
         suffix: "",
       },
       highlight: false,
@@ -221,7 +221,7 @@ export class SankeyChartGenerator extends BaseChartTool {
       title: generateDefaultTitle(
         mergedInput.title,
         mergedInput.subtitle,
-        mergedInput.theme || "light"
+        mergedInput.theme || "light",
       ),
       background: generateDefaultBackground(mergedInput.theme),
       map,
