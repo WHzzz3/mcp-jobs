@@ -175,7 +175,7 @@ export class PercentColumnChartGenerator extends BaseChartTool {
         positionChoice: "top" as const,
         fontFamily: "Misans 中等",
         fontSize: 17.5,
-        color: getLabelColorByTheme(mergedInput.theme || "light"),
+        color: "#FFFFFF",
         suffix: "",
       },
       highlight: false,

@@ -172,7 +172,7 @@ export class PercentBarChartGenerator extends BaseChartTool {
         positionChoice: "right" as const,
         fontFamily: "Misans 中等",
         fontSize: 14.5,
-        color: getLabelColorByTheme(mergedInput.theme || "light"),
+        color: "#FFFFFF",
         suffix: "",
       },
       highlight: false,

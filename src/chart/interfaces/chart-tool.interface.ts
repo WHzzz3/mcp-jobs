@@ -12,6 +12,8 @@ export interface BaseChartInput {
   height?: number;
   theme?: "light" | "dark";
   colors?: string[];
+  columnIndices?: number[]; 
+  lineIndices?: number[];
 }
 
 /**
