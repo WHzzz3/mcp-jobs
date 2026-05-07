@@ -83,7 +83,7 @@ export class StackedAreaChartGenerator extends BaseChartTool {
   }
 
   async generateConfig(
-    input: StackedAreaChartInput
+    input: StackedAreaChartInput,
   ): Promise<StackedAreaChartOutput> {
     // 验证输入
     const validatedInput = StackedAreaChartInputSchema.parse(input);
@@ -102,7 +102,7 @@ export class StackedAreaChartGenerator extends BaseChartTool {
     const seriesCount = dataCols - 1; // 减去分类列
     const themeColors = getThemeColors(
       mergedInput.theme || "light",
-      seriesCount
+      seriesCount,
     );
     const colors =
       getColors(validatedInput.colors, seriesCount) ||
@@ -147,7 +147,7 @@ export class StackedAreaChartGenerator extends BaseChartTool {
     const fill = {
       controlType: "multiple" as const,
       props: colors.slice(0, seriesCount).map((color: string) => ({
-        color: { color: color, opacity: validatedInput.fillOpacity || 0.7 },
+        color: { color: color, opacity: 1 },
         shadow: {
           show: false,
           type: "outer" as const,
@@ -253,7 +253,7 @@ export class StackedAreaChartGenerator extends BaseChartTool {
       title: generateDefaultTitle(
         mergedInput.title,
         mergedInput.subtitle,
-        mergedInput.theme || "light"
+        mergedInput.theme || "light",
       ),
       background: generateDefaultBackground(mergedInput.theme),
       map,

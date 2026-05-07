@@ -77,7 +77,7 @@ export const CascadedAreaChartInputSchema = z.object({
   width: z.number().optional().default(700),
   height: z.number().optional().default(400),
   areaType: z.enum(["straight", "curve"]).optional().default("curve"),
-  areaOpacity: z.number().min(0).max(1).optional().default(0.1),
+  areaOpacity: z.number().min(0).max(1).optional().default(0.7),
   stackMode: z.enum(["normal", "percent"]).optional().default("normal"),
   chartType: z.literal("cascaded-area"),
 });
@@ -145,7 +145,7 @@ export class CascadedAreaChartGenerator extends BaseChartTool {
     const fill = {
       controlType: "multiple" as const,
       props: colors.slice(0, seriesCount).map((color: string) => ({
-        color: { color: color, opacity: validatedInput.areaOpacity || 0.8 },
+        color: { color: color, opacity: 1 },
         texture: { url: "" },
         shadow: {
           show: false,
@@ -172,7 +172,7 @@ export class CascadedAreaChartGenerator extends BaseChartTool {
           width: 0,
           radius: 0,
         },
-        fillOpacity: 0.1,
+        fillOpacity: 0.7,
       },
     };
 
